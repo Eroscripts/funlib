@@ -3,7 +3,7 @@
     "target": "ESNext",
     "jsx": "react-jsx",
     // Environment setup & latest features
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM"],
     "moduleDetection": "force",
     "module": "ESNext",
 
@@ -16,7 +16,7 @@
     "strict": true,
     "noFallthroughCasesInSwitch": true,
     "noPropertyAccessFromIndexSignature": false,
-    "noUncheckedIndexedAccess": true,
+    "noUncheckedIndexedAccess": false,
 
     // Some stricter flags (disabled by default)
     "noUnusedLocals": false,

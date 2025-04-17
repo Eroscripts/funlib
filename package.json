@@ -1,13 +1,18 @@
 {
   "name": "funlib",
   "type": "module",
+  "version": "0.1.0",
   "packageManager": "bun@1.2.10",
+  "author": "Dimava",
   "module": "index.ts",
   "scripts": {
     "lint": "eslint --fix"
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "dependencies": {
+    "colorizr": "^3.0.7"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.12.0",
