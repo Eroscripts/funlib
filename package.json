@@ -1,5 +1,5 @@
 {
-  "name": "funlib",
+  "name": "@eroscripts/funlib",
   "type": "module",
   "version": "0.1.0",
   "packageManager": "bun@1.2.10",
