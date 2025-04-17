@@ -1,17 +1,27 @@
 {
   "name": "discourse-funscript",
-  "module": "index.ts",
   "type": "module",
   "private": true,
-  "devDependencies": {
-    "@types/bun": "latest",
-    "@antfu/eslint-config": "^4.12.0",
-    "eslint": "^9.24.0"
+  "packageManager": "bun@1.2.10",
+  "scripts": {
+    "lint": "eslint --fix"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
-  "scripts": {
-    "lint": "eslint --fix"
+  "dependencies": {
+    "@eroscripts/funlib": "^0.1.1",
+    "@resvg/resvg-js": "^2.6.2",
+    "discourse2": "^1.1.26",
+    "sharp": "^0.34.1"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^4.12.0",
+    "@types/bun": "latest",
+    "@types/node": "^22.14.1",
+    "eslint": "^9.24.0"
+  },
+  "patchedDependencies": {
+    "discourse2@1.1.26": "patches/discourse2@1.1.26.patch"
   }
 }

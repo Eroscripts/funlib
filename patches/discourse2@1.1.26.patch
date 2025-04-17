@@ -1,0 +1,64 @@
+diff --git a/esm/index.d.ts b/esm/index.d.ts
+index de1f73ecf70a176f3be10f056f4e72516977b21f..1dae9a2378b3e514e91c99c912873099c08dd87e 100644
+--- a/esm/index.d.ts
++++ b/esm/index.d.ts
+@@ -67,9 +67,25 @@ export default class DiscourseAPI extends DiscourseAPIGenerated {
+     private url;
+     private "Api-Key"?;
+     private "Api-Username"?;
++    private headers: Record<string, string>;
+     constructor(url: string, opts?: {
+         "Api-Key"?: string;
+         "Api-Username"?: string;
++        headers?: {
++            "accept"?: string;
++            "accept-language"?: string;
++            "content-type"?: string;
++            "dont-chunk"?: string;
++            "sec-ch-ua"?: string;
++            "sec-ch-ua-mobile"?: string;
++            "sec-ch-ua-platform"?: string;
++            "sec-fetch-dest"?: string;
++            "sec-fetch-mode"?: string;
++            "sec-fetch-site"?: string;
++            "x-csrf-token"?: string;
++            "x-requested-with"?: string;
++            "x-silence-logger"?: string;
++        } & Record<string, string>;
+     });
+     _exec<T>(operationName: string, params?: Record<string, string>): Promise<unknown>;
+     createUpload(params: Prettify<Omit<Parameters<DiscourseAPIGenerated["createUpload"]>[0], "file"> & {
+diff --git a/esm/index.js b/esm/index.js
+index 1aec9b98a81967f10408e7c861bb31a12f1b5b2d..877f5102cde8ecddcb7ea065e6abc7a60d9d3a24 100644
+--- a/esm/index.js
++++ b/esm/index.js
+@@ -223,11 +223,18 @@ export default class DiscourseAPI extends DiscourseAPIGenerated {
+             writable: true,
+             value: void 0
+         });
++        Object.defineProperty(this, "headers", {
++            enumerable: true,
++            configurable: true,
++            writable: true,
++            value: void 0
++        });
+         this.url = url;
+         if (opts["Api-Key"])
+             this["Api-Key"] = opts["Api-Key"];
+         if (opts["Api-Username"])
+             this["Api-Username"] = opts["Api-Username"];
++        this.headers = opts.headers && typeof opts.headers === 'object' ? { ...opts.headers } : {};
+     }
+     async _exec(operationName, params = {}) {
+         const operation = byOperationId[operationName];
+@@ -337,7 +344,9 @@ export default class DiscourseAPI extends DiscourseAPIGenerated {
+             const error = new ParamaterValidationError(message, errors);
+             throw error;
+         }
+-        // Do this after validation (of user headers)
++        // Merge constructor headers
++        Object.assign(header, this.headers);
++        // Do this after validation (of user headers) and merging constructor headers
+         if (contentType)
+             header["Content-Type"] = contentType;
+         // Sometimes the OpenAPI doesn't list the Api-Key and Api-Username as parameters
