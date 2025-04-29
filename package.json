@@ -20,7 +20,8 @@
     }
   },
   "scripts": {
-    "lint": "eslint --fix"
+    "lint": "eslint --fix",
+    "build:iife": "bun build src/iife.ts --target browser --outdir dist --format iife"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^4.12.0",
     "@types/bun": "latest",
+    "@types/w3c-web-serial": "^1.0.8",
     "eslint": "^9.24.0"
   }
 }

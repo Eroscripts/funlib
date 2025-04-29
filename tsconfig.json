@@ -9,6 +9,7 @@
 
     // Bundler mode
     "moduleResolution": "bundler",
+    "types": ["w3c-web-serial"],
     "allowImportingTsExtensions": true,
     "allowJs": true,
 
