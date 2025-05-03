@@ -1,6 +1,7 @@
 import type { Funscript } from '.'
-import type { axisPairs } from './types'
+import type { axis, axisLike, axisName, axisNorm, axisPairs, axisRaw, ms, pos, seconds, speed, timeSpan } from './types'
 import { oklch2hex } from 'colorizr'
+import { clamplerp, compareWithOrder } from './misc'
 
 export function timeSpanToMs(timeSpan: timeSpan): ms {
   if (typeof timeSpan !== 'string') {
@@ -37,7 +38,7 @@ export function secondsToDuration(seconds: seconds): string {
     Math.floor(seconds % 60).toFixed(0).padStart(2, '0')}`
 }
 
-export function rawToValue(raw: axisRaw, axis?: axis): axisValue {
+export function rawToValue(raw: axisRaw, axis?: axis): pos {
   if (raw === undefined || raw === null) {
     throw new Error('rawToValue: raw value is required')
   }
@@ -49,14 +50,11 @@ export function rawToValue(raw: axisRaw, axis?: axis): axisValue {
   if (axis === 'R1') norm = raw / 60 + 0.5
   if (axis === 'R2') norm = raw / 60 + 0.5
 
-  if (axis === 'L1') norm = raw / 60 + 0.5
-  if (axis === 'L2') norm = raw / 60 + 0.5
-
   if (norm === -999) throw new Error(`rawToValue: ${axis} is not supported`)
   return norm * 100
 }
 
-export function valueToRaw(value: axisValue, axis?: axis): axisRaw {
+export function valueToRaw(value: pos, axis?: axis): axisRaw {
   // axisValue is [0, 100]
   // L0 is [0, 1]; R0 is [-60, 60]; R1, R2 is [-30, 30]; L1/L2 is throw
   const norm: axisNorm = value / 100
@@ -67,7 +65,7 @@ export function valueToRaw(value: axisValue, axis?: axis): axisRaw {
   throw new Error(`valueToRaw: ${axis} is not supported`)
 }
 
-export function roundAxisValue(value: axisValue): axisValue {
+export function roundAxisValue(value: pos): pos {
   return +value.toFixed(2)
 }
 
@@ -123,32 +121,9 @@ export function axisLikeToAxis(axisLike?: axisLike | 'singleaxis'): axis {
   if (axisLike === 'singleaxis') return 'L0'
   throw new Error(`axisLikeToAxis: ${axisLike} is not supported`)
 }
+
 export function orderByAxis(a: Funscript, b: Funscript) {
-  return axisLikes.indexOf(a.axis!) - axisLikes.indexOf(b.axis!)
-}
-
-export function fileNameToInfo(filePath?: string) {
-  const parts = filePath?.split('.') ?? []
-  if (parts.at(-1) === 'funscript') parts.pop()
-  let axisLike = parts.at(-1)
-  if (axisLikes.includes(axisLike as any)) {
-    parts.pop()
-  }
-  else if (axisLike === 'singleaxis') {
-    parts.pop()
-  }
-  else {
-    axisLike = undefined
-  }
-  const fileName = parts.join('.')
-
-  return {
-    filePath,
-    fileName,
-    primary: !axisLike || axisLike === 'singleaxis',
-    title: fileName.split(/[\\/]/).pop()!,
-    axis: axisLike ? axisLikeToAxis(axisLike as any) : undefined,
-  }
+  return compareWithOrder(a.id, b.id, axisIds)
 }
 
 export function formatJson(json: string, { lineLength = 100, maxPrecision = 1 }: { lineLength?: number, maxPrecision?: number } = {}): string {
@@ -193,35 +168,39 @@ export function formatJson(json: string, { lineLength = 100, maxPrecision = 1 }:
   return json
 }
 
-export function speedToOklch(speed: speed): [l: number, c: number, h: number] {
-  const clamp = (min: number, want: number, max: number) => Math.max(min, Math.min(want, max))
-  const lerp = (min: number, max: number, t: number) => min + t * (max - min)
-  const unlerp = (min: number, max: number, t: number) => (t - min) / (max - min)
-  function clamplerp(
-    outMin: number,
-    outMax: number,
-    inMin: number,
-    inMax: number,
-    t: number,
-  ) {
-    return lerp(outMin, outMax, clamp(0, unlerp(inMin, inMax, t), 1))
-  }
+export const oklchParams = {
+  l: { left: 500, right: 600, from: 0.8, to: 0.4 },
+  c: { left: 800, right: 900, from: 0.4, to: 0.1 },
+  h: { speed: -2.4, offset: 210 },
+  a: { left: 0, right: 100, from: 0, to: 1 },
+}
+
+/**
+ * in css:
+ * `oklch(
+ *    clamp(40%, calc(80% - 0.4% * (var(--speed) - 500)), 80%)
+ *    clamp(10%, calc(40% - 0.3% * (var(--speed) - 800)), 40%)
+ *    calc(210 - var(--speed) / 2.4))`
+ */
+export function speedToOklch(speed: speed, useAlpha = false, params = oklchParams) {
   function roll(value: number, cap: number) {
     return (value % cap + cap) % cap
   }
-  return [
-    clamplerp(0.8, 0.4, 500, 700, speed),
-    clamplerp(0.4, 0.1, 500, 800, speed),
-    roll(210 - speed / 2.4, 360),
-  ]
+  const l = clamplerp(speed, params.l.left, params.l.right, params.l.from, params.l.to)
+  const c = clamplerp(speed, params.c.left, params.c.right, params.c.from, params.c.to)
+  const h = roll(params.h.offset + speed / params.h.speed, 360)
+  const a = useAlpha ? clamplerp(speed, params.a.left, params.a.right, params.a.from, params.a.to) : 1
+
+  return [l, c, h, a]
 }
-/**
- * in css:
- * oklch(
-    max(40%, min(80%, calc(80% + (var(--speed) - 500) / 250 * -40%)))
-    max(10%, min(40%, calc(40% + (var(--speed) - 500) / 300 * -30%)))
-    calc(210 - var(--speed) / 2.4))
- */
+
+export function speedToOklchText(speed: speed, useAlpha = false) {
+  const [l, c, h, a] = speedToOklch(speed, useAlpha)
+  function toFixed(value: number, precision: number) {
+    return value.toFixed(precision).replace(/\.?0+$/, '')
+  }
+  return `oklch(${toFixed(l * 100, 3)}% ${toFixed(c, 3)} ${toFixed(h, 1)}${useAlpha ? ` / ${toFixed(a, 3)}` : ''})`
+}
 
 export function speedToHex(speed: speed) {
   const [l, c, h] = speedToOklch(speed)

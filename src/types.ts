@@ -36,7 +36,7 @@ export type at = ms
 
 export interface JsonAction {
   at: ms
-  pos: axisValue
+  pos: pos
 }
 export interface JsonChapter {
   name: chapterName
@@ -59,6 +59,7 @@ export interface JsonMetadata {
   // video_url?: string
 }
 export interface JsonFunscript {
+  id?: axis
   actions: JsonAction[]
   // ids are L0..R2
   axes?: { id: axis, actions: JsonAction[] }[]
@@ -66,27 +67,4 @@ export interface JsonFunscript {
   // inverted?: boolean
   // range?: number
   // version?: string
-}
-
-declare global {
-    type mantissa = import('./types').mantissa
-    type ms = import('./types').ms
-    type seconds = import('./types').seconds
-    type timeSpan = import('./types').timeSpan
-    type speed = import('./types').speed
-    type axisValue = import('./types').axisValue
-    type axisNorm = import('./types').axisNorm
-    type axisAngle = import('./types').axisAngle
-    type axisRaw = import('./types').axisRaw
-    type axis = import('./types').axis
-    type axisName = import('./types').axisName
-    type axisLike = import('./types').axisLike
-    type AxisToName = import('./types').AxisToName
-    type chapterName = import('./types').chapterName
-    type pos = import('./types').pos
-    type at = import('./types').at
-    type JsonAction = import('./types').JsonAction
-    type JsonChapter = import('./types').JsonChapter
-    type JsonMetadata = import('./types').JsonMetadata
-    type JsonFunscript = import('./types').JsonFunscript
 }

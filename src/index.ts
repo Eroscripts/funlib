@@ -1,55 +1,64 @@
 import type { SvgOptions } from './svg'
-import { axisLikeToAxis, fileNameToInfo, formatJson, msToTimeSpan, orderByAxis, orderTrimJson, rawToValue, secondsToDuration, timeSpanToMs, valueToRaw } from './converter'
+import type { axis, axisLike, chapterName, JsonAction, JsonChapter, JsonFunscript, JsonMetadata, ms, pos, seconds, speed, timeSpan } from './types'
+import { axisLikes, axisLikeToAxis, formatJson, msToTimeSpan, orderByAxis, orderTrimJson, secondsToDuration, timeSpanToMs } from './converter'
 import { actionsAverageSpeed, actionsRequiredMaxSpeed } from './manipulations'
-import { defineValue, speedBetween } from './misc'
-import { toSvgElement } from './svg'
+import { clamp, clamplerp, speedBetween } from './misc'
+import { svgDefaultOptions, toSvgElement } from './svg'
 
 export { speedToOklch } from './converter'
 export { handySmooth } from './manipulations'
+export * from './types'
 
-export interface JsonAction {
-  at: ms
-  pos: axisValue
-}
-
-interface ActionLike {
-  axis?: axis
-  at: ms
-  pos: axisValue
-}
-
-export class FunAction implements ActionLike {
-  axis?: axis
-  prevAction?: FunAction
-  nextAction?: FunAction
-  at: ms = 0
-  pos: axisValue = 0
-
-  constructor(action?: ActionLike, extras?: { axis?: axis }) {
-    Object.assign(this, action)
-    defineValue(this, 'axis', extras?.axis ?? (action as FunAction)?.axis)
-    defineValue(this, 'prevAction')
-    defineValue(this, 'nextAction')
+export class FunAction implements JsonAction {
+  // --- Static Methods ---
+  static linkList(list: FunAction[], extras: { parent?: Funscript | true }) {
+    if (extras?.parent === true) extras.parent = list[0]?.parent
+    for (let i = 1; i < list.length; i++) {
+      list[i].#prevAction = list[i - 1]
+      list[i - 1].#nextAction = list[i]
+      if (extras?.parent) list[i].#parent = extras.parent
+    }
+    return list
   }
+
+  // --- Public Instance Properties ---
+  at: ms = 0
+  pos: pos = 0
+
+  // --- Private Instance Properties ---
+  #parent?: Funscript
+  #prevAction?: FunAction
+  #nextAction?: FunAction
+
+  // --- Constructor ---
+  constructor(action?: JsonAction, extras?: { parent?: Funscript }) {
+    Object.assign(this, action)
+    this.#parent = extras && 'parent' in extras
+      ? extras.parent
+      : (action instanceof FunAction ? action.#parent : undefined)
+  }
+
+  // --- Getters ---
+  get nextAction(): FunAction | undefined { return this.#nextAction }
+  get prevAction(): FunAction | undefined { return this.#prevAction }
+  get parent(): Funscript | undefined { return this.#parent }
 
   /** speed from prev to this */
   get speedTo(): speed {
-    if (!this.prevAction) return 0 as speed
-    return speedBetween(this.prevAction, this)
+    return speedBetween(this.#prevAction, this)
   }
 
   /** speed from this to next */
   get speedFrom(): speed {
-    if (!this.nextAction) return 0 as speed
-    return speedBetween(this, this.nextAction)
+    return speedBetween(this, this.#nextAction)
   }
 
   get isPeak(): -1 | 0 | 1 {
     const { speedTo, speedFrom } = this
     // if there is no prev or next action, it's a peak because we need peaks at corners
-    if (!this.prevAction && !this.nextAction) return 1
-    if (!this.prevAction) return speedFrom < 0 ? 1 : 1
-    if (!this.nextAction) return speedTo > 0 ? -1 : -1
+    if (!this.#prevAction && !this.#nextAction) return 1
+    if (!this.#prevAction) return speedFrom < 0 ? 1 : 1
+    if (!this.#nextAction) return speedTo > 0 ? -1 : -1
 
     if (Math.sign(speedTo) === Math.sign(speedFrom)) return 0
 
@@ -60,49 +69,63 @@ export class FunAction implements ActionLike {
 
   /** Time difference to next action in milliseconds */
   get datNext(): ms {
-    if (!this.nextAction) return 0 as ms
-    return (this.nextAction.at - this.at) as ms
+    if (!this.#nextAction) return 0 as ms
+    return (this.#nextAction.at - this.at) as ms
   }
 
-  get dposNext(): axisValue {
-    if (!this.nextAction) return 0 as axisValue
-    return this.nextAction.pos - this.pos
+  get datPrev(): ms {
+    if (!this.#prevAction) return 0 as ms
+    return (this.at - this.#prevAction.at) as ms
   }
 
-  get time(): seconds { return this.at / 1000 }
-  set time(v: seconds) { this.at = v * 1000 }
+  get dposNext(): pos {
+    if (!this.#nextAction) return 0 as pos
+    return this.#nextAction.pos - this.pos
+  }
 
-  get value(): axisValue { return this.pos }
-  set value(v: axisValue) { this.pos = v }
+  get dposPrev(): pos {
+    if (!this.#prevAction) return 0 as pos
+    return this.pos - this.#prevAction.pos
+  }
 
-  get norm(): axisNorm { return this.value / 100 }
-  set norm(v: axisNorm) { this.value = v * 100 }
+  // get raw(): axisRaw { return valueToRaw(this.value, this.#parent?.id) }
+  // set raw(v: axisRaw) { this.value = rawToValue(v, this.#parent?.id) }
 
-  get raw(): axisRaw { return valueToRaw(this.value, this.axis) }
-  set raw(v: axisRaw) { this.value = rawToValue(v, this.axis) }
+  // --- Public Instance Methods ---
+  clerpAt(at: ms): pos {
+    if (at === this.at) return this.pos
+    if (at < this.at) {
+      if (!this.#prevAction) return this.pos
+      return clamplerp(at, this.#prevAction.at, this.at, this.#prevAction.pos, this.pos)
+    }
+    if (at > this.at) {
+      if (!this.#nextAction) return this.pos
+      return clamplerp(at, this.at, this.#nextAction.at, this.pos, this.#nextAction.pos)
+    }
+    return this.pos
+  }
 
+  // --- JSON & Clone Section ---
   static jsonOrder = { at: undefined, pos: undefined }
+  static cloneList(list: JsonAction[], extras: { parent?: Funscript | true }) {
+    const parent = extras?.parent === true ? (list[0] as FunAction)?.parent : extras?.parent
+    const newList = list.map(e => new FunAction(e, { parent }))
+    return FunAction.linkList(newList, extras)
+  }
+
   toJSON() {
     return orderTrimJson({
       ...this,
       at: +this.at.toFixed(1),
       pos: +this.pos.toFixed(1),
-      axis: undefined,
     }, FunAction.jsonOrder, {})
   }
 
-  static cloneList(list: ActionLike[], extras?: { axis?: axis }) {
-    const newList = list.map(e => new FunAction(e, { axis: e.axis, ...extras }))
-    FunAction.linkList(newList)
-    return newList
-  }
-
-  static linkList(list: FunAction[]) {
-    for (let i = 1; i < list.length; i++) {
-      list[i].prevAction = list[i - 1]
-      list[i - 1].nextAction = list[i]
-    }
-    return list
+  clone(): FunAction {
+    // NOTE: This creates a shallow clone. The private #prevAction, #nextAction
+    // will be undefined in the new clone. They need to be relinked if the clone
+    // is part of a list (e.g., using FunAction.linkList).
+    return new FunAction(this, { parent: this.#parent })
   }
 }
 
@@ -117,15 +140,10 @@ export class FunChapter implements JsonChapter {
     this.endTime = chapter?.endTime ?? '00:00:00.000'
   }
 
-  get start(): seconds { return timeSpanToMs(this.startTime) / 1000 }
-  set start(v: seconds) { this.startTime = msToTimeSpan(v * 1000) }
-  get end(): seconds { return timeSpanToMs(this.endTime) / 1000 }
-  set end(v: seconds) { this.endTime = msToTimeSpan(v * 1000) }
-
-  get startMs(): ms { return timeSpanToMs(this.startTime) }
-  set startMs(v: ms) { this.startTime = msToTimeSpan(v) }
-  get endMs(): ms { return timeSpanToMs(this.endTime) }
-  set endMs(v: ms) { this.endTime = msToTimeSpan(v) }
+  get startAt(): ms { return timeSpanToMs(this.startTime) }
+  set startAt(v: ms) { this.startTime = msToTimeSpan(v) }
+  get endAt(): ms { return timeSpanToMs(this.endTime) }
+  set endAt(v: ms) { this.endTime = msToTimeSpan(v) }
 
   static jsonOrder = { startTime: undefined, endTime: undefined, name: undefined }
   toJSON() {
@@ -144,10 +162,8 @@ export class FunBookmark {
     this.time = bookmark?.time ?? '00:00:00.000'
   }
 
-  get start(): seconds { return timeSpanToMs(this.time) / 1000 }
-  set start(v: seconds) { this.time = msToTimeSpan(v * 1000) }
-  get startMs(): ms { return timeSpanToMs(this.time) }
-  set startMs(v: ms) { this.time = msToTimeSpan(v) }
+  get startAt(): ms { return timeSpanToMs(this.time) }
+  set startAt(v: ms) { this.time = msToTimeSpan(v) }
 
   static jsonOrder = { time: undefined, name: undefined }
   toJSON() {
@@ -158,21 +174,30 @@ export class FunBookmark {
 }
 
 export class FunMetadata implements JsonMetadata {
+  // --- Public Instance Properties ---
   duration: seconds = 0
   chapters: FunChapter[] = []
   bookmarks: FunBookmark[] = []
+  // TODO: Add other metadata properties here if they should be public
   // declare durationIsExact: boolean
 
+  // --- Constructor ---
   constructor(metadata?: JsonMetadata) {
     Object.assign(this, metadata)
     if (metadata?.bookmarks) this.bookmarks = metadata.bookmarks.map(e => new FunBookmark(e))
     if (metadata?.chapters) this.chapters = metadata.chapters.map(e => new FunChapter(e))
     if (metadata?.duration) this.duration = metadata.duration
-    if (this.duration > 36_000) // 10 hours
+    if (this.duration > 36_000) { // 10 hours
+      const text = `FunMetadata: duration ${this.duration} is greater than 10 hours, parsing as milliseconds`
+      console.warn(text)
+      // eslint-disable-next-line no-alert
+      if (typeof alert === 'function') alert(text)
       this.duration /= 1000
-    // defineValue(this, 'durationIsExact', !!((metadata as any)?.durationIsExact))
+    }
+    // Assign other metadata properties if necessary
   }
 
+  // --- JSON & Clone Section ---
   static emptyJson = {
     bookmarks: [],
     chapters: [],
@@ -186,6 +211,7 @@ export class FunMetadata implements JsonMetadata {
     title: '',
     type: 'basic',
     video_url: '',
+    // Need to list all potential metadata fields here
   }
 
   static jsonOrder = {
@@ -195,6 +221,8 @@ export class FunMetadata implements JsonMetadata {
     duration: undefined,
     chapters: undefined,
     bookmarks: undefined,
+    // Need to list all potential metadata fields here in desired order
+    // TODO: add the rest
   }
 
   toJSON() {
@@ -203,71 +231,114 @@ export class FunMetadata implements JsonMetadata {
       duration: +this.duration.toFixed(3),
     }, FunMetadata.jsonOrder, FunMetadata.emptyJson)
   }
+
+  clone(): FunMetadata {
+    // Create a deep clone to avoid modifying the original's chapters/bookmarks
+    const clonedData = JSON.parse(JSON.stringify(this.toJSON()))
+    return new FunMetadata(clonedData)
+  }
+}
+
+export class FunscriptFile {
+  axisName: axisLike | '' = ''
+  title: string = ''
+  dir: string = ''
+
+  constructor(filePath: string) {
+    let parts = filePath.split('.')
+    if (parts.at(-1) === 'funscript') parts.pop()
+    const axisLike = parts.at(-1)
+    if (axisLikes.includes(axisLike as any)) {
+      this.axisName = parts.pop()! as any
+    }
+    filePath = parts.join('.')
+    parts = filePath.split(/[\\/]/)
+    this.title = parts.pop()!
+    this.dir = filePath.slice(0, -this.title.length)
+  }
+
+  get id(): axis {
+    return !this.axisName ? 'L0' : axisLikeToAxis(this.axisName)
+  }
+
+  get filePath(): string {
+    return `${this.dir}${this.title}${this.axisName ? `.${this.axisName}` : ''}.funscript`
+  }
+
+  clone() {
+    return new FunscriptFile(this.filePath)
+  }
 }
 
 export class Funscript implements JsonFunscript {
-  axis?: axis
+  // --- Static Methods ---
+  static svgDefaultOptions = svgDefaultOptions
+
+  static toSvgElement(scripts: Funscript[], ops: SvgOptions): string {
+    return toSvgElement(scripts, ops)
+  }
+
+  /** merge multi-axis scripts into one */
+  static mergeMultiAxis(scripts: Funscript[]): Funscript[] {
+    const groups = Object.groupBy(scripts, e => e.#file?.title ?? '[unnamed]')
+    return Object.entries(groups).flatMap<Funscript>(([_title, scripts]) => {
+      if (!scripts) return []
+      // base case: no duplicate axes
+      const allScripts = scripts.flatMap(e => [e, ...e.axes])
+      const axes = [...new Set(allScripts.map(e => e.id))]
+      if (axes.length === allScripts.length) {
+        // merge them all into a single script
+        const L0 = allScripts.find(e => e.id === 'L0')
+        return new Funscript({
+          actions: [],
+          ...L0,
+          axes: allScripts.sort(orderByAxis).filter(e => e.id !== 'L0') as any[],
+        })
+      }
+      throw new Error('Funscript: multi-axis scripts are not implemented yet')
+    })
+  }
+
+  // --- Public Instance Properties ---
+  id: axis = 'L0'
   actions: FunAction[] = []
-  axes: FunSecondaryScript[] = []
+  axes: AxisScript[] = []
   metadata: FunMetadata = new FunMetadata()
-  filePath: string = ''
-  declare parent?: Funscript
 
-  declare _isForHandy?: string
+  // --- Private Instance Properties ---
+  #parent?: Funscript
+  #file?: FunscriptFile
 
-  constructor(funscript?: JsonFunscript, extras?: { axis?: axisLike, filePath?: string, axes?: JsonFunscript[] }) {
+  // --- Constructor ---
+  constructor(
+    funscript?: JsonFunscript,
+    extras?: { id?: axis, file?: string, axes?: JsonFunscript[], parent?: Funscript },
+  ) {
     Object.assign(this, funscript)
-    defineValue(this, 'parent')
 
-    if (extras?.axis) this.axis = axisLikeToAxis(extras.axis)
+    if (extras?.file) this.#file = new FunscriptFile(extras.file)
+    this.id = extras?.id ?? this.#file?.id ?? funscript?.id ?? 'L0'
+
     if (funscript?.actions) {
-      this.actions = FunAction.cloneList(funscript.actions, { axis: this.axis })
+      this.actions = FunAction.cloneList(funscript.actions, { parent: this })
     }
     if (funscript?.metadata) this.metadata = new FunMetadata(funscript.metadata)
-    if (extras?.filePath) this.filePath = extras.filePath
+    else if (funscript instanceof Funscript) this.#file = funscript.#file?.clone()
 
     if (extras?.axes) {
       if (funscript?.axes?.length) throw new Error('FunFunscript: both axes and axes are defined')
-      this.axes = extras.axes.map(e => new FunSecondaryScript(e, { parent: this }))
+      this.axes = extras.axes.map(e => new AxisScript(e, { parent: this })).sort(orderByAxis)
     }
     else if (funscript?.axes) {
-      this.axes = funscript.axes.map(e => new FunSecondaryScript(e, { parent: this }))
+      this.axes = funscript.axes.map(e => new AxisScript(e, { parent: this })).sort(orderByAxis)
     }
+    if (extras?.parent) this.#parent = extras.parent
   }
 
-  set id(v: axisLike) { this.axis = axisLikeToAxis(v) }
-  get id(): axis { return this.axis ?? 'L0' }
-
-  static emptyJson = {
-    axes: [],
-    metadata: {},
-    inverted: false,
-    range: 100,
-    version: '1.0',
-  }
-
-  static jsonOrder = {
-    metadata: undefined,
-    actions: undefined,
-    axes: undefined,
-  }
-
-  toJSON() {
-    return orderTrimJson({
-      ...this,
-      axis: undefined,
-      filePath: undefined,
-      metadata: {
-        title: this.filePath ? fileNameToInfo(this.filePath).title : '',
-        ...this.metadata.toJSON(),
-      },
-      axes: this.axes.slice().sort(orderByAxis),
-    }, Funscript.jsonOrder, Funscript.emptyJson)
-  }
-
-  toJsonText() {
-    return formatJson(JSON.stringify(this, null, 2))
-  }
+  // --- Getters/Setters ---
+  get parent(): Funscript | undefined { return this.#parent }
+  set parent(v: Funscript | undefined) { this.#parent = v }
+  get file(): FunscriptFile | undefined { return this.#file }
 
   get duration(): seconds {
     if (this.metadata.duration) return this.metadata.duration
@@ -293,12 +364,7 @@ export class Funscript implements JsonFunscript {
     return metadataDuration
   }
 
-  getAxis(axis?: axisLike): Funscript {
-    if (!axis) return this
-    if (axis === 'L0' && !this.axes.find(e => e.id === 'L0')) return this
-    return this.axes.find(e => e.id === axis)!
-  }
-
+  // --- Public Instance Methods ---
   toStats() {
     const MaxSpeed = actionsRequiredMaxSpeed(this.actions)
     const AvgSpeed = actionsAverageSpeed(this.actions)
@@ -311,96 +377,96 @@ export class Funscript implements JsonFunscript {
     }
   }
 
-  toSvgElement(ops: SvgOptions = {}) {
+  toSvgElement(ops: SvgOptions = {}): string {
     return toSvgElement([this], { ...ops })
   }
 
-  static toSvgElement(scripts: Funscript[], ops: SvgOptions) {
-    return toSvgElement(scripts, ops)
-  }
-
-  /** merge multi-axis scripts into one */
-  static mergeMultiAxis(scripts: Funscript[]): Funscript[] {
-    function scriptName(s: Funscript) {
-      return fileNameToInfo(s.filePath!).fileName
-    }
-    const baseNames = [...new Set(scripts.map(scriptName))]
-    return baseNames.flatMap((name) => {
-      let ss = scripts.filter(s => scriptName(s) === name)
-      const multiAxis = ss.filter(s => s.axes?.length)
-      ss = ss.filter(s => !s.axes?.length)
-      if (ss.length === 0) return multiAxis
-
-      const primary = ss.find(s => fileNameToInfo(s.filePath).primary) ?? ss[0]
-      ss.splice(ss.indexOf(primary), 1)
-      ss.map(e => e.id = e.filePath!.split('.').at(-2)! as any)
-      ss.map(e => e.parent = primary)
-      ss.sort(orderByAxis)
-      return [...multiAxis, new Funscript(primary, {
-        axis: fileNameToInfo(primary.filePath).axis,
-        axes: ss,
-        filePath: primary.filePath,
-      })]
-    })
-  }
-
-  /**
-   * Sets actions while ensuring they have proper prev/next references.
-   */
-  setActions(actions: ActionLike[]) {
-    this.actions = FunAction.cloneList(actions, { axis: this.axis })
-  }
-
   normalize() {
-    this.axes.map(e => e.normalize())
+    this.axes.forEach(e => e.normalize())
+
     this.actions.forEach((e) => {
       e.at = Math.round(e.at) || 0
-      e.pos = Math.round(e.pos) || 0
-      e.pos = Math.max(0, Math.min(e.pos, 100))
+      e.pos = clamp(Math.round(e.pos) || 0, 0, 100)
     })
     this.actions.sort((a, b) => a.at - b.at)
-    FunAction.linkList(this.actions)
+    this.actions = this.actions.filter((e, i, a) => {
+      if (!i) return true
+      return a[i - 1].at < e.at
+    })
+    const negativeActions = this.actions.filter(e => e.at < 0)
+    if (negativeActions.length) {
+      this.actions = this.actions.filter(e => e.at >= 0)
+      if (this.actions[0]?.at > 0) {
+        const lastNegative = negativeActions.at(-1)!
+        lastNegative.at = 0
+        this.actions.unshift(lastNegative)
+      }
+    }
+    FunAction.linkList(this.actions, { parent: this })
 
-    const duration = this.actualDuration
+    const duration = Math.ceil(this.actualDuration)
     this.metadata.duration = duration
     this.axes.forEach(e => e.metadata.duration = duration)
     return this
   }
 
-  clone() {
-    return new Funscript(this)
+  getAxes(): Funscript[] {
+    return [this, ...this.axes].sort(orderByAxis)
   }
-}
 
-export class FunSecondaryScript extends Funscript {
-  declare axis: axis
-  declare parent?: Funscript
-
-  constructor(funscript?: JsonFunscript & { id?: axis }, extras?: { axis?: axisLike, filePath?: string, metadata?: FunMetadata, parent?: Funscript }) {
-    super(funscript, extras)
-
-    if (funscript && !this.axis && 'id' in funscript) this.id = axisLikeToAxis(funscript.id as any)
-    if (!this.axis) throw new Error('FunSecondaryScript: axis is not defined')
-    if (extras?.metadata) this.metadata = extras.metadata
-    if (extras?.parent) this.parent = extras.parent
+  // --- JSON & Clone Section ---
+  static emptyJson = {
+    axes: [],
+    metadata: {},
+    inverted: false,
+    range: 100,
+    version: '1.0',
   }
 
   static jsonOrder = {
     id: undefined,
-    axis: undefined,
+    metadata: undefined,
     actions: undefined,
     axes: undefined,
-    metadata: undefined,
   }
 
   toJSON(): Record<string, any> {
     return orderTrimJson({
-      ...super.toJSON(),
-      filePath: undefined,
-      id: this.id,
-      metadata: undefined,
-    }, FunSecondaryScript.jsonOrder, FunSecondaryScript.emptyJson)
+      ...this,
+      // TODO: maybe remove L0 id
+      // TODO: remove duplicate metadata in axis scripts
+      metadata: {
+        // TODO: why is this needed?
+        title: this.#file?.title ?? '[unnamed]',
+        ...this.metadata.toJSON(),
+      },
+      axes: this.axes.slice().sort(orderByAxis).map(e => ({ ...e.toJSON(), metadata: undefined })),
+    }, Funscript.jsonOrder, Funscript.emptyJson)
+  }
+
+  toJsonText() {
+    return formatJson(JSON.stringify(this, null, 2))
+  }
+
+  clone() {
+    const clone = new Funscript(this)
+    // clone.#parent = this.#parent
+    clone.#file = this.#file?.clone()
+    return clone
   }
 }
 
-export * from './types'
+export class AxisScript extends Funscript {
+  declare id: axis
+  declare axes: []
+
+  constructor(
+    funscript?: JsonFunscript,
+    extras?: { id?: axis, filePath?: string, axes?: JsonFunscript[], parent?: Funscript },
+  ) {
+    super(funscript, extras)
+
+    if (!this.id) throw new Error('AxisScript: axis is not defined')
+    if (!this.parent) throw new Error('AxisScript: parent is not defined')
+  }
+}

@@ -1,0 +1,13 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# Words meaning
+
+When user asks to "Tell", don't try to edit the code
+
+When user asks to "Show", show the suggerted code, but don't try to apply edits
+
+When users ends request with "Start with <doing X>", you should do only that
+

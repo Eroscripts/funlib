@@ -1,7 +1,16 @@
-import type { Funscript } from '.'
+import type { Funscript, speed } from '.'
 import { FunAction } from '.'
 import { axisToName, speedToHex } from './converter'
 import { actionsToLines, actionsToZigzag, mergeLinesSpeed } from './manipulations'
+
+const speedToHexCache = new Map<speed, string>()
+function speedToHexCached(speed: speed) {
+  speed = Math.round(speed)
+  if (speedToHexCache.has(speed)) return speedToHexCache.get(speed)!
+  const hex = speedToHex(speed)
+  speedToHexCache.set(speed, hex)
+  return hex
+}
 
 export interface SvgOptions {
   title?: string
@@ -42,7 +51,6 @@ export function textToSvgLength(text: string, font: string) {
   const context = canvas.getContext('2d')!
   context.font = font
   const width = context.measureText(text).width
-  console.log({ width }, text)
   return width
 }
 
@@ -54,10 +62,10 @@ export function textToSvgText(text: string) {
   return span.innerHTML
 }
 
-export function toSvgLines(script: Funscript, width: number, height: number, w = 2, mergeLimit = 500) {
+export function toSvgLines(script: Funscript, { width, height, w = 2, mergeLimit = 500 }: { width: number, height: number, w?: number, mergeLimit?: number }) {
   const duration = script.actualDuration
   function lineToStroke(a: FunAction, b: FunAction) {
-    const at = (a: FunAction) => (a.time / duration * (width - 2 * w)) + w
+    const at = (a: FunAction) => ((a.at / 1000) / duration * (width - 2 * w)) + w
     const pos = (a: FunAction) => (100 - a.pos) * (height - 2 * w) / 100 + w
     return `M ${at(a)} ${pos(a)} L ${at(b)} ${pos(b)}`
   }
@@ -66,11 +74,11 @@ export function toSvgLines(script: Funscript, width: number, height: number, w =
 
   lines.sort((a, b) => a[2] - b[2])
   // global styles: stroke-width="${w}" fill="none" stroke-linecap="round"
-  return lines.map(([a, b, speed]) => `<path d="${lineToStroke(a, b)}" stroke="${speedToHex(speed)}"></path>`).join('\n')
+  return lines.map(([a, b, speed]) => `<path d="${lineToStroke(a, b)}" stroke="${speedToHexCached(speed)}"></path>`).join('\n')
 }
 
-export function toSvgBackgroundGradient(script: Funscript, id: string) {
-  const duration = script.actualDuration
+export function toSvgBackgroundGradient(script: Funscript, linearGradientId: string) {
+  const durationMs = script.actualDuration * 1000
   const lines = actionsToLines(actionsToZigzag(script.actions))
     .flatMap((e) => {
       const [a, b, s] = e
@@ -105,19 +113,19 @@ export function toSvgBackgroundGradient(script: Funscript, id: string) {
       return true
     })
     .map(([a, b, speed]) => {
-      const time = (a.time + b.time) / 2
-      return { time, speed }
+      const at = (a.at + b.at) / 2
+      return { at, speed }
     })
   // add start, first, last, end stops
   if (lines.length) {
     const first = lines[0], last = lines.at(-1)!
-    stops.unshift({ time: first[0].time, speed: first[2] })
-    if (first[0].time > 0.1) {
-      stops.unshift({ time: first[0].time - 0.1, speed: 0 })
+    stops.unshift({ at: first[0].at, speed: first[2] })
+    if (first[0].at > 100) {
+      stops.unshift({ at: first[0].at - 100, speed: 0 })
     }
-    stops.push({ time: last[1].time, speed: last[2] })
-    if (last[1].time < duration - 0.1) {
-      stops.push({ time: last[1].time + 0.1, speed: 0 })
+    stops.push({ at: last[1].at, speed: last[2] })
+    if (last[1].at < durationMs - 100) {
+      stops.push({ at: last[1].at + 100, speed: 0 })
     }
   }
   // remove duplicates
@@ -129,23 +137,23 @@ export function toSvgBackgroundGradient(script: Funscript, id: string) {
   })
 
   return `
-      <linearGradient id="${id}">
-        ${stops.map(s => `<stop offset="${Math.max(0, Math.min(1, s.time / duration))}" stop-color="${speedToHex(s.speed)}"${(
+      <linearGradient id="${linearGradientId}">
+        ${stops.map(s => `<stop offset="${Math.max(0, Math.min(1, s.at / durationMs))}" stop-color="${speedToHexCached(s.speed)}"${(
             s.speed >= 100 ? '' : ` stop-opacity="${s.speed / 100}"`
           )}></stop>`).join('\n          ')
         }
       </linearGradient>`
 }
 
-export function toSvgBackground(script: Funscript, width: number, height: number, _w = 2, bgOpacity = 0.2) {
+export function toSvgBackground(script: Funscript, { width, height, bgOpacity = 0.2, rectId }: { width: number, height: number, bgOpacity?: number, rectId?: string }) {
   const id = `grad_${Math.random().toString(26).slice(2)}`
 
   return `
     <defs>${toSvgBackgroundGradient(script, id)}</defs>
-    <rect id="rect1" width="${width}" height="${height}" fill="url(#${id})" opacity="${bgOpacity}"></rect>`
+    <rect${rectId ? ` id="${rectId}"` : ''} width="${width}" height="${height}" fill="url(#${id})" opacity="${bgOpacity}"></rect>`
 }
 
-export function toSvgElement(scripts: Funscript[], ops: SvgOptions) {
+export function toSvgElement(scripts: Funscript[], ops: SvgOptions): string {
   const fullOps = { ...svgDefaultOptions, ...ops }
   const pieces: string[] = []
   let y = 2
@@ -167,7 +175,7 @@ export function toSvgElement(scripts: Funscript[], ops: SvgOptions) {
   y -= fullOps.scriptSpacing
   y += 2
 
-  return `<svg width="690" height="${y}" xmlns="http://www.w3.org/2000/svg"
+  return `<svg class="funsvg" width="690" height="${y}" xmlns="http://www.w3.org/2000/svg"
     font-size="14px" font-family="Consolas"
   >
     ${pieces.join('\n')}
@@ -192,13 +200,13 @@ export function toSvgG(script: Funscript, ops: Required<SvgOptions> & { transfor
 
   const isForHandy = '_isForHandy' in script && script._isForHandy
   if (!title) {
-    title = script.filePath || script.parent?.filePath || '[no parent]'
-    if (script.parent) {
-      if (isForHandy) title += '::handy'
-      else if (!script.axes.length) title += `::${axisToName(script.id ?? 'L0')}`
+    if (script.file) {
+      title = script.file.filePath
+    } else if (script.parent?.file) {
+      title = script.parent.file.filePath + '::' + axisToName(script.id)
     }
   }
-  let axis = script.axis ?? 'L0'
+  let axis: string = script.id ?? 'L0'
   if (isForHandy) axis = '☞'
 
   // repair:
@@ -213,45 +221,63 @@ export function toSvgG(script: Funscript, ops: Required<SvgOptions> & { transfor
   const stats = script.toStats()
   const xx = [0, 46 - dw, 46, 640]
   const yy = [0, 20, 20 + dh, 20 + 32 + dh]
-  const bgGradientId = `grad_${Math.random().toString(26).slice(2)}`
+  const bgGradientId = `funsvg-grad-${Math.random().toString(26).slice(2)}`
 
   const axisTitleTop = axisCells === 1 ? yy[0] : yy[2]
   const color = 'transparent'
 
+  const round = (x: number) => +x.toFixed(2)
+
   return `
     <g transform="${ops.transform}">
-
-      <rect x="0" y="${axisTitleTop}" width="${xx[1]}" height="${yy[3] - axisTitleTop}" fill="${speedToHex(stats.AvgSpeed)}" opacity="${headerOpacity * Math.min(1, stats.AvgSpeed / 100)}"></rect>
-      ${(
-          axisTitleTop === yy[0]
-            ? ''
-            : `<rect x="0" y="0" width="${xx[1]}" height="20" stroke="${color}" stroke-width="0.2" fill="none"></rect>`
-        )}
-      <rect x="0" y="${axisTitleTop}" width="${xx[1]}" height="${yy[3] - axisTitleTop}" stroke="${color}" stroke-width="0.2" fill="none"></rect>
-      <rect x="${xx[2]}" y="0" width="${xx[3]}" height="20" stroke="${color}" stroke-width="0.2" fill="none"></rect>
-      <rect x="${xx[2]}" y="${yy[2]}" width="${xx[3]}" height="32" stroke="${color}" stroke-width="0.2" fill="none"></rect>
-
-      <g transform="translate(${xx[2]}, 0)">
+      
+      <g class="funsvg-bgs">
         <defs>${toSvgBackgroundGradient(script, bgGradientId)}</defs>
-        <rect id="rect1" width="${xx[3]}" height="${yy[1]}" fill="#ccc" opacity="${bgOpacity * 1.5}"></rect>
-        <rect id="rect1" width="${xx[3]}" height="${yy[1]}" fill="url(#${bgGradientId})" opacity="${headerOpacity}"></rect>
-        <rect id="rect1" width="${xx[3]}" y="${yy[1]}" height="${yy[3] - yy[1]}" fill="url(#${bgGradientId})" opacity="${bgOpacity}"></rect>
+        <rect class="funsvg-bg-axis-drop" x="0" y="${axisTitleTop}" width="${xx[1]}" height="${yy[3] - axisTitleTop}" fill="#ccc" opacity="${round(bgOpacity * 1.5)}"></rect>
+        <rect class="funsvg-bg-title-drop" x="${xx[2]}" width="${xx[3]}" height="${yy[1]}" fill="#ccc" opacity="${round(bgOpacity * 1.5)}"></rect>
+        <rect class="funsvg-bg-axis" x="0" y="${axisTitleTop}" width="${xx[1]}" height="${yy[3] - axisTitleTop}" fill="${speedToHexCached(stats.AvgSpeed)}" opacity="${round(headerOpacity * Math.max(0.5, Math.min(1, stats.AvgSpeed / 100)))}"></rect>
+        <rect class="funsvg-bg-title" x="${xx[2]}" width="${xx[3]}" height="${yy[1]}" fill="url(#${bgGradientId})" opacity="${round(headerOpacity)}"></rect>
+        <rect class="funsvg-bg-graph" x="${xx[2]}" width="${xx[3]}" y="${yy[1]}" height="${yy[3] - yy[1]}" fill="url(#${bgGradientId})" opacity="${round(bgOpacity)}"></rect>
       </g>
-      <g transform="translate(${xx[2]}, ${yy[2]})" stroke-width="${w}" fill="none" stroke-linecap="round">
-        ${toSvgLines(script, xx[3], 32, w, mergeLimit)}
+
+
+      <g class="funsvg-lines" transform="translate(${xx[2]}, ${yy[2]})" stroke-width="${w}" fill="none" stroke-linecap="round">
+        ${toSvgLines(script, { width: xx[3], height: 32, w, mergeLimit })}
       </g>
       
-      <text x="${xx[1] / 2}" y="${(axisTitleTop + yy[3]) / 2 + (axisTitleTop === yy[2] ? 2 : 4)}" font-size="250%" text-anchor="middle" dominant-baseline="middle"> ${axis} </text>
-      <text x="49" y="15" lengthAdjust="spacingAndGlyphs" ${textToSvgLength(title, '14px Consolas') > 450 ? 'textLength="450"' : ''
-      }> ${textToSvgText(title)} </text>
+      <g class="funsvg-titles">
+        <g class="funsvg-titles-drop" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent">
+          <text class="funsvg-axis-drop" opacity="0" x="${xx[1] / 2}" y="${(axisTitleTop + yy[3]) / 2 + (axisTitleTop === yy[2] ? 2 : 4)}" font-size="250%" text-anchor="middle" dominant-baseline="middle"> ${axis} </text>
+          <text class="funsvg-title-drop" x="49" y="15" lengthAdjust="spacingAndGlyphs" ${textToSvgLength(title, '14px Consolas') > 450 ? 'textLength="450"' : ''
+          }> ${textToSvgText(title)} </text>
+          ${Object.entries(stats).reverse().map(([k, v], i) => `
+              <text class="funsvg-stat-label-drop" x="${683 - i * 46}" y="7" font-weight="bold" font-size="50%" text-anchor="end"> ${k} </text>
+              <text class="funsvg-stat-value-drop" x="${683 - i * 46}" y="17" font-weight="bold" font-size="90%" text-anchor="end"> ${v} </text>
+            `).join('\n')
+          } 
+        </g>
+        <text class="funsvg-axis" x="${xx[1] / 2}" y="${(axisTitleTop + yy[3]) / 2 + (axisTitleTop === yy[2] ? 2 : 4)}" font-size="250%" text-anchor="middle" dominant-baseline="middle"> ${axis} </text>
+        <text class="funsvg-title" x="49" y="15" lengthAdjust="spacingAndGlyphs" ${textToSvgLength(title, '14px Consolas') > 450 ? 'textLength="450"' : ''
+        }> ${textToSvgText(title)} </text>
+        ${Object.entries(stats).reverse().map(([k, v], i) => `
+            <text class="funsvg-stat-label" x="${683 - i * 46}" y="7" font-weight="bold" font-size="50%" text-anchor="end"> ${k} </text>
+            <text class="funsvg-stat-value" x="${683 - i * 46}" y="17" font-weight="bold" font-size="90%" text-anchor="end"> ${v} </text>
+          `).join('\n')
+        } 
+      </g>
 
-      ${Object.entries(stats).reverse().map(([k, v], i) => `
-          <text x="${683 - i * 46}" y="7" font-weight="bold" font-size="50%" text-anchor="end"> ${k} </text>
-          <text x="${683 - i * 46}" y="17" font-weight="bold" font-size="90%" text-anchor="end"> ${v} </text>
-        `).join('\n')
-      } 
+      <g class="funsvg-borders">
+        ${(
+            axisTitleTop === yy[0]
+              ? ''
+              : `<rect x="0" y="0" width="${xx[1]}" height="20" stroke="${color}" stroke-width="0.2" fill="none"></rect>`
+          )}
+        <rect x="0" y="${axisTitleTop}" width="${xx[1]}" height="${yy[3] - axisTitleTop}" stroke="${color}" stroke-width="0.2" fill="none"></rect>
+        <rect x="${xx[2]}" y="0" width="${xx[3]}" height="20" stroke="${color}" stroke-width="0.2" fill="none"></rect>
+        <rect x="${xx[2]}" y="${yy[2]}" width="${xx[3]}" height="32" stroke="${color}" stroke-width="0.2" fill="none"></rect>
+        <rect x="${-sw / 2}" y="${-sw / 2}" width="${686 + sw}" height="${yy[3] + sw}" stroke="${'#eee'}" stroke-width="${sw}" fill="none"></rect>
+      </g>
 
-      <rect x="${-sw / 2}" y="${-sw / 2}" width="${686 + sw}" height="${yy[3] + sw}" stroke="${'#eee'}" stroke-width="${sw}" fill="none"></rect>
     </g>
   `
 }

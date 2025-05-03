@@ -12,4 +12,5 @@ export default antfu({
     'node/prefer-global/process': ['warn', 'always'],
     'style/brace-style': 'off',
     'prefer-template': 'off',
+    'ts/explicit-function-return-type': ['warn', {}],
   })

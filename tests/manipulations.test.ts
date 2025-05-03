@@ -15,7 +15,7 @@ describe('limitPeakSpeed', () => {
       new FunAction({ at: 7000, pos: 100 }),
       new FunAction({ at: 8000, pos: 0 }),
     ]
-    FunAction.linkList(actions)
+    FunAction.linkList(actions, {})
 
     expect(actions.map(a => a.speedFrom)).toEqual([100, -100, 100, -100, 100, -100, 100, -100, 0])
 

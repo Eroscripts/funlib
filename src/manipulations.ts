@@ -1,4 +1,4 @@
-import type { Funscript } from '.'
+import type { Funscript, ms, speed } from '.'
 import { FunAction } from '.'
 import { absSpeedBetween, lerp, listToSum, minBy, speedBetween, unlerp } from './misc'
 
@@ -25,7 +25,9 @@ export function actionsToLines(actions: FunAction[]) {
  * Filters actions to create a zigzag pattern by removing actions with same direction changes
  */
 export function actionsToZigzag(actions: FunAction[]) {
-  return FunAction.cloneList(actions.filter(e => e.isPeak))
+  return FunAction.cloneList(actions.filter(e => e.isPeak), {
+    parent: true,
+  })
 }
 
 /**
@@ -69,7 +71,7 @@ export function smoothActions(actions: FunAction[], windowSize: number = 3): Fun
       at: action.at,
       pos: avgPos,
     })
-  }))
+  }), { parent: actions[0]?.parent })
 }
 
 export function actionsAverageSpeed(actions: FunAction[]) {
@@ -102,13 +104,6 @@ export function actionsRequiredMaxSpeed(actions: FunAction[]): speed {
 
   // return speed that is active for at least 50ms
   return sorted.find(e => e[1] >= 50)?.[0] ?? 0
-}
-
-export function experimentalProcess(fun: Funscript): void {
-  const axes = [fun, ...fun.axes]
-  for (const axis of axes) {
-    console.log(axis.filePath, actionsRequiredMaxSpeed(axis.actions))
-  }
 }
 
 /**
@@ -152,7 +147,7 @@ export function smoothCurve(
     }
   }
 
-  return FunAction.linkList(curve)
+  return FunAction.linkList(curve, {})
 }
 
 /**
@@ -182,6 +177,7 @@ export function connectSegments(segments: FunAction[][]): FunAction[] {
   return FunAction.linkList(
     segments.flat()
       .filter((e, i, a) => e !== a[i - 1]),
+    { parent: true },
   )
 }
 
@@ -193,7 +189,7 @@ export function simplifyLinearCurve(
   threshold: number,
 ) {
   if (curve.length <= 2) {
-    return FunAction.linkList(curve) // Nothing to simplify
+    return FunAction.linkList(curve, { parent: true }) // Nothing to simplify
   }
 
   const segments = splitToSegments(curve)
@@ -243,7 +239,7 @@ const HANDY_MAX_STRAIGHT_THRESHOLD = 3
  * This function will smooth the actions to fit those constraints
  */
 export function handySmooth(actions: FunAction[]): FunAction[] {
-  actions = FunAction.cloneList(actions)
+  actions = FunAction.cloneList(actions, { parent: true })
   // pass 0: round at values
   actions.map(e => e.pos = Math.round(e.pos))
 
@@ -330,7 +326,7 @@ export function handySmooth(actions: FunAction[]): FunAction[] {
     // }
   }
 
-  filteredActions = FunAction.linkList(filteredActions)
+  filteredActions = FunAction.linkList(filteredActions, { parent: true })
 
   // pass 4: if the speed between two points is too high, move them closer together
 
@@ -345,7 +341,7 @@ export function handySmooth(actions: FunAction[]): FunAction[] {
     e.pos = Math.round(e.pos)
   })
 
-  return FunAction.linkList(filteredActions)
+  return FunAction.linkList(filteredActions, { parent: true })
 }
 
 /**
