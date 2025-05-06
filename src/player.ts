@@ -7,6 +7,7 @@ export class TCodePlayer {
   constructor(video: HTMLVideoElement | undefined, funscript: Funscript | undefined) {
     this.video = video
     this.funscript = funscript
+    this.run()
   }
 
   port?: SerialPort
@@ -14,6 +15,12 @@ export class TCodePlayer {
 
   async requestPort() {
     this.port = await navigator.serial.requestPort()
+    this.port.ondisconnect = () => {
+      this.port?.close()
+      this.port = undefined
+      this.writer?.close()
+      this.writer = undefined
+    }
     await this.port.open({ baudRate: 115200 })
     const encoder = new TextEncoderStream()
     encoder.readable.pipeTo(this.port.writable!)
@@ -43,7 +50,7 @@ export class TCodePlayer {
     if (!this.video || !this.funscript) return ''
 
     const { paused, currentTime, seeking } = this.video
-    let at = currentTime * 1000
+    const at = currentTime * 1000
     let tcode = ''
     if (seeking) { // Jumped
       tcode = this.funscript.getTCodeAt(at).toString(this.tcodeOptions)

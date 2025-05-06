@@ -1,7 +1,7 @@
 import type { Funscript } from '.'
-import type { axis, axisLike, axisName, axisNorm, axisPairs, axisRaw, ms, pos, seconds, speed, timeSpan } from './types'
+import type { axis, axisLike, axisName, axisNorm, axisPairs, axisRaw, axisValue, mantissa, ms, pos, seconds, speed, TCodeTuple, timeSpan } from './types'
 import { oklch2hex } from 'colorizr'
-import { clamplerp, compareWithOrder } from './misc'
+import { clamp, clamplerp, compareWithOrder } from './misc'
 
 export function timeSpanToMs(timeSpan: timeSpan): ms {
   if (typeof timeSpan !== 'string') {
@@ -38,7 +38,7 @@ export function secondsToDuration(seconds: seconds): string {
     Math.floor(seconds % 60).toFixed(0).padStart(2, '0')}`
 }
 
-export function rawToValue(raw: axisRaw, axis?: axis): pos {
+export function rawToValue(raw: axisRaw, axis?: axis): axisValue {
   if (raw === undefined || raw === null) {
     throw new Error('rawToValue: raw value is required')
   }
@@ -50,11 +50,14 @@ export function rawToValue(raw: axisRaw, axis?: axis): pos {
   if (axis === 'R1') norm = raw / 60 + 0.5
   if (axis === 'R2') norm = raw / 60 + 0.5
 
+  if (axis === 'L1') norm = raw / 60 + 0.5
+  if (axis === 'L2') norm = raw / 60 + 0.5
+
   if (norm === -999) throw new Error(`rawToValue: ${axis} is not supported`)
   return norm * 100
 }
 
-export function valueToRaw(value: pos, axis?: axis): axisRaw {
+export function valueToRaw(value: axisValue, axis?: axis): axisRaw {
   // axisValue is [0, 100]
   // L0 is [0, 1]; R0 is [-60, 60]; R1, R2 is [-30, 30]; L1/L2 is throw
   const norm: axisNorm = value / 100
@@ -65,7 +68,7 @@ export function valueToRaw(value: pos, axis?: axis): axisRaw {
   throw new Error(`valueToRaw: ${axis} is not supported`)
 }
 
-export function roundAxisValue(value: pos): pos {
+export function roundAxisValue(value: axisValue): axisValue {
   return +value.toFixed(2)
 }
 
@@ -98,7 +101,15 @@ function fromEntries<A extends [any, any][]>(a: A): { [K in A[number] as K[0]]: 
 }
 
 // eslint-disable-next-line ts/no-redeclare
-const axisPairs: axisPairs = [['L0', 'stroke'], ['L1', 'surge'], ['L2', 'sway'], ['R0', 'twist'], ['R1', 'roll'], ['R2', 'pitch']]
+const axisPairs: axisPairs = [
+  ['L0', 'stroke'],
+  ['L1', 'surge'],
+  ['L2', 'sway'],
+  ['R0', 'twist'],
+  ['R1', 'roll'],
+  ['R2', 'pitch'],
+  ['A1', 'suck'],
+]
 
 export const axisToNameMap: Record<axis, axisName> = fromEntries(axisPairs)
 export const axisNameToAxisMap: Record<axisName, axis> = fromEntries(axisPairs.map(([a, b]) => [b, a]))
@@ -124,6 +135,30 @@ export function axisLikeToAxis(axisLike?: axisLike | 'singleaxis'): axis {
 
 export function orderByAxis(a: Funscript, b: Funscript) {
   return compareWithOrder(a.id, b.id, axisIds)
+}
+
+export function fileNameToInfo(filePath?: string) {
+  const parts = filePath?.split('.') ?? []
+  if (parts.at(-1) === 'funscript') parts.pop()
+  let axisLike = parts.at(-1)
+  if (axisLikes.includes(axisLike as any)) {
+    parts.pop()
+  }
+  else if (axisLike === 'singleaxis') {
+    parts.pop()
+  }
+  else {
+    axisLike = undefined
+  }
+  const fileName = parts.join('.')
+
+  return {
+    filePath,
+    fileName,
+    primary: !axisLike || axisLike === 'singleaxis',
+    title: fileName.split(/[\\/]/).pop()!,
+    id: axisLike ? axisLikeToAxis(axisLike as any) : undefined,
+  }
 }
 
 export function formatJson(json: string, { lineLength = 100, maxPrecision = 1 }: { lineLength?: number, maxPrecision?: number } = {}): string {
@@ -168,31 +203,31 @@ export function formatJson(json: string, { lineLength = 100, maxPrecision = 1 }:
   return json
 }
 
-export const oklchParams = {
+export const speedToOklchParams = {
   l: { left: 500, right: 600, from: 0.8, to: 0.4 },
   c: { left: 800, right: 900, from: 0.4, to: 0.1 },
   h: { speed: -2.4, offset: 210 },
   a: { left: 0, right: 100, from: 0, to: 1 },
 }
 
-/**
- * in css:
- * `oklch(
- *    clamp(40%, calc(80% - 0.4% * (var(--speed) - 500)), 80%)
- *    clamp(10%, calc(40% - 0.3% * (var(--speed) - 800)), 40%)
- *    calc(210 - var(--speed) / 2.4))`
- */
-export function speedToOklch(speed: speed, useAlpha = false, params = oklchParams) {
+export function speedToOklch(speed: speed, useAlpha = false) {
   function roll(value: number, cap: number) {
     return (value % cap + cap) % cap
   }
-  const l = clamplerp(speed, params.l.left, params.l.right, params.l.from, params.l.to)
-  const c = clamplerp(speed, params.c.left, params.c.right, params.c.from, params.c.to)
-  const h = roll(params.h.offset + speed / params.h.speed, 360)
-  const a = useAlpha ? clamplerp(speed, params.a.left, params.a.right, params.a.from, params.a.to) : 1
+  const l = clamplerp(speed, speedToOklchParams.l.left, speedToOklchParams.l.right, speedToOklchParams.l.from, speedToOklchParams.l.to)
+  const c = clamplerp(speed, speedToOklchParams.c.left, speedToOklchParams.c.right, speedToOklchParams.c.from, speedToOklchParams.c.to)
+  const h = roll(speedToOklchParams.h.offset + speed / speedToOklchParams.h.speed, 360)
+  const a = useAlpha ? clamplerp(speed, speedToOklchParams.a.left, speedToOklchParams.a.right, speedToOklchParams.a.from, speedToOklchParams.a.to) : 1
 
   return [l, c, h, a]
 }
+/**
+ * in css:
+ * oklch(
+    max(40%, min(80%, calc(80% + (var(--speed) - 500) / 250 * -40%)))
+    max(10%, min(40%, calc(40% + (var(--speed) - 500) / 300 * -30%)))
+    calc(210 - var(--speed) / 2.4))
+ */
 
 export function speedToOklchText(speed: speed, useAlpha = false) {
   const [l, c, h, a] = speedToOklch(speed, useAlpha)
@@ -205,4 +240,57 @@ export function speedToOklchText(speed: speed, useAlpha = false) {
 export function speedToHex(speed: speed) {
   const [l, c, h] = speedToOklch(speed)
   return oklch2hex({ l, c, h })
+}
+
+export function formatTCode(tcode: string, format = true) {
+  if (!format) return tcode
+  return tcode.replaceAll(
+    /\b([LR])(\d)(\d+)(?:([IS])(\d+))?/g,
+    (s, a, b, c, d, e) =>
+      `${a}${b}${c.padStart(4, '_')}${d ? '_' + d : ''}${e ? e.padStart(4, '_') : ''}`,
+  )
+}
+
+export class TCodeAction extends
+  (Array<number | string> as any as (new(...a: any[]) => readonly [axis: axis, pos: pos, type?: 'I' | 'S', target?: ms | speed])) {
+  static from(a: TCodeTuple | [TCodeTuple]) {
+    return new TCodeAction(...a)
+  }
+
+  constructor(...a: TCodeTuple | [TCodeTuple]) {
+    super()
+    ;(this as any as any[]).push(...(Array.isArray(a[0]) ? a[0] : a))
+  }
+
+  toString(ops?: { precision?: number, format?: boolean }) {
+    const d = ops?.format ? '_' : ''
+
+    let mantissa = clamp(this[1] / 100, 0, 1).toFixed(ops?.precision ?? 4)
+    if (mantissa.startsWith('1')) mantissa = '0.999999999'
+    mantissa = mantissa.slice(2).slice(0, ops?.precision ?? 4)
+    if (d) mantissa = mantissa.padStart(ops?.precision ?? 4, '_')
+    else mantissa = mantissa.replace(/(?<=.)0+$/, '')
+
+    const target = this[3] ?? 0
+    const speedText = clamp(target, 0, 9999).toFixed(0)
+    const intervalText = clamp(target, 0, 99999).toFixed(0)
+    const postfix
+     = this[2] === 'I'
+       ? `${d}I${d}${intervalText.padStart(d ? 3 : 0, '_')}`
+       : this[2] === 'S'
+         ? `${d}S${d}${speedText.padStart(d ? 3 : 0, '_')}`
+         : ''
+    return `${this[0]}${d}${mantissa}${postfix}`
+  }
+}
+
+export class TCodeList extends Array<TCodeAction> {
+  static from(arrayLike: TCodeTuple[]): TCodeList {
+    return new TCodeList(...arrayLike.map(e => new TCodeAction(e)))
+  }
+
+  toString(ops?: { precision?: number, format?: boolean }) {
+    if (!this.length) return ''
+    return this.map(e => e.toString(ops)).join(' ') + '\n'
+  }
 }

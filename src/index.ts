@@ -1,6 +1,6 @@
 import type { SvgOptions } from './svg'
-import type { axis, axisLike, chapterName, JsonAction, JsonChapter, JsonFunscript, JsonMetadata, ms, pos, seconds, speed, timeSpan } from './types'
-import { axisLikes, axisLikeToAxis, formatJson, msToTimeSpan, orderByAxis, orderTrimJson, secondsToDuration, timeSpanToMs } from './converter'
+import type { axis, axisLike, chapterName, JsonAction, JsonChapter, JsonFunscript, JsonMetadata, ms, pos, seconds, speed, TCodeTuple, timeSpan } from './types'
+import { axisLikes, axisLikeToAxis, formatJson, msToTimeSpan, orderByAxis, orderTrimJson, secondsToDuration, TCodeList, timeSpanToMs } from './converter'
 import { actionsAverageSpeed, actionsRequiredMaxSpeed } from './manipulations'
 import { clamp, clamplerp, speedBetween } from './misc'
 import { svgDefaultOptions, toSvgElement } from './svg'
@@ -410,6 +410,71 @@ export class Funscript implements JsonFunscript {
 
   getAxes(): Funscript[] {
     return [this, ...this.axes].sort(orderByAxis)
+  }
+
+  #searchActionIndex = -1
+  /** find an action after the given time */
+  getActionAfter(at: ms) {
+    /* last action or action directly after at */
+    const isTarget = (e: FunAction) => ((!e.nextAction || e.at > at) && (!e.prevAction || e.prevAction.at <= at))
+    const AROUND_LOOKUP = 5
+    for (let di = -AROUND_LOOKUP; di <= AROUND_LOOKUP; di++) {
+      const index = this.#searchActionIndex + di
+      if (!this.actions[index]) continue
+      if (isTarget(this.actions[index])) {
+        this.#searchActionIndex = index
+        break
+      }
+    }
+    if (!isTarget(this.actions[this.#searchActionIndex])) {
+      this.#searchActionIndex = this.actions.findIndex(isTarget)
+    }
+    return this.actions[this.#searchActionIndex]
+  }
+
+  getPosAt(at: ms): pos {
+    const action = this.getActionAfter(at)
+    if (!action) return 50
+    return action.clerpAt(at)
+  }
+
+  getAxesPosAt(at: ms) {
+    return Object.fromEntries(this.getAxes().map(e => [e.id, e.getPosAt(at)]))
+  }
+
+  /** Returns TCode at the given time */
+  getTCodeAt(at: ms) {
+    const apos = this.getAxesPosAt(at)
+    const tcode = Object.entries(apos)
+      .map<TCodeTuple>(([axis, pos]) => [axis as axis, pos])
+    return TCodeList.from(tcode)
+  }
+
+  /** returns TCode to move from the current point to the next point on every axis */
+  getTCodeFrom(at: ms, since?: ms) {
+    at = ~~at; since = since && ~~since
+    const tcode: TCodeTuple[] = []
+
+    for (const a of this.getAxes()) {
+      const nextAction = a.getActionAfter(at)
+      if (!nextAction) continue
+      if (since === undefined) {
+        // action is in the past, move with default speed
+        if (nextAction.at <= at) tcode.push([a.id, nextAction.pos])
+        else tcode.push([a.id, nextAction.pos, 'I', nextAction.at - at])
+        continue
+      }
+      // action is in the past, do nothing
+      if (nextAction.at <= at) continue
+
+      const prevAt = nextAction.prevAction?.at ?? 0
+      // prev action is in the same prev-next interval, do nothing
+      if (prevAt <= since) continue
+
+      tcode.push([a.id, nextAction.pos, 'I', nextAction.at - at])
+    }
+
+    return TCodeList.from(tcode)
   }
 
   // --- JSON & Clone Section ---

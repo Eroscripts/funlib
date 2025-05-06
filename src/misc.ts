@@ -1,4 +1,4 @@
-import type { FunAction, speed } from '.'
+import type { FunAction, mantissa, mantissaText, pos, speed } from '.'
 
 export { oklch2rgb } from 'colorizr'
 
@@ -72,4 +72,8 @@ export function compareWithOrder(a: string | undefined, b: string | undefined, o
     return a === b ? 0 : a! < b! ? -1 : 1
   }
   return 0
+}
+
+export function toMantissa(value: pos): mantissaText {
+  return clamp(value / 100, 0, 0.9999).toFixed(4).slice(2).replace(/(?<=.)0+$/, '') as mantissaText
 }

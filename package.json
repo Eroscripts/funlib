@@ -33,7 +33,6 @@
     "@antfu/eslint-config": "^4.12.0",
     "@types/bun": "latest",
     "@types/w3c-web-serial": "^1.0.8",
-    "bun-types": "^1.2.11",
     "eslint": "^9.24.0"
   }
 }
