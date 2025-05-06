@@ -182,19 +182,17 @@ export class FunMetadata implements JsonMetadata {
   // declare durationIsExact: boolean
 
   // --- Constructor ---
-  constructor(metadata?: JsonMetadata) {
+  constructor(metadata?: JsonMetadata, parent?: Funscript) {
     Object.assign(this, metadata)
     if (metadata?.bookmarks) this.bookmarks = metadata.bookmarks.map(e => new FunBookmark(e))
     if (metadata?.chapters) this.chapters = metadata.chapters.map(e => new FunChapter(e))
     if (metadata?.duration) this.duration = metadata.duration
-    if (this.duration > 36_000) { // 10 hours
-      const text = `FunMetadata: duration ${this.duration} is greater than 10 hours, parsing as milliseconds`
-      console.warn(text)
-      // eslint-disable-next-line no-alert
-      if (typeof alert === 'function') alert(text)
-      this.duration /= 1000
+    if (this.duration > 3600) { // 1 hour
+      const actionsDuration = parent?.actionsDuraction
+      if (actionsDuration && actionsDuration < 500 * this.duration) {
+        this.duration /= 1000
+      }
     }
-    // Assign other metadata properties if necessary
   }
 
   // --- JSON & Clone Section ---
@@ -322,7 +320,7 @@ export class Funscript implements JsonFunscript {
     if (funscript?.actions) {
       this.actions = FunAction.cloneList(funscript.actions, { parent: this })
     }
-    if (funscript?.metadata) this.metadata = new FunMetadata(funscript.metadata)
+    if (funscript?.metadata !== undefined) this.metadata = new FunMetadata(funscript.metadata, this)
     else if (funscript instanceof Funscript) this.#file = funscript.#file?.clone()
 
     if (extras?.axes) {
@@ -433,14 +431,11 @@ export class Funscript implements JsonFunscript {
   toJSON(): Record<string, any> {
     return orderTrimJson({
       ...this,
-      // TODO: maybe remove L0 id
-      // TODO: remove duplicate metadata in axis scripts
-      metadata: {
-        // TODO: why is this needed?
-        title: this.#file?.title ?? '[unnamed]',
-        ...this.metadata.toJSON(),
-      },
       axes: this.axes.slice().sort(orderByAxis).map(e => ({ ...e.toJSON(), metadata: undefined })),
+      metadata: {
+        ...this.metadata.toJSON(),
+        duration: +this.duration.toFixed(3),
+      },
     }, Funscript.jsonOrder, Funscript.emptyJson)
   }
 
