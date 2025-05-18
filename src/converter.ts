@@ -88,11 +88,11 @@ export function orderTrimJson(that: Record<string, any>, order: Record<string, a
       delete (copy as any)[k]
     }
   }
-  for (const k of Object.keys(copy)) {
-    if (k.startsWith('__')) {
-      delete (copy as any)[k]
-    }
-  }
+  // for (const k of Object.keys(copy)) {
+  //   if (k.startsWith('__')) {
+  //     delete (copy as any)[k]
+  //   }
+  // }
   return copy
 }
 
@@ -161,7 +161,11 @@ export function fileNameToInfo(filePath?: string) {
   }
 }
 
-export function formatJson(json: string, { lineLength = 100, maxPrecision = 1 }: { lineLength?: number, maxPrecision?: number } = {}): string {
+export function formatJson(
+  json: string,
+  { lineLength = 100, maxPrecision = 1, compress = false }:
+  { lineLength?: number, maxPrecision?: number, compress?: boolean } = {},
+): string {
   function removeNewlines(s: string) { return s.replaceAll(/ *\n\s*/g, ' ') }
   const inArrayRegex = /(?<=\[)([^[\]]+)(?=\])/g
 
@@ -191,11 +195,16 @@ export function formatJson(json: string, { lineLength = 100, maxPrecision = 1 }:
     })
     const actionLength = '{ "at": , "pos": 100 },'.length + maxAtLength + posDot
 
-    let actionsPerLine = 10
-    while (6 + (actionLength + 1) * actionsPerLine - 1 > lineLength)
-      actionsPerLine--
+    let actionsPerLine1 = 10
+    while (6 + (actionLength + 1) * actionsPerLine1 - 1 > lineLength)
+      actionsPerLine1--
     let i = 0
-    s = s.replaceAll(/\n(?!\s*$)\s*/g, s => (i++ % actionsPerLine === 0) ? s : ' ')
+    s = s.replaceAll(/\n(?!\s*$)\s*/g, s => (i++ % actionsPerLine1 === 0) ? s : ' ')
+
+    if (compress) {
+      const [, start, , end] = s.match(/^(\s*(?=$|\S))([\s\S]+)((?<=^|\S)\s*)$/) ?? ['', '', '', '']
+      s = start + JSON.stringify(JSON.parse(`[${s}]`)).slice(1, -1) + end
+    }
 
     return s
   })

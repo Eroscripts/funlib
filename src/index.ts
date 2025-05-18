@@ -278,8 +278,11 @@ export class Funscript implements JsonFunscript {
 
   /** merge multi-axis scripts into one */
   static mergeMultiAxis(scripts: Funscript[]): Funscript[] {
-    const groups = Object.groupBy(scripts, e => e.#file?.title ?? '[unnamed]')
-    return Object.entries(groups).flatMap<Funscript>(([_title, scripts]) => {
+    const multiaxisScripts = scripts.filter(e => e.axes.length)
+    const singleaxisScripts = scripts.filter(e => !e.axes.length)
+
+    const groups = Object.groupBy(singleaxisScripts, e => e.#file?.title ?? '[unnamed]')
+    const mergedSingleaxisScripts = Object.entries(groups).flatMap<Funscript>(([_title, scripts]) => {
       if (!scripts) return []
       // base case: no duplicate axes
       const allScripts = scripts.flatMap(e => [e, ...e.axes])
@@ -287,14 +290,14 @@ export class Funscript implements JsonFunscript {
       if (axes.length === allScripts.length) {
         // merge them all into a single script
         const L0 = allScripts.find(e => e.id === 'L0')
-        return new Funscript({
-          actions: [],
-          ...L0,
-          axes: allScripts.sort(orderByAxis).filter(e => e.id !== 'L0') as any[],
-        })
+        if (!L0) throw new Error('Funscript.mergeMultiAxis: L0 is not defined')
+        const base = L0.clone()
+        base.axes = allScripts.sort(orderByAxis).filter(e => e.id !== 'L0').map(e => new AxisScript(e, { parent: base })) as any[]
+        return base
       }
-      throw new Error('Funscript: multi-axis scripts are not implemented yet')
+      throw new Error('Funscript.mergeMultiAxis: multi-axis scripts are not implemented yet')
     })
+    return [...multiaxisScripts, ...mergedSingleaxisScripts]
   }
 
   // --- Public Instance Properties ---
@@ -315,6 +318,7 @@ export class Funscript implements JsonFunscript {
     Object.assign(this, funscript)
 
     if (extras?.file) this.#file = new FunscriptFile(extras.file)
+    else if (funscript instanceof Funscript) this.#file = funscript.#file?.clone()
     this.id = extras?.id ?? this.#file?.id ?? funscript?.id ?? 'L0'
 
     if (funscript?.actions) {
@@ -504,8 +508,8 @@ export class Funscript implements JsonFunscript {
     }, Funscript.jsonOrder, Funscript.emptyJson)
   }
 
-  toJsonText() {
-    return formatJson(JSON.stringify(this, null, 2))
+  toJsonText(options?: Parameters<typeof formatJson>[1]) {
+    return formatJson(JSON.stringify(this, null, 2), options ?? {})
   }
 
   clone() {

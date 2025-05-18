@@ -1,19 +1,62 @@
 import type { Funscript } from '.'
 
+class Ticker {
+  ontick = () => {}
+  constructor(ontick?: () => void) {
+    this.ontick = ontick ?? (() => {})
+  }
+
+  #interval = 0
+
+  async tick() {
+    try {
+      await this.ontick()
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  async start() {
+    if (this.#interval) clearInterval(this.#interval)
+    let int = this.#interval = +setInterval(() => this.tick)
+
+    while (true) {
+      await new Promise(requestAnimationFrame)
+      if (this.#interval !== int) break
+      clearInterval(this.#interval)
+      int = this.#interval = +setInterval(() => this.tick)
+      this.tick()
+    }
+  }
+
+  async stop() {
+    if (this.#interval) clearInterval(this.#interval)
+    this.#interval = 0
+  }
+}
+
 export class TCodePlayer {
   video: HTMLVideoElement | undefined
   funscript: Funscript | undefined
+  ticker: Ticker
 
   constructor(video: HTMLVideoElement | undefined, funscript: Funscript | undefined) {
     this.video = video
     this.funscript = funscript
-    this.run()
+    this.ticker = new Ticker()
   }
 
   port?: SerialPort
   writer?: WritableStreamDefaultWriter<string>
 
-  async requestPort() {
+  async requestPort(disconnect = false) {
+    if (this.port && !disconnect) return
+    if (disconnect) {
+      this.port?.close()
+      this.port = undefined
+      this.writer?.close()
+      this.writer = undefined
+    }
     this.port = await navigator.serial.requestPort()
     this.port.ondisconnect = () => {
       this.port?.close()
@@ -34,14 +77,18 @@ export class TCodePlayer {
     this.writer?.write(output)
   }
 
-  async run() {
-    while (true) {
-      await new Promise(requestAnimationFrame)
+  run() {
+    this.ticker.ontick = () => {
       const tcode = this.tCodeForState()
       if (tcode) {
         this.write(tcode)
       }
     }
+    this.ticker.start()
+  }
+
+  stop() {
+    this.ticker.stop()
   }
 
   tcodeOptions = { format: true, precision: 2 }

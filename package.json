@@ -1,7 +1,7 @@
 {
   "name": "@eroscripts/funlib",
   "type": "module",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "packageManager": "bun@1.2.10",
   "description": "A library for working with .funscript files",
   "author": "Dimava",
