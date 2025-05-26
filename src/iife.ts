@@ -1,5 +1,6 @@
 import * as Fun from '.'
 import { drawFunscriptGraph, drawFunscriptsCanvas, makeGradient } from './canvas'
+import { orderByAxis } from './converter'
 import { TCodePlayer } from './player'
 
 Object.assign(window, {
@@ -9,5 +10,8 @@ Object.assign(window, {
     drawFunscriptGraph,
     makeGradient,
     drawFunscriptsCanvas,
+    misc: {
+      orderByAxis,
+    },
   },
 })

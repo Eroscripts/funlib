@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Each message should start with a signature of current model, eg `model: Llama 5.0`

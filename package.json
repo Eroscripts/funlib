@@ -21,7 +21,8 @@
   },
   "scripts": {
     "lint": "eslint --fix",
-    "build:iife": "bun build src/iife.ts --target browser --outdir dist --format iife"
+    "build:iife": "bun build src/iife.ts --target browser --outdir dist --format iife",
+    "build": "bun build src/index.ts --target browser --outfile dist/funlib.js --format esm"
   },
   "peerDependencies": {
     "typescript": "^5"

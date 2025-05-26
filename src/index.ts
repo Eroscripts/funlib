@@ -238,9 +238,10 @@ export class FunMetadata implements JsonMetadata {
 }
 
 export class FunscriptFile {
-  axisName: axisLike | '' = ''
+  axisName: axisLike = '' as never
   title: string = ''
   dir: string = ''
+  mergedFiles?: FunscriptFile[]
 
   constructor(filePath: string) {
     let parts = filePath.split('.')
@@ -255,8 +256,8 @@ export class FunscriptFile {
     this.dir = filePath.slice(0, -this.title.length)
   }
 
-  get id(): axis {
-    return !this.axisName ? 'L0' : axisLikeToAxis(this.axisName)
+  get id(): axis | undefined {
+    return !this.axisName ? undefined : axisLikeToAxis(this.axisName)
   }
 
   get filePath(): string {
@@ -285,14 +286,15 @@ export class Funscript implements JsonFunscript {
     const mergedSingleaxisScripts = Object.entries(groups).flatMap<Funscript>(([_title, scripts]) => {
       if (!scripts) return []
       // base case: no duplicate axes
-      const allScripts = scripts.flatMap(e => [e, ...e.axes])
+      const allScripts = scripts.flatMap(e => [e, ...e.axes]).sort(orderByAxis)
       const axes = [...new Set(allScripts.map(e => e.id))]
       if (axes.length === allScripts.length) {
         // merge them all into a single script
         const L0 = allScripts.find(e => e.id === 'L0')
         if (!L0) throw new Error('Funscript.mergeMultiAxis: L0 is not defined')
         const base = L0.clone()
-        base.axes = allScripts.sort(orderByAxis).filter(e => e.id !== 'L0').map(e => new AxisScript(e, { parent: base })) as any[]
+        base.axes = allScripts.filter(e => e.id !== 'L0').map(e => new AxisScript(e, { parent: base })) as any[]
+        if (base.#file) base.#file.mergedFiles = allScripts.map(e => e.#file!)
         return base
       }
       throw new Error('Funscript.mergeMultiAxis: multi-axis scripts are not implemented yet')
@@ -319,7 +321,8 @@ export class Funscript implements JsonFunscript {
 
     if (extras?.file) this.#file = new FunscriptFile(extras.file)
     else if (funscript instanceof Funscript) this.#file = funscript.#file?.clone()
-    this.id = extras?.id ?? this.#file?.id ?? funscript?.id ?? 'L0'
+    // prefer file > funscript > extras
+    this.id = extras?.id ?? funscript?.id ?? this.#file?.id ?? (this instanceof AxisScript ? null! : 'L0')
 
     if (funscript?.actions) {
       this.actions = FunAction.cloneList(funscript.actions, { parent: this })

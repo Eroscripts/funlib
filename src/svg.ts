@@ -26,6 +26,8 @@ export interface SvgOptions {
   normalize?: boolean
 
   scriptSpacing?: number
+  width?: number
+  font?: string
 }
 
 export const svgDefaultOptions: Required<SvgOptions> = {
@@ -40,6 +42,8 @@ export const svgDefaultOptions: Required<SvgOptions> = {
   axisCells: 1,
   scriptSpacing: 4,
   normalize: true,
+  width: 690,
+  font: 'Arial, sans-serif',
 }
 
 const isBrowser = typeof document !== 'undefined'
@@ -175,8 +179,8 @@ export function toSvgElement(scripts: Funscript[], ops: SvgOptions): string {
   y -= fullOps.scriptSpacing
   y += 2
 
-  return `<svg class="funsvg" width="690" height="${y}" xmlns="http://www.w3.org/2000/svg"
-    font-size="14px" font-family="Consolas"
+  return `<svg class="funsvg" width="${fullOps.width}" height="${y}" xmlns="http://www.w3.org/2000/svg"
+    font-size="14px" font-family="${fullOps.font}"
   >
     ${pieces.join('\n')}
   </svg>`
@@ -194,18 +198,21 @@ export function toSvgG(script: Funscript, ops: Required<SvgOptions> & { transfor
     mergeLimit,
     axisCells,
     normalize = true,
+    width,
   } = ops
+
+  if (!title) {
+    if (script.file?.filePath) {
+      title = script.file.filePath
+    } else if (script.parent?.file) {
+      title = '<' + axisToName(script.id) + '>'
+    }
+  }
+
   script = script.clone()
   if (normalize) script.normalize()
 
   const isForHandy = '_isForHandy' in script && script._isForHandy
-  if (!title) {
-    if (script.file) {
-      title = script.file.filePath
-    } else if (script.parent?.file) {
-      title = script.parent.file.filePath + '::' + axisToName(script.id)
-    }
-  }
   let axis: string = script.id ?? 'L0'
   if (isForHandy) axis = '☞'
 
@@ -219,7 +226,8 @@ export function toSvgG(script: Funscript, ops: Required<SvgOptions> & { transfor
   }
 
   const stats = script.toStats()
-  const xx = [0, 46 - dw, 46, 640]
+  const graphWidth = width - 50
+  const xx = [0, 46 - dw, 46, width]
   const yy = [0, 20, 20 + dh, 20 + 32 + dh]
   const bgGradientId = `funsvg-grad-${Math.random().toString(26).slice(2)}`
 
@@ -234,34 +242,34 @@ export function toSvgG(script: Funscript, ops: Required<SvgOptions> & { transfor
       <g class="funsvg-bgs">
         <defs>${toSvgBackgroundGradient(script, bgGradientId)}</defs>
         <rect class="funsvg-bg-axis-drop" x="0" y="${axisTitleTop}" width="${xx[1]}" height="${yy[3] - axisTitleTop}" fill="#ccc" opacity="${round(bgOpacity * 1.5)}"></rect>
-        <rect class="funsvg-bg-title-drop" x="${xx[2]}" width="${xx[3]}" height="${yy[1]}" fill="#ccc" opacity="${round(bgOpacity * 1.5)}"></rect>
+        <rect class="funsvg-bg-title-drop" x="${xx[2]}" width="${graphWidth}" height="${yy[1]}" fill="#ccc" opacity="${round(bgOpacity * 1.5)}"></rect>
         <rect class="funsvg-bg-axis" x="0" y="${axisTitleTop}" width="${xx[1]}" height="${yy[3] - axisTitleTop}" fill="${speedToHexCached(stats.AvgSpeed)}" opacity="${round(headerOpacity * Math.max(0.5, Math.min(1, stats.AvgSpeed / 100)))}"></rect>
-        <rect class="funsvg-bg-title" x="${xx[2]}" width="${xx[3]}" height="${yy[1]}" fill="url(#${bgGradientId})" opacity="${round(headerOpacity)}"></rect>
-        <rect class="funsvg-bg-graph" x="${xx[2]}" width="${xx[3]}" y="${yy[1]}" height="${yy[3] - yy[1]}" fill="url(#${bgGradientId})" opacity="${round(bgOpacity)}"></rect>
+        <rect class="funsvg-bg-title" x="${xx[2]}" width="${graphWidth}" height="${yy[1]}" fill="url(#${bgGradientId})" opacity="${round(headerOpacity)}"></rect>
+        <rect class="funsvg-bg-graph" x="${xx[2]}" width="${graphWidth}" y="${yy[1]}" height="${yy[3] - yy[1]}" fill="url(#${bgGradientId})" opacity="${round(bgOpacity)}"></rect>
       </g>
 
 
       <g class="funsvg-lines" transform="translate(${xx[2]}, ${yy[2]})" stroke-width="${w}" fill="none" stroke-linecap="round">
-        ${toSvgLines(script, { width: xx[3], height: 32, w, mergeLimit })}
+        ${toSvgLines(script, { width: graphWidth, height: 32, w, mergeLimit })}
       </g>
       
       <g class="funsvg-titles">
         <g class="funsvg-titles-drop" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent">
           <text class="funsvg-axis-drop" opacity="0" x="${xx[1] / 2}" y="${(axisTitleTop + yy[3]) / 2 + (axisTitleTop === yy[2] ? 2 : 4)}" font-size="250%" text-anchor="middle" dominant-baseline="middle"> ${axis} </text>
-          <text class="funsvg-title-drop" x="49" y="15" lengthAdjust="spacingAndGlyphs" ${textToSvgLength(title, '14px Consolas') > 450 ? 'textLength="450"' : ''
+          <text class="funsvg-title-drop" x="49" y="15" lengthAdjust="spacingAndGlyphs" ${textToSvgLength(title, `14px ${ops.font}`) > 450 ? 'textLength="450"' : ''
           }> ${textToSvgText(title)} </text>
           ${Object.entries(stats).reverse().map(([k, v], i) => `
-              <text class="funsvg-stat-label-drop" x="${683 - i * 46}" y="7" font-weight="bold" font-size="50%" text-anchor="end"> ${k} </text>
-              <text class="funsvg-stat-value-drop" x="${683 - i * 46}" y="17" font-weight="bold" font-size="90%" text-anchor="end"> ${v} </text>
+              <text class="funsvg-stat-label-drop" x="${xx[3] - 7 - i * 46}" y="7" font-weight="bold" font-size="50%" text-anchor="end"> ${k} </text>
+              <text class="funsvg-stat-value-drop" x="${xx[3] - 7 - i * 46}" y="17" font-weight="bold" font-size="90%" text-anchor="end"> ${v} </text>
             `).join('\n')
           } 
         </g>
         <text class="funsvg-axis" x="${xx[1] / 2}" y="${(axisTitleTop + yy[3]) / 2 + (axisTitleTop === yy[2] ? 2 : 4)}" font-size="250%" text-anchor="middle" dominant-baseline="middle"> ${axis} </text>
-        <text class="funsvg-title" x="49" y="15" lengthAdjust="spacingAndGlyphs" ${textToSvgLength(title, '14px Consolas') > 450 ? 'textLength="450"' : ''
+        <text class="funsvg-title" x="49" y="15" lengthAdjust="spacingAndGlyphs" ${textToSvgLength(title, `14px ${ops.font}`) > 450 ? 'textLength="450"' : ''
         }> ${textToSvgText(title)} </text>
         ${Object.entries(stats).reverse().map(([k, v], i) => `
-            <text class="funsvg-stat-label" x="${683 - i * 46}" y="7" font-weight="bold" font-size="50%" text-anchor="end"> ${k} </text>
-            <text class="funsvg-stat-value" x="${683 - i * 46}" y="17" font-weight="bold" font-size="90%" text-anchor="end"> ${v} </text>
+            <text class="funsvg-stat-label" x="${xx[3] - 7 - i * 46}" y="7" font-weight="bold" font-size="50%" text-anchor="end"> ${k} </text>
+            <text class="funsvg-stat-value" x="${xx[3] - 7 - i * 46}" y="17" font-weight="bold" font-size="90%" text-anchor="end"> ${v} </text>
           `).join('\n')
         } 
       </g>
@@ -273,9 +281,9 @@ export function toSvgG(script: Funscript, ops: Required<SvgOptions> & { transfor
               : `<rect x="0" y="0" width="${xx[1]}" height="20" stroke="${color}" stroke-width="0.2" fill="none"></rect>`
           )}
         <rect x="0" y="${axisTitleTop}" width="${xx[1]}" height="${yy[3] - axisTitleTop}" stroke="${color}" stroke-width="0.2" fill="none"></rect>
-        <rect x="${xx[2]}" y="0" width="${xx[3]}" height="20" stroke="${color}" stroke-width="0.2" fill="none"></rect>
-        <rect x="${xx[2]}" y="${yy[2]}" width="${xx[3]}" height="32" stroke="${color}" stroke-width="0.2" fill="none"></rect>
-        <rect x="${-sw / 2}" y="${-sw / 2}" width="${686 + sw}" height="${yy[3] + sw}" stroke="${'#eee'}" stroke-width="${sw}" fill="none"></rect>
+        <rect x="${xx[2]}" y="0" width="${graphWidth}" height="20" stroke="${color}" stroke-width="0.2" fill="none"></rect>
+        <rect x="${xx[2]}" y="${yy[2]}" width="${graphWidth}" height="32" stroke="${color}" stroke-width="0.2" fill="none"></rect>
+        <rect x="${-sw / 2}" y="${-sw / 2}" width="${xx[3] - 4 + sw}" height="${yy[3] + sw}" stroke="${'#eee'}" stroke-width="${sw}" fill="none"></rect>
       </g>
 
     </g>
