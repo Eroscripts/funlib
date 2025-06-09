@@ -1,13 +1,9 @@
-import type { Funscript } from '.'
-import type { ms } from './types'
-import { FunAction } from '.'
-import { axisToName, speedToOklchText } from './converter'
-import { actionsToLines, actionsToZigzag } from './manipulations'
-
-// Helper function (consider moving to a shared utils file)
-function lerp(min: number, max: number, t: number): number {
-  return min + t * (max - min)
-}
+import type { Funscript } from '..'
+import type { ms } from '../types'
+import { FunAction } from '..'
+import { axisToName, speedToOklchText } from '../converter'
+import { actionsToLines, actionsToZigzag } from '../manipulations'
+import { lerp } from '../misc'
 
 export function drawFunscriptGraph(
   ctx: HTMLCanvasElement | CanvasRenderingContext2D,

@@ -1,4 +1,4 @@
-import type { FunAction, mantissa, mantissaText, pos, speed } from '.'
+import type { FunAction, mantissaText, pos, speed } from '.'
 
 export { oklch2rgb } from 'colorizr'
 

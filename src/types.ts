@@ -1,5 +1,3 @@
-/* eslint-disable ts/no-redeclare */
-
 export declare const B: unique symbol
 export interface B<Brand> {
   [B]?: Brand
@@ -24,14 +22,13 @@ export type seconds = number & B<['time', 's']>
 export type timeSpan = string & B<['time', 'TimeSpan']>
 
 export type speed = number & B<['speed', 'u/s']>
-export type speed10 = number & B<['speed', '0.1u/s']>
+// export type speed10 = number & B<['speed', '0.1u/s']>
 
 // axis value variants
-/** @deprecated use pos instead */
-export type axisValue = number & B<['axis', 'u']> // 0-100
-export type axisNorm = number & B<['axis', 'mantissa']> // 0-1
-export type axisAngle = number & B<['axis', 'deg']> // in degrees
-export type axisRaw = number & B<['axis', 'deg' | 'mantissa']>
+export type pos = number & B<['axis', 'u']> // 0-100
+// export type axisNorm = number & B<['axis', 'mantissa']> // 0-1
+// export type axisAngle = number & B<['axis', 'deg']> // in degrees
+// export type axisRaw = number & B<['axis', 'deg' | 'mantissa']>
 
 // axes
 export type axis = `${'L' | 'R' | 'A'}${0 | 1 | 2}` & B<['axis', 'name']>
@@ -44,10 +41,6 @@ export type chapterName = string & B<['chapter', 'name']>
 export type TCodeTuple = [axis: axis, pos: pos]
   | [axis: axis, pos: pos, 'I', interval: ms]
   | [axis: axis, pos: pos, 'S', speed: speed]
-
-// aliases:
-export type pos = axisValue
-export type at = ms
 
 export interface JsonAction {
   at: ms

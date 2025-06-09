@@ -13,4 +13,5 @@ export default antfu({
     'style/brace-style': 'off',
     'prefer-template': 'off',
     'ts/explicit-function-return-type': ['warn', {}],
+    'ts/no-redeclare': 'off',
   })

@@ -1,4 +1,4 @@
-import type { Funscript, ms, speed } from '.'
+import type { ms, speed } from '.'
 import { FunAction } from '.'
 import { absSpeedBetween, lerp, listToSum, minBy, speedBetween, unlerp } from './misc'
 

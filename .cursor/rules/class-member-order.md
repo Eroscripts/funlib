@@ -16,4 +16,4 @@ The general order is as follows:
     *   Instance JSON-related methods (e.g., `toJSON`, `toJsonText`).
     *   Instance `clone` method.
 
-Sections with no members (e.g., if a class has no private properties) should simply be omitted, including their comment headers. 
+Sections with no members (e.g., if a class has no private properties) should simply be omitted, including their comment headers.

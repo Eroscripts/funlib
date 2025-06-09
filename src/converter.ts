@@ -1,5 +1,5 @@
 import type { Funscript } from '.'
-import type { axis, axisLike, axisName, axisNorm, axisPairs, axisRaw, axisValue, mantissa, ms, pos, seconds, speed, TCodeTuple, timeSpan } from './types'
+import type { axis, axisLike, axisName, axisPairs, ms, pos, seconds, speed, TCodeTuple, timeSpan } from './types'
 import { oklch2hex } from 'colorizr'
 import { clamp, clamplerp, compareWithOrder } from './misc'
 
@@ -38,40 +38,6 @@ export function secondsToDuration(seconds: seconds): string {
     Math.floor(seconds % 60).toFixed(0).padStart(2, '0')}`
 }
 
-export function rawToValue(raw: axisRaw, axis?: axis): axisValue {
-  if (raw === undefined || raw === null) {
-    throw new Error('rawToValue: raw value is required')
-  }
-  // axisValue is [0, 100]
-  // L0 is [0, 1]; R0 is [-60, 60]; R1, R2 is [-30, 30]; L1/L2 is throw
-  let norm: axisNorm = -999
-  if (axis === 'L0') norm = raw + 0
-  if (axis === 'R0') norm = raw / 120 + 0.5
-  if (axis === 'R1') norm = raw / 60 + 0.5
-  if (axis === 'R2') norm = raw / 60 + 0.5
-
-  if (axis === 'L1') norm = raw / 60 + 0.5
-  if (axis === 'L2') norm = raw / 60 + 0.5
-
-  if (norm === -999) throw new Error(`rawToValue: ${axis} is not supported`)
-  return norm * 100
-}
-
-export function valueToRaw(value: axisValue, axis?: axis): axisRaw {
-  // axisValue is [0, 100]
-  // L0 is [0, 1]; R0 is [-60, 60]; R1, R2 is [-30, 30]; L1/L2 is throw
-  const norm: axisNorm = value / 100
-  if (axis === 'L0') return norm
-  if (axis === 'R0') return (norm - 0.5) * 120
-  if (axis === 'R1') return (norm - 0.5) * 60
-  if (axis === 'R2') return (norm - 0.5) * 60
-  throw new Error(`valueToRaw: ${axis} is not supported`)
-}
-
-export function roundAxisValue(value: axisValue): axisValue {
-  return +value.toFixed(2)
-}
-
 export function orderTrimJson(that: Record<string, any>, order: Record<string, any>, empty: Record<string, any>): Record<string, any> {
   const copy: Record<string, any> = { ...order, ...that }
   for (const [k, v] of Object.entries(empty)) {
@@ -88,11 +54,6 @@ export function orderTrimJson(that: Record<string, any>, order: Record<string, a
       delete (copy as any)[k]
     }
   }
-  // for (const k of Object.keys(copy)) {
-  //   if (k.startsWith('__')) {
-  //     delete (copy as any)[k]
-  //   }
-  // }
   return copy
 }
 
@@ -100,7 +61,6 @@ function fromEntries<A extends [any, any][]>(a: A): { [K in A[number] as K[0]]: 
   return Object.fromEntries(a)
 }
 
-// eslint-disable-next-line ts/no-redeclare
 const axisPairs: axisPairs = [
   ['L0', 'stroke'],
   ['L1', 'surge'],
@@ -249,6 +209,14 @@ export function speedToOklchText(speed: speed, useAlpha = false) {
 export function speedToHex(speed: speed) {
   const [l, c, h] = speedToOklch(speed)
   return oklch2hex({ l, c, h })
+}
+
+const hexCache = new Map<speed, string>()
+export function speedToHexCached(speed: speed) {
+  if (hexCache.has(speed)) return hexCache.get(speed)!
+  const hex = speedToHex(Math.abs(speed))
+  hexCache.set(speed, hex)
+  return hex
 }
 
 export function formatTCode(tcode: string, format = true) {

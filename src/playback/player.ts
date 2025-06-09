@@ -1,4 +1,4 @@
-import type { Funscript } from '.'
+import type { Funscript } from '..'
 
 class Ticker {
   ontick = () => {}

@@ -22,7 +22,9 @@
   "scripts": {
     "lint": "eslint --fix",
     "build:iife": "bun build src/iife.ts --target browser --outdir dist --format iife",
-    "build": "bun build src/index.ts --target browser --outfile dist/funlib.js --format esm"
+    "build:esm": "bun build src/index.ts --target browser --outfile dist/funlib.js --format esm",
+    "build:dts": "bunx dts-bundle-generator -o dist/funlib.d.ts src/index.ts",
+    "build": "bun run build:esm && bun run build:dts"
   },
   "peerDependencies": {
     "typescript": "^5"

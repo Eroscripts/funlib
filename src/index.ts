@@ -1,9 +1,7 @@
-import type { SvgOptions } from './svg'
 import type { axis, axisLike, chapterName, JsonAction, JsonChapter, JsonFunscript, JsonMetadata, ms, pos, seconds, speed, TCodeTuple, timeSpan } from './types'
 import { axisLikes, axisLikeToAxis, formatJson, msToTimeSpan, orderByAxis, orderTrimJson, secondsToDuration, TCodeList, timeSpanToMs } from './converter'
 import { actionsAverageSpeed, actionsRequiredMaxSpeed } from './manipulations'
 import { clamp, clamplerp, speedBetween } from './misc'
-import { svgDefaultOptions, toSvgElement } from './svg'
 
 export { speedToOklch } from './converter'
 export { handySmooth } from './manipulations'
@@ -88,9 +86,6 @@ export class FunAction implements JsonAction {
     return this.pos - this.#prevAction.pos
   }
 
-  // get raw(): axisRaw { return valueToRaw(this.value, this.#parent?.id) }
-  // set raw(v: axisRaw) { this.value = rawToValue(v, this.#parent?.id) }
-
   // --- Public Instance Methods ---
   clerpAt(at: ms): pos {
     if (at === this.at) return this.pos
@@ -125,7 +120,7 @@ export class FunAction implements JsonAction {
     // NOTE: This creates a shallow clone. The private #prevAction, #nextAction
     // will be undefined in the new clone. They need to be relinked if the clone
     // is part of a list (e.g., using FunAction.linkList).
-    return new FunAction(this, { parent: this.#parent })
+    return new FunAction(this)
   }
 }
 
@@ -135,9 +130,10 @@ export class FunChapter implements JsonChapter {
   endTime: timeSpan = '00:00:00.000'
 
   constructor(chapter?: JsonChapter) {
-    this.name = chapter?.name ?? ''
-    this.startTime = chapter?.startTime ?? '00:00:00.000'
-    this.endTime = chapter?.endTime ?? '00:00:00.000'
+    // this.startTime = chapter?.startTime ?? '00:00:00.000'
+    // this.endTime = chapter?.endTime ?? '00:00:00.000'
+    // this.name = chapter?.name ?? ''
+    Object.assign(this, chapter)
   }
 
   get startAt(): ms { return timeSpanToMs(this.startTime) }
@@ -150,6 +146,10 @@ export class FunChapter implements JsonChapter {
     return orderTrimJson(this, FunChapter.jsonOrder, {
       name: '',
     })
+  }
+
+  clone(): FunChapter {
+    return new FunChapter(this)
   }
 }
 
@@ -270,13 +270,6 @@ export class FunscriptFile {
 }
 
 export class Funscript implements JsonFunscript {
-  // --- Static Methods ---
-  static svgDefaultOptions = svgDefaultOptions
-
-  static toSvgElement(scripts: Funscript[], ops: SvgOptions): string {
-    return toSvgElement(scripts, ops)
-  }
-
   /** merge multi-axis scripts into one */
   static mergeMultiAxis(scripts: Funscript[]): Funscript[] {
     const multiaxisScripts = scripts.filter(e => e.axes.length)
@@ -380,10 +373,6 @@ export class Funscript implements JsonFunscript {
       MaxSpeed: Math.round(MaxSpeed),
       AvgSpeed: Math.round(AvgSpeed),
     }
-  }
-
-  toSvgElement(ops: SvgOptions = {}): string {
-    return toSvgElement([this], { ...ops })
   }
 
   normalize() {
