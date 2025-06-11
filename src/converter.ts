@@ -135,7 +135,7 @@ export function formatJson(
   json = json.replaceAll(inArrayRegex, (s) => {
     // Round numbers to maxPrecision
     s = s.replaceAll(/(?<="(at|pos)":\s*)(-?\d+\.?\d*)/g, num =>
-      Number(num).toFixed(maxPrecision).replace(/\.?0+$/, ''))
+      Number(num).toFixed(maxPrecision).replace(/\.0+$/, ''))
 
     // "at": -123.456,
     const atValues = s.match(/(?<="at":\s*)(-?\d+\.?\d*)/g) ?? []

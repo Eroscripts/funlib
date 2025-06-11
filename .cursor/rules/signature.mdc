@@ -3,4 +3,4 @@ description:
 globs: 
 alwaysApply: true
 ---
-Each message should start with a signature of current model, eg `model: Llama 5.0`
+Each message should start with a signature of current model, eg (example)`model: Bard-2026-4-3`

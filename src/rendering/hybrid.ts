@@ -126,7 +126,7 @@ function generateCSS(opts: Required<SvgOptions>): string {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(204, 204, 204, ${opts.bgOpacity * 1.5});
+      background: rgba(204, 204, 204, ${opts.graphOpacity * 1.5});
       margin-right: ${opts.midBorderX}px;
     }
     
@@ -181,7 +181,7 @@ function generateCSS(opts: Required<SvgOptions>): string {
     
     .axis-spacer {
       width: ${46 + opts.midBorderX}px;
-      background: rgba(204, 204, 204, ${opts.bgOpacity * 1.5});
+      background: rgba(204, 204, 204, ${opts.graphOpacity * 1.5});
     }
     
     .graph-area {

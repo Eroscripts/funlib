@@ -205,7 +205,7 @@ export interface CanvasFunscriptOptions {
   bgOpacity?: number
   headerOpacity?: number
   mergeLimit?: number // For line simplification in drawFunscriptGraph (if needed)
-  axisCells?: number // (Currently unused, might influence layout later)
+
   normalize?: boolean // Whether to normalize script values before drawing
 
   scriptSpacing?: number // Vertical space between script blocks
@@ -228,7 +228,7 @@ export const canvasDefaultOptions: Required<Omit<CanvasFunscriptOptions, 'mergeL
   bgOpacity: 0.2,
   headerOpacity: 0.7,
   // mergeLimit is handled within drawing functions if necessary
-  axisCells: 1,
+
   scriptSpacing: 4,
   normalize: true,
 }
