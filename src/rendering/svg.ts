@@ -12,6 +12,8 @@ export interface SvgOptions {
   title?: ((script: Funscript) => string) | string | null
   /** font to use for text */
   font?: string
+  /** font size for text */
+  fontSize?: number
   /** font to use for axis text */
   axisFont?: string
   /** halo around text */
@@ -58,6 +60,7 @@ export const svgDefaultOptions: Required<SvgOptions> = {
   title: null,
   lineWidth: 0.5,
   font: 'Arial, sans-serif',
+  fontSize: 14,
   axisFont: 'Consolas, monospace',
   halo: true,
   solidHeaderBackground: false,
@@ -277,7 +280,7 @@ export function toSvgElement(scripts: Funscript | Funscript[], ops: SvgOptions):
   y += SVG_PADDING
 
   return `<svg class="funsvg" width="${fullOps.width}" height="${y}" xmlns="http://www.w3.org/2000/svg"
-    font-size="14px" font-family="${fullOps.font}"
+    font-size="${fullOps.fontSize}px" font-family="${fullOps.font}"
   >
     ${pieces.join('\n')}
   </svg>`
@@ -347,12 +350,12 @@ export function toSvgG(
   }
 
   if (title && titleSeparateLine !== false
-    && textToSvgLength(title, `14px ${font}`) > xx.textWidth) {
+    && textToSvgLength(title, `${ops.fontSize}px ${font}`) > xx.textWidth) {
     useSeparateLine = true
   }
   if (title && titleEllipsis
-    && textToSvgLength(title, `14px ${font}`) > xx.textWidth) {
-    title = truncateTextWithEllipsis(title, xx.textWidth, `14px ${font}`)
+    && textToSvgLength(title, `${ops.fontSize}px ${font}`) > xx.textWidth) {
+    title = truncateTextWithEllipsis(title, xx.textWidth, `${ops.fontSize}px ${font}`)
   }
   if (useSeparateLine) {
     ctx.onDoubleTitle()
