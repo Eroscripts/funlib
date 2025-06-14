@@ -363,12 +363,13 @@ export class Funscript implements JsonFunscript {
   }
 
   // --- Public Instance Methods ---
-  toStats(options?: { duration?: number }) {
+  toStats(options?: { durationMs?: ms }) {
     const MaxSpeed = actionsRequiredMaxSpeed(this.actions)
     const AvgSpeed = actionsAverageSpeed(this.actions)
+    const duration = options?.durationMs ? options.durationMs / 1000 : this.actualDuration
 
     return {
-      Duration: secondsToDuration(options?.duration ?? this.actualDuration),
+      Duration: secondsToDuration(duration),
       Actions: this.actions.filter(e => e.isPeak).length,
       MaxSpeed: Math.round(MaxSpeed),
       AvgSpeed: Math.round(AvgSpeed),
