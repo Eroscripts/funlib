@@ -45,7 +45,7 @@ export interface SvgOptions {
   /** margin between funscript axis and graph */
   axisSpacing?: number
   /** duration in milliseconds. Set to 0 to use script.actualDuration */
-  durationMs?: ms
+  durationMs?: ms | 0
 }
 /** y between one axis G and the next */
 const SPACING_BETWEEN_AXES = 0
@@ -74,6 +74,10 @@ export const svgDefaultOptions: Required<SvgOptions> = {
   axisWidth: 46,
   axisSpacing: 0,
   durationMs: 0,
+}
+
+export type SvgSubOptions<K extends keyof SvgOptions> = {
+  [P in K]-?: Required<SvgOptions>[P]
 }
 
 const isBrowser = typeof document !== 'undefined'
@@ -126,10 +130,16 @@ export function truncateTextWithEllipsis(text: string, maxWidth: number, font: s
  * Converts a Funscript to SVG path elements representing the motion lines.
  * Each line is colored based on speed and positioned within the specified dimensions.
  */
-export function toSvgLines(script: Funscript, { width, height, w = 2, mergeLimit = 500, durationMs }: { width: number, height: number, w?: number, mergeLimit?: number, durationMs: ms }) {
+export function toSvgLines(
+  script: Funscript,
+  ops: SvgSubOptions<'durationMs' | 'mergeLimit' | 'lineWidth'>,
+  ctx: { width: number, height: number },
+) {
+  const { lineWidth, mergeLimit, durationMs } = ops
+  const { width, height } = ctx
   function lineToStroke(a: FunAction, b: FunAction) {
-    const at = (a: FunAction) => ((a.at / 1000) / (durationMs / 1000) * (width - 2 * w)) + w
-    const pos = (a: FunAction) => (100 - a.pos) * (height - 2 * w) / 100 + w
+    const at = (a: FunAction) => ((a.at / 1000) / (durationMs / 1000) * (width - 2 * lineWidth)) + lineWidth
+    const pos = (a: FunAction) => (100 - a.pos) * (height - 2 * lineWidth) / 100 + lineWidth
     return `M ${at(a)} ${pos(a)} L ${at(b)} ${pos(b)}`
   }
   const lines = actionsToLines(script.actions)
@@ -144,7 +154,11 @@ export function toSvgLines(script: Funscript, { width, height, w = 2, mergeLimit
  * Creates an SVG linear gradient definition based on a Funscript's speed variations over time.
  * The gradient represents speed changes throughout the script duration with color transitions.
  */
-export function toSvgBackgroundGradient(script: Funscript, linearGradientId: string, durationMs: ms) {
+export function toSvgBackgroundGradient(
+  script: Funscript,
+  { durationMs }: SvgSubOptions<'durationMs'>,
+  linearGradientId: string,
+) {
   const lines = actionsToLines(actionsToZigzag(script.actions))
     .flatMap((e) => {
       const [a, b, s] = e
@@ -215,12 +229,18 @@ export function toSvgBackgroundGradient(script: Funscript, linearGradientId: str
  * Creates a complete SVG background with gradient fill based on a Funscript's speed patterns.
  * Includes both the gradient definition and the rectangle that uses it.
  */
-export function toSvgBackground(script: Funscript, { width, height, bgOpacity = 0.2, rectId, durationMs }: { width: number, height: number, bgOpacity?: number, rectId?: string, durationMs: ms }) {
+export function toSvgBackground(
+  script: Funscript,
+  ops: SvgSubOptions<'width' | 'height' | 'durationMs'>,
+  ctx?: { bgOpacity?: number, rectId?: string },
+) {
+  const { width, height, durationMs } = ops
+  const { bgOpacity, rectId } = ctx ?? {}
   const id = `grad_${Math.random().toString(26).slice(2)}`
 
   return `
-    <defs>${toSvgBackgroundGradient(script, id, durationMs)}</defs>
-    <rect${rectId ? ` id="${rectId}"` : ''} width="${width}" height="${height}" fill="url(#${id})" opacity="${bgOpacity}"></rect>`
+    <defs>${toSvgBackgroundGradient(script, { durationMs }, id)}</defs>
+    <rect${rectId ? ` id="${rectId}"` : ''} width="${width}" height="${height}" fill="url(#${id})" opacity="${bgOpacity ?? svgDefaultOptions.graphOpacity}"></rect>`
 }
 
 /**
@@ -236,22 +256,17 @@ export function toSvgElement(scripts: Funscript | Funscript[], ops: SvgOptions):
   let y = SVG_PADDING
   for (const s of scripts) {
     const durationMs = fullOps.durationMs || s.actualDuration * 1000
-    pieces.push(toSvgG(s, {
-      ...fullOps,
-      // Only show title for the first script
-      title: fullOps.title,
+    // Only show title for the first script
+    pieces.push(toSvgG(s, { ...fullOps, durationMs, title: fullOps.title }, {
       transform: `translate(${SVG_PADDING}, ${y})`,
-      durationMs,
       onDoubleTitle: () => y += fullOps.headerHeight,
     }))
     y += fullOps.height + SPACING_BETWEEN_AXES
     for (const a of s.axes) {
-      pieces.push(toSvgG(a, {
-        ...fullOps,
-        title: fullOps.title ?? '', // Axes never show title
+      // Axes never show title
+      pieces.push(toSvgG(a, { ...fullOps, durationMs, title: fullOps.title ?? '' }, {
         transform: `translate(${SVG_PADDING}, ${y})`,
         isSecondaryAxis: true,
-        durationMs,
         onDoubleTitle: () => y += fullOps.headerHeight,
       }))
       y += fullOps.height + SPACING_BETWEEN_AXES
@@ -275,7 +290,8 @@ export function toSvgElement(scripts: Funscript | Funscript[], ops: SvgOptions):
  */
 export function toSvgG(
   script: Funscript,
-  ops: Required<SvgOptions> & { transform: string, onDoubleTitle: () => void, isSecondaryAxis?: boolean },
+  ops: SvgSubOptions<keyof SvgOptions>,
+  ctx: { transform: string, onDoubleTitle: () => void, isSecondaryAxis?: boolean },
 ) {
   const {
     title: rawTitle,
@@ -288,16 +304,15 @@ export function toSvgG(
     axisWidth,
     axisSpacing,
     axisFont,
-    mergeLimit,
-    normalize = true,
+    normalize,
     width,
     solidHeaderBackground,
     titleEllipsis,
     titleSeparateLine,
     font,
-    isSecondaryAxis,
     durationMs,
   } = ops
+  const { isSecondaryAxis } = ctx
 
   // Resolve title to string once
   let title: string = ''
@@ -340,7 +355,7 @@ export function toSvgG(
     title = truncateTextWithEllipsis(title, xx.textWidth, `14px ${font}`)
   }
   if (useSeparateLine) {
-    ops.onDoubleTitle()
+    ctx.onDoubleTitle()
   }
 
   // Calculate the actual graph height from total height
@@ -381,10 +396,10 @@ export function toSvgG(
   const axisOpacity = round(headerOpacity * Math.max(0.5, Math.min(1, stats.AvgSpeed / 100)))
 
   return `
-    <g transform="${ops.transform}">
+    <g transform="${ctx.transform}">
       
       <g class="funsvg-bgs">
-        <defs>${toSvgBackgroundGradient(script, bgGradientId, durationMs)}</defs>
+        <defs>${toSvgBackgroundGradient(script, { durationMs }, bgGradientId)}</defs>
         <rect class="funsvg-bg-axis-drop" x="0" y="${yy.top}" width="${xx.axisEnd}" height="${yy.svgBottom - yy.top}" fill="#ccc" opacity="${round(graphOpacity * 1.5)}"></rect>
         <rect class="funsvg-bg-title-drop" x="${xx.titleStart}" width="${xx.graphWidth}" height="${yy.titleBottom}" fill="#ccc" opacity="${round(graphOpacity * 1.5)}"></rect>
         <rect class="funsvg-bg-axis" x="0" y="${yy.top}" width="${xx.axisEnd}" height="${yy.svgBottom - yy.top}" fill="${axisColor}" opacity="${axisOpacity}"></rect>
@@ -394,7 +409,7 @@ export function toSvgG(
 
 
       <g class="funsvg-lines" transform="translate(${xx.titleStart}, ${yy.graphTop})" stroke-width="${w}" fill="none" stroke-linecap="round">
-        ${toSvgLines(script, { width: xx.graphWidth, height: graphHeight, w, mergeLimit, durationMs })}
+        ${toSvgLines(script, ops, { width: xx.graphWidth, height: graphHeight })}
       </g>
       
       <g class="funsvg-titles">
