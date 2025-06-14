@@ -301,8 +301,6 @@ export function toSvgG(
     headerHeight,
     headerSpacing,
     height,
-    axisWidth,
-    axisSpacing,
     axisFont,
     normalize,
     width,
@@ -313,6 +311,8 @@ export function toSvgG(
     durationMs,
   } = ops
   const { isSecondaryAxis } = ctx
+  const axisWidth = ops.axisWidth
+  const axisSpacing = axisWidth === 0 ? 0 : ops.axisSpacing
 
   // Resolve title to string once
   let title: string = ''
@@ -400,9 +400,9 @@ export function toSvgG(
       
       <g class="funsvg-bgs">
         <defs>${toSvgBackgroundGradient(script, { durationMs }, bgGradientId)}</defs>
-        <rect class="funsvg-bg-axis-drop" x="0" y="${yy.top}" width="${xx.axisEnd}" height="${yy.svgBottom - yy.top}" fill="#ccc" opacity="${round(graphOpacity * 1.5)}"></rect>
+        ${axisWidth > 0 ? `<rect class="funsvg-bg-axis-drop" x="0" y="${yy.top}" width="${xx.axisEnd}" height="${yy.svgBottom - yy.top}" fill="#ccc" opacity="${round(graphOpacity * 1.5)}"></rect>` : ''}
         <rect class="funsvg-bg-title-drop" x="${xx.titleStart}" width="${xx.graphWidth}" height="${yy.titleBottom}" fill="#ccc" opacity="${round(graphOpacity * 1.5)}"></rect>
-        <rect class="funsvg-bg-axis" x="0" y="${yy.top}" width="${xx.axisEnd}" height="${yy.svgBottom - yy.top}" fill="${axisColor}" opacity="${axisOpacity}"></rect>
+        ${axisWidth > 0 ? `<rect class="funsvg-bg-axis" x="0" y="${yy.top}" width="${xx.axisEnd}" height="${yy.svgBottom - yy.top}" fill="${axisColor}" opacity="${axisOpacity}"></rect>` : ''}
         <rect class="funsvg-bg-title" x="${xx.titleStart}" width="${xx.graphWidth}" height="${yy.titleBottom}" fill="${solidHeaderBackground ? axisColor : `url(#${bgGradientId})`}" opacity="${round(solidHeaderBackground ? axisOpacity * headerOpacity : headerOpacity)}"></rect>
         <rect class="funsvg-bg-graph" x="${xx.titleStart}" width="${xx.graphWidth}" y="${yy.graphTop}" height="${graphHeight}" fill="url(#${bgGradientId})" opacity="${round(graphOpacity)}"></rect>
       </g>
@@ -423,7 +423,7 @@ export function toSvgG(
                   `).reverse().join('\n')
                 } 
               </g>`}
-        <text class="funsvg-axis" x="${xx.axisText}" y="${yy.axisText}" font-size="250%" font-family="${axisFont}" text-anchor="middle" dominant-baseline="middle"> ${axis} </text>
+        ${axisWidth > 0 ? `<text class="funsvg-axis" x="${xx.axisText}" y="${yy.axisText}" font-size="250%" font-family="${axisFont}" text-anchor="middle" dominant-baseline="middle"> ${axis} </text>` : ''}
         <text class="funsvg-title" x="${xx.headerText}" y="${yy.headerText}"> ${textToSvgText(title)} </text>
         ${Object.entries(stats).reverse().map(([k, v], i) => `
             <text class="funsvg-stat-label" x="${xx.statText(i)}" y="${yy.statLabelText}" font-weight="bold" font-size="50%" text-anchor="end"> ${k} </text>
