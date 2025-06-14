@@ -147,7 +147,7 @@ export function toSvgLines(
 
   lines.sort((a, b) => a[2] - b[2])
   // global styles: stroke-width="${w}" fill="none" stroke-linecap="round"
-  return lines.map(([a, b, speed]) => `<path d="${lineToStroke(a, b)}" stroke="${speedToHexCached(speed)}"></path>`).join('\n')
+  return lines.map(([a, b, speed]) => `<path d="${lineToStroke(a, b)}" stroke="${speedToHexCached(speed)}"></path>`)
 }
 
 /**
@@ -292,7 +292,7 @@ export function toSvgG(
   script: Funscript,
   ops: SvgSubOptions<keyof SvgOptions>,
   ctx: { transform: string, onDoubleTitle: () => void, isSecondaryAxis?: boolean },
-) {
+): string {
   const {
     title: rawTitle,
     lineWidth: w,
@@ -395,44 +395,43 @@ export function toSvgG(
   const axisColor = speedToHexCached(stats.AvgSpeed)
   const axisOpacity = round(headerOpacity * Math.max(0.5, Math.min(1, stats.AvgSpeed / 100)))
 
-  return `
-    <g transform="${ctx.transform}">
-      
-      <g class="funsvg-bgs">
-        <defs>${toSvgBackgroundGradient(script, { durationMs }, bgGradientId)}</defs>
-        ${axisWidth > 0 ? `<rect class="funsvg-bg-axis-drop" x="0" y="${yy.top}" width="${xx.axisEnd}" height="${yy.svgBottom - yy.top}" fill="#ccc" opacity="${round(graphOpacity * 1.5)}"></rect>` : ''}
-        <rect class="funsvg-bg-title-drop" x="${xx.titleStart}" width="${xx.graphWidth}" height="${yy.titleBottom}" fill="#ccc" opacity="${round(graphOpacity * 1.5)}"></rect>
-        ${axisWidth > 0 ? `<rect class="funsvg-bg-axis" x="0" y="${yy.top}" width="${xx.axisEnd}" height="${yy.svgBottom - yy.top}" fill="${axisColor}" opacity="${axisOpacity}"></rect>` : ''}
-        <rect class="funsvg-bg-title" x="${xx.titleStart}" width="${xx.graphWidth}" height="${yy.titleBottom}" fill="${solidHeaderBackground ? axisColor : `url(#${bgGradientId})`}" opacity="${round(solidHeaderBackground ? axisOpacity * headerOpacity : headerOpacity)}"></rect>
-        <rect class="funsvg-bg-graph" x="${xx.titleStart}" width="${xx.graphWidth}" y="${yy.graphTop}" height="${graphHeight}" fill="url(#${bgGradientId})" opacity="${round(graphOpacity)}"></rect>
-      </g>
+  return [
+    `<g transform="${ctx.transform}">`,
+    '  <g class="funsvg-bgs">',
+    `    <defs>${toSvgBackgroundGradient(script, { durationMs }, bgGradientId)}</defs>`,
+    axisWidth > 0 && `    <rect class="funsvg-bg-axis-drop" x="0" y="${yy.top}" width="${xx.axisEnd}" height="${yy.svgBottom - yy.top}" fill="#ccc" opacity="${round(graphOpacity * 1.5)}"></rect>`,
+    `    <rect class="funsvg-bg-title-drop" x="${xx.titleStart}" width="${xx.graphWidth}" height="${yy.titleBottom}" fill="#ccc" opacity="${round(graphOpacity * 1.5)}"></rect>`,
+    axisWidth > 0 && `    <rect class="funsvg-bg-axis" x="0" y="${yy.top}" width="${xx.axisEnd}" height="${yy.svgBottom - yy.top}" fill="${axisColor}" opacity="${axisOpacity}"></rect>`,
+    `    <rect class="funsvg-bg-title" x="${xx.titleStart}" width="${xx.graphWidth}" height="${yy.titleBottom}" fill="${solidHeaderBackground ? axisColor : `url(#${bgGradientId})`}" opacity="${round(solidHeaderBackground ? axisOpacity * headerOpacity : headerOpacity)}"></rect>`,
+    `    <rect class="funsvg-bg-graph" x="${xx.titleStart}" width="${xx.graphWidth}" y="${yy.graphTop}" height="${graphHeight}" fill="url(#${bgGradientId})" opacity="${round(graphOpacity)}"></rect>`,
+    '  </g>',
 
+    `  <g class="funsvg-lines" transform="translate(${xx.titleStart}, ${yy.graphTop})" stroke-width="${w}" fill="none" stroke-linecap="round">`,
+    ...toSvgLines(script, ops, { width: xx.graphWidth, height: graphHeight }).map(line => `    ${line}`),
+    '  </g>',
 
-      <g class="funsvg-lines" transform="translate(${xx.titleStart}, ${yy.graphTop})" stroke-width="${w}" fill="none" stroke-linecap="round">
-        ${toSvgLines(script, ops, { width: xx.graphWidth, height: graphHeight })}
-      </g>
-      
-      <g class="funsvg-titles">
-        ${!ops.halo
-          ? ''
-          : ` <g class="funsvg-titles-halo" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent">
-                <text class="funsvg-title-halo" x="${xx.headerText}" y="${yy.headerText}"> ${textToSvgText(title)} </text>
-                ${Object.entries(stats).reverse().map(([k, v], i) => `
-                    <text class="funsvg-stat-label-halo" x="${xx.statText(i)}" y="${yy.statLabelText}" font-weight="bold" font-size="50%" text-anchor="end"> ${k} </text>
-                    <text class="funsvg-stat-value-halo" x="${xx.statText(i)}" y="${yy.statValueText}" font-weight="bold" font-size="90%" text-anchor="end"> ${v} </text>
-                  `).reverse().join('\n')
-                } 
-              </g>`}
-        ${axisWidth > 0 ? `<text class="funsvg-axis" x="${xx.axisText}" y="${yy.axisText}" font-size="250%" font-family="${axisFont}" text-anchor="middle" dominant-baseline="middle"> ${axis} </text>` : ''}
-        <text class="funsvg-title" x="${xx.headerText}" y="${yy.headerText}"> ${textToSvgText(title)} </text>
-        ${Object.entries(stats).reverse().map(([k, v], i) => `
-            <text class="funsvg-stat-label" x="${xx.statText(i)}" y="${yy.statLabelText}" font-weight="bold" font-size="50%" text-anchor="end"> ${k} </text>
-            <text class="funsvg-stat-value" x="${xx.statText(i)}" y="${yy.statValueText}" font-weight="bold" font-size="90%" text-anchor="end"> ${v} </text>
-          `).reverse().join('\n')
-        } 
-      </g>
-    </g>
-    `
+    '  <g class="funsvg-titles">',
+    ops.halo && [
+      `    <g class="funsvg-titles-halo" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent">`,
+      `      <text class="funsvg-title-halo" x="${xx.headerText}" y="${yy.headerText}"> ${textToSvgText(title)} </text>`,
+      ...Object.entries(stats).reverse().map(([k, v], i) => [
+        `      <text class="funsvg-stat-label-halo" x="${xx.statText(i)}" y="${yy.statLabelText}" font-weight="bold" font-size="50%" text-anchor="end"> ${k} </text>`,
+        `      <text class="funsvg-stat-value-halo" x="${xx.statText(i)}" y="${yy.statValueText}" font-weight="bold" font-size="90%" text-anchor="end"> ${v} </text>`,
+      ]),
+      '    </g>',
+    ],
+    axisWidth > 0 && `    <text class="funsvg-axis" x="${xx.axisText}" y="${yy.axisText}" font-size="250%" font-family="${axisFont}" text-anchor="middle" dominant-baseline="middle"> ${axis} </text>`,
+    `    <text class="funsvg-title" x="${xx.headerText}" y="${yy.headerText}"> ${textToSvgText(title)} </text>`,
+    ...Object.entries(stats).reverse().map(([k, v], i) => [
+      `    <text class="funsvg-stat-label" x="${xx.statText(i)}" y="${yy.statLabelText}" font-weight="bold" font-size="50%" text-anchor="end"> ${k} </text>`,
+      `    <text class="funsvg-stat-value" x="${xx.statText(i)}" y="${yy.statValueText}" font-weight="bold" font-size="90%" text-anchor="end"> ${v} </text>`,
+    ]),
+    '  </g>',
+    '</g>',
+  ]
+    .flat(4)
+    .filter((e): e is string => !!e)
+    .join('\n')
   //  lengthAdjust="spacingAndGlyphs" ${textToSvgLength(title, `14px ${ops.font}`) > xx.graphWidth - 6 ? `textLength="${xx.graphWidth - 6}"` : ''
   //             }
   // <g class="funsvg-borders">
