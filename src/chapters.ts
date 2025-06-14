@@ -63,6 +63,6 @@ export function extractChapter(funscript: Funscript, chapter: FunChapter, lerpBo
 export function splitFunscriptByChapters(funscript: Funscript, lerpBorders: 'lerp' | 'empty'): Record<chapterName, Funscript> {
   const chapters = funscript.metadata.chapters
   return Object.fromEntries(
-    chapters.map(chapter => [chapter.name, extractChapter(funscript, chapter, lerpBorders)]),
+    chapters.slice().reverse().map(chapter => [chapter.name, extractChapter(funscript, chapter, lerpBorders)]),
   )
 }

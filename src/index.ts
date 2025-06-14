@@ -363,12 +363,12 @@ export class Funscript implements JsonFunscript {
   }
 
   // --- Public Instance Methods ---
-  toStats() {
+  toStats(options?: { duration?: number }) {
     const MaxSpeed = actionsRequiredMaxSpeed(this.actions)
     const AvgSpeed = actionsAverageSpeed(this.actions)
 
     return {
-      Duration: secondsToDuration(this.actualDuration),
+      Duration: secondsToDuration(options?.duration ?? this.actualDuration),
       Actions: this.actions.filter(e => e.isPeak).length,
       MaxSpeed: Math.round(MaxSpeed),
       AvgSpeed: Math.round(AvgSpeed),
@@ -412,7 +412,7 @@ export class Funscript implements JsonFunscript {
   /** find an action after the given time */
   getActionAfter(at: ms) {
     /* last action or action directly after at */
-    const isTarget = (e: FunAction) => ((!e.nextAction || e.at > at) && (!e.prevAction || e.prevAction.at <= at))
+    const isTarget = (e?: FunAction) => e && ((!e.nextAction || e.at > at) && (!e.prevAction || e.prevAction.at <= at))
     const AROUND_LOOKUP = 5
     for (let di = -AROUND_LOOKUP; di <= AROUND_LOOKUP; di++) {
       const index = this.#searchActionIndex + di

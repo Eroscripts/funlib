@@ -1,6 +1,6 @@
 import type { Funscript } from '..'
 import { FunAction } from '..'
-import { axisToName, speedToHexCached } from '../converter'
+import { speedToHexCached } from '../converter'
 import { actionsToLines, actionsToZigzag, mergeLinesSpeed } from '../manipulations'
 import { lerp } from '../misc'
 

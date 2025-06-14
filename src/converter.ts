@@ -123,11 +123,11 @@ export function fileNameToInfo(filePath?: string) {
 
 export function formatJson(
   json: string,
-  { lineLength = 100, maxPrecision = 1, compress = false }:
+  { lineLength = 100, maxPrecision = 0, compress = true }:
   { lineLength?: number, maxPrecision?: number, compress?: boolean } = {},
 ): string {
   function removeNewlines(s: string) { return s.replaceAll(/ *\n\s*/g, ' ') }
-  const inArrayRegex = /(?<=\[)([^[\]]+)(?=\])/g
+  const inArrayRegex = /(?<=\[)((?:[^[\]]|\[[^[\]]*\])*)(?=\])/g
 
   json = json.replaceAll(/\{\s*"(at|time|startTime)":[^{}]+\}/g, removeNewlines)
 
