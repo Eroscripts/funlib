@@ -90,3 +90,10 @@ export function makeNonEnumerable<T extends object, K extends keyof T>(
     enumerable: false,
   })
 }
+
+/**
+ * Generic clone utility that preserves the constructor type
+ */
+export function clone<T>(obj: T, ...args: any[]): T {
+  return new ((obj as any).constructor)(...args) as T
+}

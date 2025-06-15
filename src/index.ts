@@ -1,6 +1,6 @@
 import type { axis, axisLike, chapterName, JsonAction, JsonChapter, JsonFunscript, JsonMetadata, ms, pos, seconds, timeSpan } from './types'
 import { axisLikes, axisLikeToAxis, formatJson, msToTimeSpan, orderByAxis, orderTrimJson, timeSpanToMs } from './converter'
-import { clamp, makeNonEnumerable } from './misc'
+import { clamp, clone, makeNonEnumerable } from './misc'
 
 export { speedToOklch } from './converter'
 export { LinkedFunAction } from './flavors/linked'
@@ -28,8 +28,8 @@ export class FunAction implements JsonAction {
     }, FunAction.jsonOrder, {})
   }
 
-  clone(): FunAction {
-    return new FunAction(this)
+  clone(): this {
+    return clone(this, this)
   }
 }
 
@@ -57,8 +57,8 @@ export class FunChapter implements JsonChapter {
     })
   }
 
-  clone(): FunChapter {
-    return new FunChapter(this)
+  clone(): this {
+    return clone(this, this)
   }
 }
 
@@ -83,6 +83,10 @@ export class FunBookmark {
 }
 
 export class FunMetadata implements JsonMetadata {
+  // --- Static Class References (for extensibility) ---
+  static Bookmark = FunBookmark
+  static Chapter = FunChapter
+
   // --- Public Instance Properties ---
   duration: seconds = 0
   chapters: FunChapter[] = []
@@ -93,8 +97,9 @@ export class FunMetadata implements JsonMetadata {
   // --- Constructor ---
   constructor(metadata?: JsonMetadata, parent?: Funscript) {
     Object.assign(this, metadata)
-    if (metadata?.bookmarks) this.bookmarks = metadata.bookmarks.map(e => new FunBookmark(e))
-    if (metadata?.chapters) this.chapters = metadata.chapters.map(e => new FunChapter(e))
+    const MetadataClass = this.constructor as typeof FunMetadata
+    if (metadata?.bookmarks) this.bookmarks = metadata.bookmarks.map(e => new MetadataClass.Bookmark(e))
+    if (metadata?.chapters) this.chapters = metadata.chapters.map(e => new MetadataClass.Chapter(e))
     if (metadata?.duration) this.duration = metadata.duration
     if (this.duration > 3600) { // 1 hour
       const actionsDuration = parent?.actionsDuraction
@@ -139,10 +144,10 @@ export class FunMetadata implements JsonMetadata {
     }, FunMetadata.jsonOrder, FunMetadata.emptyJson)
   }
 
-  clone(): FunMetadata {
+  clone(): this {
     // Create a deep clone to avoid modifying the original's chapters/bookmarks
     const clonedData = JSON.parse(JSON.stringify(this.toJSON()))
-    return new FunMetadata(clonedData)
+    return clone(this, clonedData)
   }
 }
 
@@ -173,8 +178,8 @@ export class FunscriptFile {
     return `${this.dir}${this.title}${this.axisName ? `.${this.axisName}` : ''}.funscript`
   }
 
-  clone() {
-    return new FunscriptFile(this.filePath)
+  clone(): this {
+    return clone(this, this.filePath)
   }
 }
 
@@ -204,7 +209,7 @@ export class Funscript implements JsonFunscript {
         const L0 = allScripts.find(e => e.id === 'L0')
         if (!L0) throw new Error('Funscript.mergeMultiAxis: L0 is not defined')
         const base = L0.clone()
-        base.axes = allScripts.filter(e => e.id !== 'L0').map(e => new AxisScript(e, { parent: base })) as any[]
+        base.axes = allScripts.filter(e => e.id !== 'L0').map(e => new (base.constructor as typeof Funscript).AxisScript(e, { parent: base })) as any[]
         if (base.file) base.file.mergedFiles = allScripts.map(e => e.file!)
         return base
       }
@@ -217,7 +222,7 @@ export class Funscript implements JsonFunscript {
   id: axis = 'L0'
   actions: FunAction[] = []
   axes: AxisScript[] = []
-  metadata: FunMetadata = new FunMetadata()
+  metadata!: FunMetadata
 
   // --- Non-enumerable Properties ---
   parent?: Funscript
@@ -230,23 +235,26 @@ export class Funscript implements JsonFunscript {
   ) {
     Object.assign(this, funscript)
 
-    if (extras?.file) this.file = new FunscriptFile(extras.file)
+    const FunscriptClass = this.constructor as typeof Funscript
+    this.metadata = new FunscriptClass.Metadata()
+
+    if (extras?.file) this.file = new FunscriptClass.File(extras.file)
     else if (funscript instanceof Funscript) this.file = funscript.file?.clone()
     // prefer file > funscript > extras
     this.id = extras?.id ?? funscript?.id ?? this.file?.id ?? (this instanceof AxisScript ? null! : 'L0')
 
     if (funscript?.actions) {
-      this.actions = funscript.actions.map(e => new FunAction(e))
+      this.actions = funscript.actions.map(e => new FunscriptClass.Action(e))
     }
-    if (funscript?.metadata !== undefined) this.metadata = new FunMetadata(funscript.metadata, this)
+    if (funscript?.metadata !== undefined) this.metadata = new FunscriptClass.Metadata(funscript.metadata, this)
     else if (funscript instanceof Funscript) this.file = funscript.file?.clone()
 
     if (extras?.axes) {
       if (funscript?.axes?.length) throw new Error('FunFunscript: both axes and axes are defined')
-      this.axes = extras.axes.map(e => new AxisScript(e, { parent: this })).sort(orderByAxis)
+      this.axes = extras.axes.map(e => new FunscriptClass.AxisScript(e, { parent: this })).sort(orderByAxis)
     }
     else if (funscript?.axes) {
-      this.axes = funscript.axes.map(e => new AxisScript(e, { parent: this })).sort(orderByAxis)
+      this.axes = funscript.axes.map(e => new FunscriptClass.AxisScript(e, { parent: this })).sort(orderByAxis)
     }
     if (extras?.parent) this.parent = extras.parent
 
@@ -347,10 +355,10 @@ export class Funscript implements JsonFunscript {
     return formatJson(JSON.stringify(this, null, 2), options ?? {})
   }
 
-  clone() {
-    const clone = new Funscript(this)
-    clone.file = this.file?.clone()
-    return clone
+  clone(): this {
+    const cloned = clone(this, this)
+    cloned.file = this.file?.clone()
+    return cloned
   }
 }
 
