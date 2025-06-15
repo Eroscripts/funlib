@@ -12,8 +12,6 @@ export interface SvgOptions {
   title?: ((script: Funscript) => string) | string | null
   /** font to use for text */
   font?: string
-  /** font size for text */
-  fontSize?: number
   /** font to use for axis text */
   axisFont?: string
   /** halo around text */
@@ -60,7 +58,6 @@ export const svgDefaultOptions: Required<SvgOptions> = {
   title: null,
   lineWidth: 0.5,
   font: 'Arial, sans-serif',
-  fontSize: 14,
   axisFont: 'Consolas, monospace',
   halo: true,
   solidHeaderBackground: false,
@@ -280,7 +277,7 @@ export function toSvgElement(scripts: Funscript | Funscript[], ops: SvgOptions):
   y += SVG_PADDING
 
   return `<svg class="funsvg" width="${fullOps.width}" height="${y}" xmlns="http://www.w3.org/2000/svg"
-    font-size="${fullOps.fontSize}px" font-family="${fullOps.font}"
+    font-size="${fullOps.headerHeight * 0.8}px" font-family="${fullOps.font}"
   >
     ${pieces.join('\n')}
   </svg>`
@@ -334,6 +331,10 @@ export function toSvgG(
 
   const statCount = Object.keys(stats).length
 
+  const proportionalFontSize = headerHeight * 0.8
+  const statLabelFontSize = headerHeight * 0.4
+  const statValueFontSize = headerHeight * 0.72
+
   let useSeparateLine = false
 
   // Define x positions for key SVG elements
@@ -343,19 +344,19 @@ export function toSvgG(
     titleStart: axisWidth + axisSpacing, // Start of title/graph area (after axis + spacing)
     svgEnd: width, // End of SVG (full width)
     graphWidth: width - axisWidth - axisSpacing, // Width of the graph area
-    statText: (i: number) => width - 7 - i * 46, // X position for stat labels/values
+    statText: (i: number) => width - (7 + i * 46) * (headerHeight / 20), // X position for stat labels/values
     get axisText() { return this.axisEnd / 2 }, // X position for axis text (centered)
     get headerText() { return this.titleStart + 3 }, // X position for header text
     get textWidth() { return this.statText(useSeparateLine ? 0 : statCount) - this.headerText },
   }
 
   if (title && titleSeparateLine !== false
-    && textToSvgLength(title, `${ops.fontSize}px ${font}`) > xx.textWidth) {
+    && textToSvgLength(title, `${proportionalFontSize}px ${font}`) > xx.textWidth) {
     useSeparateLine = true
   }
   if (title && titleEllipsis
-    && textToSvgLength(title, `${ops.fontSize}px ${font}`) > xx.textWidth) {
-    title = truncateTextWithEllipsis(title, xx.textWidth, `${ops.fontSize}px ${font}`)
+    && textToSvgLength(title, `${proportionalFontSize}px ${font}`) > xx.textWidth) {
+    title = truncateTextWithEllipsis(title, xx.textWidth, `${proportionalFontSize}px ${font}`)
   }
   if (useSeparateLine) {
     ctx.onDoubleTitle()
@@ -389,9 +390,9 @@ export function toSvgG(
     get graphTop() { return this.titleBottom + headerSpacing }, // Top of graph area
     get svgBottom() { return height + this.headerExtra }, // Bottom of SVG (total block height)
     get axisText() { return (this.top + this.svgBottom) / 2 + 4 + this.headerExtra / 2 }, // Y position for axis text (centered)
-    headerText: headerHeight / 2 + 5, // Y position for header text
-    get statLabelText() { return this.headerText - 8 + this.headerExtra }, // Y position for stat labels
-    get statValueText() { return this.headerText + 2 + this.headerExtra }, // Y position for stat values
+    headerText: headerHeight * 0.75, // Y position for header text (proportional to headerHeight)
+    get statLabelText() { return headerHeight * 0.35 + this.headerExtra }, // Y position for stat labels (proportional)
+    get statValueText() { return headerHeight * 0.95 + this.headerExtra }, // Y position for stat values (proportional)
   }
   const bgGradientId = `funsvg-grad-${Math.random().toString(26).slice(2)}`
 
@@ -418,16 +419,16 @@ export function toSvgG(
       `    <g class="funsvg-titles-halo" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent">`,
       `      <text class="funsvg-title-halo" x="${xx.headerText}" y="${yy.headerText}"> ${textToSvgText(title)} </text>`,
       ...Object.entries(stats).reverse().map(([k, v], i) => [
-        `      <text class="funsvg-stat-label-halo" x="${xx.statText(i)}" y="${yy.statLabelText}" font-weight="bold" font-size="50%" text-anchor="end"> ${k} </text>`,
-        `      <text class="funsvg-stat-value-halo" x="${xx.statText(i)}" y="${yy.statValueText}" font-weight="bold" font-size="90%" text-anchor="end"> ${v} </text>`,
+        `      <text class="funsvg-stat-label-halo" x="${xx.statText(i)}" y="${yy.statLabelText}" font-weight="bold" font-size="${statLabelFontSize}px" text-anchor="end"> ${k} </text>`,
+        `      <text class="funsvg-stat-value-halo" x="${xx.statText(i)}" y="${yy.statValueText}" font-weight="bold" font-size="${statValueFontSize}px" text-anchor="end"> ${v} </text>`,
       ]),
       '    </g>',
     ],
-    axisWidth > 0 && `    <text class="funsvg-axis" x="${xx.axisText}" y="${yy.axisText}" font-size="250%" font-family="${axisFont}" text-anchor="middle" dominant-baseline="middle"> ${axis} </text>`,
+    axisWidth > 0 && `    <text class="funsvg-axis" x="${xx.axisText}" y="${yy.axisText}" font-size="${Math.max(12, axisWidth * 0.75)}px" font-family="${axisFont}" text-anchor="middle" dominant-baseline="middle"> ${axis} </text>`,
     `    <text class="funsvg-title" x="${xx.headerText}" y="${yy.headerText}"> ${textToSvgText(title)} </text>`,
     ...Object.entries(stats).reverse().map(([k, v], i) => [
-      `    <text class="funsvg-stat-label" x="${xx.statText(i)}" y="${yy.statLabelText}" font-weight="bold" font-size="50%" text-anchor="end"> ${k} </text>`,
-      `    <text class="funsvg-stat-value" x="${xx.statText(i)}" y="${yy.statValueText}" font-weight="bold" font-size="90%" text-anchor="end"> ${v} </text>`,
+      `    <text class="funsvg-stat-label" x="${xx.statText(i)}" y="${yy.statLabelText}" font-weight="bold" font-size="${statLabelFontSize}px" text-anchor="end"> ${k} </text>`,
+      `    <text class="funsvg-stat-value" x="${xx.statText(i)}" y="${yy.statValueText}" font-weight="bold" font-size="${statValueFontSize}px" text-anchor="end"> ${v} </text>`,
     ]),
     '  </g>',
     '</g>',
