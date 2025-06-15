@@ -270,6 +270,15 @@ export class FunscriptFile {
 }
 
 export class Funscript implements JsonFunscript {
+  // --- Static Class References (for extensibility) ---
+  static Action = FunAction
+  static Chapter = FunChapter
+  static Bookmark = FunBookmark
+  static Metadata = FunMetadata
+  static File = FunscriptFile
+  static AxisScript = null! as typeof AxisScript
+  // AxisScript will be set after its declaration
+
   /** merge multi-axis scripts into one */
   static mergeMultiAxis(scripts: Funscript[]): Funscript[] {
     const multiaxisScripts = scripts.filter(e => e.axes.length)
@@ -405,8 +414,10 @@ export class Funscript implements JsonFunscript {
     return this
   }
 
-  getAxes(): Funscript[] {
-    return [this, ...this.axes].sort(orderByAxis)
+  getAxes(ids?: axis[]): Funscript[] {
+    const allAxes = [this, ...this.axes].sort(orderByAxis)
+    if (!ids) return allAxes
+    return allAxes.filter(axis => ids.includes(axis.id))
   }
 
   #searchActionIndex = -1
@@ -527,3 +538,6 @@ export class AxisScript extends Funscript {
     if (!this.parent) throw new Error('AxisScript: parent is not defined')
   }
 }
+
+// Set the AxisScript reference after it's declared
+Funscript.AxisScript = AxisScript

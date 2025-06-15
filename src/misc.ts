@@ -77,3 +77,16 @@ export function compareWithOrder(a: string | undefined, b: string | undefined, o
 export function toMantissa(value: pos): mantissaText {
   return clamp(value / 100, 0, 0.9999).toFixed(4).slice(2).replace(/(?<=.)0+$/, '') as mantissaText
 }
+
+export function makeNonEnumerable<T extends object, K extends keyof T>(
+  target: T,
+  key: K,
+  value?: T[K],
+): T {
+  return Object.defineProperty(target, key, {
+    value: value ?? target[key],
+    writable: true,
+    configurable: true,
+    enumerable: false,
+  })
+}

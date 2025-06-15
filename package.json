@@ -19,6 +19,7 @@
       "import": "./src/*.ts"
     }
   },
+  "module": "src/index.ts",
   "scripts": {
     "lint": "eslint --fix",
     "build:iife": "bun build src/iife.ts --target browser --outdir dist --format iife",
