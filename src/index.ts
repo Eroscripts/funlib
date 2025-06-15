@@ -1,112 +1,24 @@
-import type { axis, axisLike, chapterName, JsonAction, JsonChapter, JsonFunscript, JsonMetadata, ms, pos, seconds, speed, TCodeTuple, timeSpan } from './types'
-import { axisLikes, axisLikeToAxis, formatJson, msToTimeSpan, orderByAxis, orderTrimJson, secondsToDuration, TCodeList, timeSpanToMs } from './converter'
-import { actionsAverageSpeed, actionsRequiredMaxSpeed } from './manipulations'
-import { clamp, clamplerp, speedBetween } from './misc'
+import type { axis, axisLike, chapterName, JsonAction, JsonChapter, JsonFunscript, JsonMetadata, ms, pos, seconds, timeSpan } from './types'
+import { axisLikes, axisLikeToAxis, formatJson, msToTimeSpan, orderByAxis, orderTrimJson, timeSpanToMs } from './converter'
+import { clamp, makeNonEnumerable } from './misc'
 
 export { speedToOklch } from './converter'
+export { LinkedFunAction } from './flavors/linked'
 export { handySmooth } from './manipulations'
 export * from './types'
 
 export class FunAction implements JsonAction {
-  // --- Static Methods ---
-  static linkList(list: FunAction[], extras: { parent?: Funscript | true }) {
-    if (extras?.parent === true) extras.parent = list[0]?.parent
-    for (let i = 1; i < list.length; i++) {
-      list[i].#prevAction = list[i - 1]
-      list[i - 1].#nextAction = list[i]
-      if (extras?.parent) list[i].#parent = extras.parent
-    }
-    return list
-  }
-
   // --- Public Instance Properties ---
   at: ms = 0
   pos: pos = 0
 
-  // --- Private Instance Properties ---
-  #parent?: Funscript
-  #prevAction?: FunAction
-  #nextAction?: FunAction
-
   // --- Constructor ---
-  constructor(action?: JsonAction, extras?: { parent?: Funscript }) {
+  constructor(action?: JsonAction) {
     Object.assign(this, action)
-    this.#parent = extras && 'parent' in extras
-      ? extras.parent
-      : (action instanceof FunAction ? action.#parent : undefined)
-  }
-
-  // --- Getters ---
-  get nextAction(): FunAction | undefined { return this.#nextAction }
-  get prevAction(): FunAction | undefined { return this.#prevAction }
-  get parent(): Funscript | undefined { return this.#parent }
-
-  /** speed from prev to this */
-  get speedTo(): speed {
-    return speedBetween(this.#prevAction, this)
-  }
-
-  /** speed from this to next */
-  get speedFrom(): speed {
-    return speedBetween(this, this.#nextAction)
-  }
-
-  get isPeak(): -1 | 0 | 1 {
-    const { speedTo, speedFrom } = this
-    // if there is no prev or next action, it's a peak because we need peaks at corners
-    if (!this.#prevAction && !this.#nextAction) return 1
-    if (!this.#prevAction) return speedFrom < 0 ? 1 : 1
-    if (!this.#nextAction) return speedTo > 0 ? -1 : -1
-
-    if (Math.sign(speedTo) === Math.sign(speedFrom)) return 0
-
-    if (speedTo > speedFrom) return 1
-    if (speedTo < speedFrom) return -1
-    return 0
-  }
-
-  /** Time difference to next action in milliseconds */
-  get datNext(): ms {
-    if (!this.#nextAction) return 0 as ms
-    return (this.#nextAction.at - this.at) as ms
-  }
-
-  get datPrev(): ms {
-    if (!this.#prevAction) return 0 as ms
-    return (this.at - this.#prevAction.at) as ms
-  }
-
-  get dposNext(): pos {
-    if (!this.#nextAction) return 0 as pos
-    return this.#nextAction.pos - this.pos
-  }
-
-  get dposPrev(): pos {
-    if (!this.#prevAction) return 0 as pos
-    return this.pos - this.#prevAction.pos
-  }
-
-  // --- Public Instance Methods ---
-  clerpAt(at: ms): pos {
-    if (at === this.at) return this.pos
-    if (at < this.at) {
-      if (!this.#prevAction) return this.pos
-      return clamplerp(at, this.#prevAction.at, this.at, this.#prevAction.pos, this.pos)
-    }
-    if (at > this.at) {
-      if (!this.#nextAction) return this.pos
-      return clamplerp(at, this.at, this.#nextAction.at, this.pos, this.#nextAction.pos)
-    }
-    return this.pos
   }
 
   // --- JSON & Clone Section ---
   static jsonOrder = { at: undefined, pos: undefined }
-  static cloneList(list: JsonAction[], extras: { parent?: Funscript | true }) {
-    const parent = extras?.parent === true ? (list[0] as FunAction)?.parent : extras?.parent
-    const newList = list.map(e => new FunAction(e, { parent }))
-    return FunAction.linkList(newList, extras)
-  }
 
   toJSON() {
     return orderTrimJson({
@@ -117,9 +29,6 @@ export class FunAction implements JsonAction {
   }
 
   clone(): FunAction {
-    // NOTE: This creates a shallow clone. The private #prevAction, #nextAction
-    // will be undefined in the new clone. They need to be relinked if the clone
-    // is part of a list (e.g., using FunAction.linkList).
     return new FunAction(this)
   }
 }
@@ -284,7 +193,7 @@ export class Funscript implements JsonFunscript {
     const multiaxisScripts = scripts.filter(e => e.axes.length)
     const singleaxisScripts = scripts.filter(e => !e.axes.length)
 
-    const groups = Object.groupBy(singleaxisScripts, e => e.#file?.title ?? '[unnamed]')
+    const groups = Object.groupBy(singleaxisScripts, e => e.file?.title ?? '[unnamed]')
     const mergedSingleaxisScripts = Object.entries(groups).flatMap<Funscript>(([_title, scripts]) => {
       if (!scripts) return []
       // base case: no duplicate axes
@@ -296,7 +205,7 @@ export class Funscript implements JsonFunscript {
         if (!L0) throw new Error('Funscript.mergeMultiAxis: L0 is not defined')
         const base = L0.clone()
         base.axes = allScripts.filter(e => e.id !== 'L0').map(e => new AxisScript(e, { parent: base })) as any[]
-        if (base.#file) base.#file.mergedFiles = allScripts.map(e => e.#file!)
+        if (base.file) base.file.mergedFiles = allScripts.map(e => e.file!)
         return base
       }
       throw new Error('Funscript.mergeMultiAxis: multi-axis scripts are not implemented yet')
@@ -310,9 +219,9 @@ export class Funscript implements JsonFunscript {
   axes: AxisScript[] = []
   metadata: FunMetadata = new FunMetadata()
 
-  // --- Private Instance Properties ---
-  #parent?: Funscript
-  #file?: FunscriptFile
+  // --- Non-enumerable Properties ---
+  parent?: Funscript
+  file?: FunscriptFile
 
   // --- Constructor ---
   constructor(
@@ -321,16 +230,16 @@ export class Funscript implements JsonFunscript {
   ) {
     Object.assign(this, funscript)
 
-    if (extras?.file) this.#file = new FunscriptFile(extras.file)
-    else if (funscript instanceof Funscript) this.#file = funscript.#file?.clone()
+    if (extras?.file) this.file = new FunscriptFile(extras.file)
+    else if (funscript instanceof Funscript) this.file = funscript.file?.clone()
     // prefer file > funscript > extras
-    this.id = extras?.id ?? funscript?.id ?? this.#file?.id ?? (this instanceof AxisScript ? null! : 'L0')
+    this.id = extras?.id ?? funscript?.id ?? this.file?.id ?? (this instanceof AxisScript ? null! : 'L0')
 
     if (funscript?.actions) {
-      this.actions = FunAction.cloneList(funscript.actions, { parent: this })
+      this.actions = funscript.actions.map(e => new FunAction(e))
     }
     if (funscript?.metadata !== undefined) this.metadata = new FunMetadata(funscript.metadata, this)
-    else if (funscript instanceof Funscript) this.#file = funscript.#file?.clone()
+    else if (funscript instanceof Funscript) this.file = funscript.file?.clone()
 
     if (extras?.axes) {
       if (funscript?.axes?.length) throw new Error('FunFunscript: both axes and axes are defined')
@@ -339,13 +248,13 @@ export class Funscript implements JsonFunscript {
     else if (funscript?.axes) {
       this.axes = funscript.axes.map(e => new AxisScript(e, { parent: this })).sort(orderByAxis)
     }
-    if (extras?.parent) this.#parent = extras.parent
+    if (extras?.parent) this.parent = extras.parent
+
+    makeNonEnumerable(this, 'parent')
+    makeNonEnumerable(this, 'file')
   }
 
   // --- Getters/Setters ---
-  get parent(): Funscript | undefined { return this.#parent }
-  set parent(v: Funscript | undefined) { this.#parent = v }
-  get file(): FunscriptFile | undefined { return this.#file }
 
   get duration(): seconds {
     if (this.metadata.duration) return this.metadata.duration
@@ -372,18 +281,6 @@ export class Funscript implements JsonFunscript {
   }
 
   // --- Public Instance Methods ---
-  toStats(options?: { durationMs?: ms }) {
-    const MaxSpeed = actionsRequiredMaxSpeed(this.actions)
-    const AvgSpeed = actionsAverageSpeed(this.actions)
-    const duration = options?.durationMs ? options.durationMs / 1000 : this.actualDuration
-
-    return {
-      Duration: secondsToDuration(duration),
-      Actions: this.actions.filter(e => e.isPeak).length,
-      MaxSpeed: Math.round(MaxSpeed),
-      AvgSpeed: Math.round(AvgSpeed),
-    }
-  }
 
   normalize() {
     this.axes.forEach(e => e.normalize())
@@ -406,7 +303,6 @@ export class Funscript implements JsonFunscript {
         this.actions.unshift(lastNegative)
       }
     }
-    FunAction.linkList(this.actions, { parent: this })
 
     const duration = Math.ceil(this.actualDuration)
     this.metadata.duration = duration
@@ -418,71 +314,6 @@ export class Funscript implements JsonFunscript {
     const allAxes = [this, ...this.axes].sort(orderByAxis)
     if (!ids) return allAxes
     return allAxes.filter(axis => ids.includes(axis.id))
-  }
-
-  #searchActionIndex = -1
-  /** find an action after the given time */
-  getActionAfter(at: ms) {
-    /* last action or action directly after at */
-    const isTarget = (e?: FunAction) => e && ((!e.nextAction || e.at > at) && (!e.prevAction || e.prevAction.at <= at))
-    const AROUND_LOOKUP = 5
-    for (let di = -AROUND_LOOKUP; di <= AROUND_LOOKUP; di++) {
-      const index = this.#searchActionIndex + di
-      if (!this.actions[index]) continue
-      if (isTarget(this.actions[index])) {
-        this.#searchActionIndex = index
-        break
-      }
-    }
-    if (!isTarget(this.actions[this.#searchActionIndex])) {
-      this.#searchActionIndex = this.actions.findIndex(isTarget)
-    }
-    return this.actions[this.#searchActionIndex]
-  }
-
-  getPosAt(at: ms): pos {
-    const action = this.getActionAfter(at)
-    if (!action) return 50
-    return action.clerpAt(at)
-  }
-
-  getAxesPosAt(at: ms) {
-    return Object.fromEntries(this.getAxes().map(e => [e.id, e.getPosAt(at)]))
-  }
-
-  /** Returns TCode at the given time */
-  getTCodeAt(at: ms) {
-    const apos = this.getAxesPosAt(at)
-    const tcode = Object.entries(apos)
-      .map<TCodeTuple>(([axis, pos]) => [axis as axis, pos])
-    return TCodeList.from(tcode)
-  }
-
-  /** returns TCode to move from the current point to the next point on every axis */
-  getTCodeFrom(at: ms, since?: ms) {
-    at = ~~at; since = since && ~~since
-    const tcode: TCodeTuple[] = []
-
-    for (const a of this.getAxes()) {
-      const nextAction = a.getActionAfter(at)
-      if (!nextAction) continue
-      if (since === undefined) {
-        // action is in the past, move with default speed
-        if (nextAction.at <= at) tcode.push([a.id, nextAction.pos])
-        else tcode.push([a.id, nextAction.pos, 'I', nextAction.at - at])
-        continue
-      }
-      // action is in the past, do nothing
-      if (nextAction.at <= at) continue
-
-      const prevAt = nextAction.prevAction?.at ?? 0
-      // prev action is in the same prev-next interval, do nothing
-      if (prevAt <= since) continue
-
-      tcode.push([a.id, nextAction.pos, 'I', nextAction.at - at])
-    }
-
-    return TCodeList.from(tcode)
   }
 
   // --- JSON & Clone Section ---
@@ -518,8 +349,7 @@ export class Funscript implements JsonFunscript {
 
   clone() {
     const clone = new Funscript(this)
-    // clone.#parent = this.#parent
-    clone.#file = this.#file?.clone()
+    clone.file = this.file?.clone()
     return clone
   }
 }

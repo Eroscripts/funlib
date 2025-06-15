@@ -1,5 +1,6 @@
-import type { ms, speed } from '.'
-import { FunAction } from '.'
+import type { FunAction, ms, seconds, speed } from '.'
+import { secondsToDuration } from './converter'
+import { LinkedFunAction } from './flavors/linked'
 import { absSpeedBetween, lerp, listToSum, minBy, speedBetween, unlerp } from './misc'
 
 /**
@@ -419,4 +420,19 @@ export function limitPeakSpeed(actions: FunAction[], maxSpeed: number): FunActio
   }
 
   return connectSegments(segments)
+}
+
+/**
+ * Generates statistics for a funscript's actions
+ */
+export function toStats(actions: FunAction[], options: { durationSeconds: seconds }) {
+  const MaxSpeed = actionsRequiredMaxSpeed(actions)
+  const AvgSpeed = actionsAverageSpeed(actions)
+
+  return {
+    Duration: secondsToDuration(options.durationSeconds),
+    Actions: actions.filter(e => e.isPeak).length,
+    MaxSpeed: Math.round(MaxSpeed),
+    AvgSpeed: Math.round(AvgSpeed),
+  }
 }

@@ -2,7 +2,7 @@ import type { Funscript } from '..'
 import type { ms } from '../types'
 import { FunAction } from '..'
 import { axisToName, speedToOklchText } from '../converter'
-import { actionsToLines, actionsToZigzag } from '../manipulations'
+import { actionsToLines, actionsToZigzag, toStats } from '../manipulations'
 import { lerp } from '../misc'
 
 export function drawFunscriptGraph(
@@ -333,7 +333,7 @@ export function drawFunscriptsCanvas(
       let axis = scriptToDraw.id ?? 'L0'
       if (isForHandy) axis = '☞' as any
 
-      const stats = scriptToDraw.toStats() // Requires Funscript.toStats() method
+      const stats = toStats(scriptToDraw.actions, { durationSeconds: scriptToDraw.actualDuration })
 
       // Define areas (relative to the current block's top-left)
       const axisArea = { x: 0, y: TITLE_HEIGHT + midBorderY, width: AXIS_WIDTH, height: GRAPH_HEIGHT }

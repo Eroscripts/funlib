@@ -1,7 +1,7 @@
 import type { Funscript, ms } from '..'
 import { FunAction } from '..'
 import { speedToHexCached } from '../converter'
-import { actionsToLines, actionsToZigzag, mergeLinesSpeed } from '../manipulations'
+import { actionsToLines, actionsToZigzag, mergeLinesSpeed, toStats } from '../manipulations'
 import { lerp } from '../misc'
 
 export interface SvgOptions {
@@ -77,7 +77,7 @@ export const svgDefaultOptions: Required<SvgOptions> = {
 }
 
 export type SvgSubOptions<K extends keyof SvgOptions> = {
-  [P in K]-?: Required<SvgOptions>[P]
+  [P in K]-?: Required<SvgOptions & { durationMs?: ms }>[P]
 }
 
 const isBrowser = typeof document !== 'undefined'
@@ -326,7 +326,7 @@ export function toSvgG(
       title = ''
     }
   }
-  const stats = script.toStats({ durationMs })
+  const stats = toStats(script.actions, { durationSeconds: durationMs / 1000 })
   if (isSecondaryAxis) delete (stats as Partial<typeof stats>).Duration
 
   const statCount = Object.keys(stats).length
