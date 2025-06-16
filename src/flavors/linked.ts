@@ -2,7 +2,7 @@ import type { Funscript } from '../index'
 import type { JsonAction, ms, pos, seconds, speed } from '../types'
 import { orderTrimJson } from '../converter'
 import { FunAction } from '../index'
-import { clamplerp, makeNonEnumerable, speedBetween } from '../misc'
+import { clamplerp, clone, makeNonEnumerable, speedBetween } from '../misc'
 
 export class LinkedFunAction extends FunAction {
   // --- Static Methods ---
@@ -102,10 +102,10 @@ export class LinkedFunAction extends FunAction {
   }
 
   // --- Clone with linking support ---
-  clone(): LinkedFunAction {
+  clone(): this {
     // NOTE: This creates a shallow clone. The prevAction, nextAction
     // will be undefined in the new clone. They need to be relinked if the clone
     // is part of a list (e.g., using LinkedFunAction.linkList).
-    return new LinkedFunAction(this, { parent: this.parent })
+    return clone(this, { parent: this.parent })
   }
 }

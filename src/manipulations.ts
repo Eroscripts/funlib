@@ -1,6 +1,6 @@
-import type { FunAction, ms, seconds, speed } from '.'
+import type { FunAction } from '.'
+import type { ms, seconds, speed } from './types'
 import { secondsToDuration } from './converter'
-import { LinkedFunAction } from './flavors/linked'
 import { absSpeedBetween, lerp, listToSum, minBy, speedBetween, unlerp } from './misc'
 
 /**

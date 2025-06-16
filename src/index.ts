@@ -2,11 +2,6 @@ import type { axis, axisLike, chapterName, JsonAction, JsonChapter, JsonFunscrip
 import { axisLikes, axisLikeToAxis, formatJson, msToTimeSpan, orderByAxis, orderTrimJson, timeSpanToMs } from './converter'
 import { clamp, clone, makeNonEnumerable } from './misc'
 
-export { speedToOklch } from './converter'
-export { LinkedFunAction } from './flavors/linked'
-export { handySmooth } from './manipulations'
-export * from './types'
-
 export class FunAction implements JsonAction {
   // --- Public Instance Properties ---
   at: ms = 0
@@ -29,7 +24,7 @@ export class FunAction implements JsonAction {
   }
 
   clone(): this {
-    return clone(this, this)
+    return clone(this)
   }
 }
 
@@ -58,7 +53,7 @@ export class FunChapter implements JsonChapter {
   }
 
   clone(): this {
-    return clone(this, this)
+    return clone(this)
   }
 }
 
@@ -207,7 +202,7 @@ export class Funscript implements JsonFunscript {
       if (axes.length === allScripts.length) {
         // merge them all into a single script
         const L0 = allScripts.find(e => e.id === 'L0')
-        if (!L0) throw new Error('Funscript.mergeMultiAxis: L0 is not defined')
+        if (!L0) throw new Error('Funscript.mergeMultiAxis: trying to merge multi-axis scripts without L0')
         const base = L0.clone()
         base.axes = allScripts.filter(e => e.id !== 'L0').map(e => new (base.constructor as typeof Funscript).AxisScript(e, { parent: base })) as any[]
         if (base.file) base.file.mergedFiles = allScripts.map(e => e.file!)
@@ -356,7 +351,7 @@ export class Funscript implements JsonFunscript {
   }
 
   clone(): this {
-    const cloned = clone(this, this)
+    const cloned = clone(this)
     cloned.file = this.file?.clone()
     return cloned
   }

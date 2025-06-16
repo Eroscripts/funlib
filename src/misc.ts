@@ -1,4 +1,5 @@
-import type { FunAction, mantissaText, pos, speed } from '.'
+import type { FunAction } from '.'
+import type { mantissaText, pos, speed } from './types'
 
 export { oklch2rgb } from 'colorizr'
 
@@ -95,5 +96,5 @@ export function makeNonEnumerable<T extends object, K extends keyof T>(
  * Generic clone utility that preserves the constructor type
  */
 export function clone<T>(obj: T, ...args: any[]): T {
-  return new ((obj as any).constructor)(...args) as T
+  return new ((obj as any).constructor)(obj, ...args) as T
 }
