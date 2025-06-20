@@ -1,4 +1,5 @@
-import type { Funscript, ms } from '..'
+import type { Funscript } from '..'
+import type { ms } from '../types'
 import { FunAction } from '..'
 import { speedToHexCached } from '../converter'
 import { actionsToLines, actionsToZigzag, mergeLinesSpeed, toStats } from '../manipulations'
@@ -137,9 +138,11 @@ export function toSvgLines(
 ) {
   const { lineWidth, mergeLimit, durationMs } = ops
   const { width, height } = ctx
+  const round = (x: number) => +x.toFixed(2)
+
   function lineToStroke(a: FunAction, b: FunAction) {
-    const at = (a: FunAction) => ((a.at / 1000) / (durationMs / 1000) * (width - 2 * lineWidth)) + lineWidth
-    const pos = (a: FunAction) => (100 - a.pos) * (height - 2 * lineWidth) / 100 + lineWidth
+    const at = (a: FunAction) => round((a.at / durationMs * (width - 2 * lineWidth)) + lineWidth)
+    const pos = (a: FunAction) => round((100 - a.pos) * (height - 2 * lineWidth) / 100 + lineWidth)
     return `M ${at(a)} ${pos(a)} L ${at(b)} ${pos(b)}`
   }
   const lines = actionsToLines(script.actions)
@@ -159,6 +162,8 @@ export function toSvgBackgroundGradient(
   { durationMs }: SvgSubOptions<'durationMs'>,
   linearGradientId: string,
 ) {
+  const round = (x: number) => +x.toFixed(2)
+
   const lines = actionsToLines(actionsToZigzag(script.actions))
     .flatMap((e) => {
       const [a, b, s] = e
@@ -218,8 +223,8 @@ export function toSvgBackgroundGradient(
 
   return `
       <linearGradient id="${linearGradientId}">
-        ${stops.map(s => `<stop offset="${Math.max(0, Math.min(1, s.at / durationMs))}" stop-color="${speedToHexCached(s.speed)}"${(
-            s.speed >= 100 ? '' : ` stop-opacity="${s.speed / 100}"`
+        ${stops.map(s => `<stop offset="${round(Math.max(0, Math.min(1, s.at / durationMs)))}" stop-color="${speedToHexCached(s.speed)}"${(
+            s.speed >= 100 ? '' : ` stop-opacity="${round(s.speed / 100)}"`
           )}></stop>`).join('\n          ')
         }
       </linearGradient>`
@@ -251,10 +256,12 @@ export function toSvgElement(scripts: Funscript | Funscript[], ops: SvgOptions):
   scripts = Array.isArray(scripts) ? scripts : [scripts]
   const fullOps = { ...svgDefaultOptions, ...ops }
   fullOps.width -= SVG_PADDING * 2
+  const round = (x: number) => +x.toFixed(2)
 
   const pieces: string[] = []
   let y = SVG_PADDING
-  for (const s of scripts) {
+  for (let s of scripts) {
+    if (fullOps.normalize) s = s.clone().normalize()
     const durationMs = fullOps.durationMs || s.actualDuration * 1000
     // Only show title for the first script
     pieces.push(toSvgG(s, { ...fullOps, durationMs, title: fullOps.title }, {
@@ -276,8 +283,8 @@ export function toSvgElement(scripts: Funscript | Funscript[], ops: SvgOptions):
   y -= SPACING_BETWEEN_FUNSCRIPTS
   y += SVG_PADDING
 
-  return `<svg class="funsvg" width="${fullOps.width}" height="${y}" xmlns="http://www.w3.org/2000/svg"
-    font-size="${fullOps.headerHeight * 0.8}px" font-family="${fullOps.font}"
+  return `<svg class="funsvg" width="${round(fullOps.width)}" height="${round(y)}" xmlns="http://www.w3.org/2000/svg"
+    font-size="${round(fullOps.headerHeight * 0.8)}px" font-family="${fullOps.font}"
   >
     ${pieces.join('\n')}
   </svg>`
@@ -302,7 +309,6 @@ export function toSvgG(
     headerSpacing,
     height,
     axisFont,
-    normalize,
     width,
     solidHeaderBackground,
     titleEllipsis,
@@ -331,9 +337,11 @@ export function toSvgG(
 
   const statCount = Object.keys(stats).length
 
-  const proportionalFontSize = headerHeight * 0.8
-  const statLabelFontSize = headerHeight * 0.4
-  const statValueFontSize = headerHeight * 0.72
+  const round = (x: number) => +x.toFixed(2)
+
+  const proportionalFontSize = round(headerHeight * 0.8)
+  const statLabelFontSize = round(headerHeight * 0.4)
+  const statValueFontSize = round(headerHeight * 0.72)
 
   let useSeparateLine = false
 
@@ -344,9 +352,9 @@ export function toSvgG(
     titleStart: axisWidth + axisSpacing, // Start of title/graph area (after axis + spacing)
     svgEnd: width, // End of SVG (full width)
     graphWidth: width - axisWidth - axisSpacing, // Width of the graph area
-    statText: (i: number) => width - (7 + i * 46) * (headerHeight / 20), // X position for stat labels/values
-    get axisText() { return this.axisEnd / 2 }, // X position for axis text (centered)
-    get headerText() { return this.titleStart + 3 }, // X position for header text
+    statText: (i: number) => round(width - (7 + i * 46) * (headerHeight / 20)), // X position for stat labels/values
+    get axisText() { return round(this.axisEnd / 2) }, // X position for axis text (centered)
+    get headerText() { return round(this.titleStart + headerHeight * 0.2) }, // X position for header text (proportional to header height)
     get textWidth() { return this.statText(useSeparateLine ? 0 : statCount) - this.headerText },
   }
 
@@ -365,9 +373,6 @@ export function toSvgG(
   // Calculate the actual graph height from total height
   const graphHeight = height - headerHeight - headerSpacing
 
-  script = script.clone()
-  if (normalize) script.normalize()
-
   const isForHandy = '_isForHandy' in script && script._isForHandy
   let axis: string = script.id ?? 'L0'
   if (isForHandy) axis = '☞'
@@ -380,21 +385,20 @@ export function toSvgG(
     title += '::bad'
     axis = '!!!'
   }
-  const round = (x: number) => +x.toFixed(2)
 
   // Define y positions for key SVG elements
   const yy = {
     top: 0, // Top of SVG
     get headerExtra() { return useSeparateLine ? headerHeight : 0 },
-    get titleBottom() { return headerHeight + this.headerExtra }, // Bottom of title area
-    get graphTop() { return this.titleBottom + headerSpacing }, // Top of graph area
-    get svgBottom() { return height + this.headerExtra }, // Bottom of SVG (total block height)
-    get axisText() { return (this.top + this.svgBottom) / 2 + 4 + this.headerExtra / 2 }, // Y position for axis text (centered)
-    headerText: headerHeight * 0.75, // Y position for header text (proportional to headerHeight)
-    get statLabelText() { return headerHeight * 0.35 + this.headerExtra }, // Y position for stat labels (proportional)
-    get statValueText() { return headerHeight * 0.95 + this.headerExtra }, // Y position for stat values (proportional)
+    get titleBottom() { return round(headerHeight + this.headerExtra) }, // Bottom of title area
+    get graphTop() { return round(this.titleBottom + headerSpacing) }, // Top of graph area
+    get svgBottom() { return round(height + this.headerExtra) }, // Bottom of SVG (total block height)
+    get axisText() { return round((this.top + this.svgBottom) / 2 + 4 + this.headerExtra / 2) }, // Y position for axis text (centered)
+    headerText: round(headerHeight * 0.75), // Y position for header text (proportional to headerHeight)
+    get statLabelText() { return round(headerHeight * 0.35 + this.headerExtra) }, // Y position for stat labels (proportional)
+    get statValueText() { return round(headerHeight * 0.95 + this.headerExtra) }, // Y position for stat values (proportional)
   }
-  const bgGradientId = `funsvg-grad-${Math.random().toString(26).slice(2)}`
+  const bgGradientId = `funsvg-grad-${script.id}-${script.actions.length}-${script.actions[0]?.at || 0}`
 
   const axisColor = speedToHexCached(stats.AvgSpeed)
   const axisOpacity = round(headerOpacity * Math.max(0.5, Math.min(1, stats.AvgSpeed / 100)))
@@ -424,7 +428,7 @@ export function toSvgG(
       ]),
       '    </g>',
     ],
-    axisWidth > 0 && `    <text class="funsvg-axis" x="${xx.axisText}" y="${yy.axisText}" font-size="${Math.max(12, axisWidth * 0.75)}px" font-family="${axisFont}" text-anchor="middle" dominant-baseline="middle"> ${axis} </text>`,
+    axisWidth > 0 && `    <text class="funsvg-axis" x="${xx.axisText}" y="${yy.axisText}" font-size="${round(Math.max(12, axisWidth * 0.75))}px" font-family="${axisFont}" text-anchor="middle" dominant-baseline="middle"> ${axis} </text>`,
     `    <text class="funsvg-title" x="${xx.headerText}" y="${yy.headerText}"> ${textToSvgText(title)} </text>`,
     ...Object.entries(stats).reverse().map(([k, v], i) => [
       `    <text class="funsvg-stat-label" x="${xx.statText(i)}" y="${yy.statLabelText}" font-weight="bold" font-size="${statLabelFontSize}px" text-anchor="end"> ${k} </text>`,
