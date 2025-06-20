@@ -1,6 +1,5 @@
 import type { Funscript } from '../index'
-import type { JsonAction, ms, pos, seconds, speed } from '../types'
-import { orderTrimJson } from '../converter'
+import type { JsonAction, ms, pos, speed } from '../types'
 import { FunAction } from '../index'
 import { clamplerp, clone, makeNonEnumerable, speedBetween } from '../misc'
 

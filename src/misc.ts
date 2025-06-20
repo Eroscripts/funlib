@@ -98,3 +98,7 @@ export function makeNonEnumerable<T extends object, K extends keyof T>(
 export function clone<T>(obj: T, ...args: any[]): T {
   return new ((obj as any).constructor)(obj, ...args) as T
 }
+
+export function mapObject<K extends string, T, R>(obj: Record<K, T>, fn: (value: T, key: K) => R): Record<K, R> {
+  return Object.fromEntries(Object.entries(obj).map(([key, value]) => [key, fn(value as T, key as K)])) as Record<K, R>
+}

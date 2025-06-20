@@ -92,9 +92,9 @@ export class FunMetadata implements JsonMetadata {
   // --- Constructor ---
   constructor(metadata?: JsonMetadata, parent?: Funscript) {
     Object.assign(this, metadata)
-    const MetadataClass = this.constructor as typeof FunMetadata
-    if (metadata?.bookmarks) this.bookmarks = metadata.bookmarks.map(e => new MetadataClass.Bookmark(e))
-    if (metadata?.chapters) this.chapters = metadata.chapters.map(e => new MetadataClass.Chapter(e))
+    const base = this.constructor as typeof FunMetadata
+    if (metadata?.bookmarks) this.bookmarks = metadata.bookmarks.map(e => new base.Bookmark(e))
+    if (metadata?.chapters) this.chapters = metadata.chapters.map(e => new base.Chapter(e))
     if (metadata?.duration) this.duration = metadata.duration
     if (this.duration > 3600) { // 1 hour
       const actionsDuration = parent?.actionsDuraction
@@ -152,7 +152,8 @@ export class FunscriptFile {
   dir: string = ''
   mergedFiles?: FunscriptFile[]
 
-  constructor(filePath: string) {
+  constructor(filePath: string | FunscriptFile) {
+    if (filePath instanceof FunscriptFile) filePath = filePath.filePath
     let parts = filePath.split('.')
     if (parts.at(-1) === 'funscript') parts.pop()
     const axisLike = parts.at(-1)
@@ -196,6 +197,7 @@ export class Funscript implements JsonFunscript {
     const groups = Object.groupBy(singleaxisScripts, e => e.file?.title ?? '[unnamed]')
     const mergedSingleaxisScripts = Object.entries(groups).flatMap<Funscript>(([_title, scripts]) => {
       if (!scripts) return []
+
       // base case: no duplicate axes
       const allScripts = scripts.flatMap(e => [e, ...e.axes]).sort(orderByAxis)
       const axes = [...new Set(allScripts.map(e => e.id))]
@@ -203,10 +205,14 @@ export class Funscript implements JsonFunscript {
         // merge them all into a single script
         const L0 = allScripts.find(e => e.id === 'L0')
         if (!L0) throw new Error('Funscript.mergeMultiAxis: trying to merge multi-axis scripts without L0')
-        const base = L0.clone()
-        base.axes = allScripts.filter(e => e.id !== 'L0').map(e => new (base.constructor as typeof Funscript).AxisScript(e, { parent: base })) as any[]
-        if (base.file) base.file.mergedFiles = allScripts.map(e => e.file!)
-        return base
+        const result = new this(L0, {
+          axes: allScripts.filter(e => e !== L0),
+        })
+        if (L0.file) {
+          result.file = L0.file.clone()
+          result.file.mergedFiles = allScripts.map(e => e.file!)
+        }
+        return result
       }
       throw new Error('Funscript.mergeMultiAxis: multi-axis scripts are not implemented yet')
     })
@@ -230,26 +236,26 @@ export class Funscript implements JsonFunscript {
   ) {
     Object.assign(this, funscript)
 
-    const FunscriptClass = this.constructor as typeof Funscript
-    this.metadata = new FunscriptClass.Metadata()
+    const base = this.constructor as typeof Funscript
+    this.metadata = new base.Metadata()
 
-    if (extras?.file) this.file = new FunscriptClass.File(extras.file)
+    if (extras?.file) this.file = new base.File(extras.file)
     else if (funscript instanceof Funscript) this.file = funscript.file?.clone()
     // prefer file > funscript > extras
     this.id = extras?.id ?? funscript?.id ?? this.file?.id ?? (this instanceof AxisScript ? null! : 'L0')
 
     if (funscript?.actions) {
-      this.actions = funscript.actions.map(e => new FunscriptClass.Action(e))
+      this.actions = funscript.actions.map(e => new base.Action(e))
     }
-    if (funscript?.metadata !== undefined) this.metadata = new FunscriptClass.Metadata(funscript.metadata, this)
+    if (funscript?.metadata !== undefined) this.metadata = new base.Metadata(funscript.metadata, this)
     else if (funscript instanceof Funscript) this.file = funscript.file?.clone()
 
     if (extras?.axes) {
       if (funscript?.axes?.length) throw new Error('FunFunscript: both axes and axes are defined')
-      this.axes = extras.axes.map(e => new FunscriptClass.AxisScript(e, { parent: this })).sort(orderByAxis)
+      this.axes = extras.axes.map(e => new base.AxisScript(e, { parent: this })).sort(orderByAxis)
     }
     else if (funscript?.axes) {
-      this.axes = funscript.axes.map(e => new FunscriptClass.AxisScript(e, { parent: this })).sort(orderByAxis)
+      this.axes = funscript.axes.map(e => new base.AxisScript(e, { parent: this })).sort(orderByAxis)
     }
     if (extras?.parent) this.parent = extras.parent
 
@@ -360,6 +366,7 @@ export class Funscript implements JsonFunscript {
 export class AxisScript extends Funscript {
   declare id: axis
   declare axes: []
+  declare parent: Funscript
 
   constructor(
     funscript?: JsonFunscript,
@@ -370,7 +377,15 @@ export class AxisScript extends Funscript {
     if (!this.id) throw new Error('AxisScript: axis is not defined')
     if (!this.parent) throw new Error('AxisScript: parent is not defined')
   }
+
+  clone(): this {
+    const index = this.parent.axes.indexOf(this)
+    return this.parent.clone().axes[index]! as any
+  }
 }
 
 // Set the AxisScript reference after it's declared
 Funscript.AxisScript = AxisScript
+
+// export general types that are always needed. This is not a barrel file.
+export type * from './types'

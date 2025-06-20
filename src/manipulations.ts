@@ -1,7 +1,39 @@
-import type { FunAction } from '.'
 import type { ms, seconds, speed } from './types'
+import { FunAction } from '.'
 import { secondsToDuration } from './converter'
 import { absSpeedBetween, lerp, listToSum, minBy, speedBetween, unlerp } from './misc'
+
+/**
+ * Determines if an action at given index is a peak
+ * @param actions - Array of actions
+ * @param index - Index to check
+ * @returns -1 for valley, 0 for neither, 1 for peak
+ */
+function isPeak(actions: FunAction[], index: number): -1 | 0 | 1 {
+  const action = actions[index]
+  const prevAction = actions[index - 1]
+  const nextAction = actions[index + 1]
+
+  // if there is no prev or next action, it's a peak because we need peaks at corners
+  if (!prevAction && !nextAction) return 1
+  if (!prevAction) {
+    const speedFrom = speedBetween(action, nextAction)
+    return speedFrom < 0 ? 1 : 1
+  }
+  if (!nextAction) {
+    const speedTo = speedBetween(prevAction, action)
+    return speedTo > 0 ? -1 : -1
+  }
+
+  const speedTo = speedBetween(prevAction, action)
+  const speedFrom = speedBetween(action, nextAction)
+
+  if (Math.sign(speedTo) === Math.sign(speedFrom)) return 0
+
+  if (speedTo > speedFrom) return 1
+  if (speedTo < speedFrom) return -1
+  return 0
+}
 
 /**
  * Converts an array of actions into an array of lines with speed calculations
@@ -26,9 +58,7 @@ export function actionsToLines(actions: FunAction[]) {
  * Filters actions to create a zigzag pattern by removing actions with same direction changes
  */
 export function actionsToZigzag(actions: FunAction[]) {
-  return FunAction.cloneList(actions.filter(e => e.isPeak), {
-    parent: true,
-  })
+  return actions.filter((_, i) => isPeak(actions, i)).map(e => e.clone())
 }
 
 /**
@@ -63,7 +93,7 @@ export function calculateWeightedSpeed(lines: ReturnType<typeof actionsToLines>)
  */
 export function smoothActions(actions: FunAction[], windowSize: number = 3): FunAction[] {
   if (windowSize < 2) return actions
-  return FunAction.cloneList(actions.map((action, i, arr) => {
+  return actions.map((action, i, arr) => {
     const start = Math.max(0, i - Math.floor(windowSize / 2))
     const end = Math.min(arr.length, start + windowSize)
     const window = arr.slice(start, end)
@@ -72,14 +102,26 @@ export function smoothActions(actions: FunAction[], windowSize: number = 3): Fun
       at: action.at,
       pos: avgPos,
     })
-  }), { parent: actions[0]?.parent })
+  })
 }
 
 export function actionsAverageSpeed(actions: FunAction[]) {
   const zigzag = actionsToZigzag(actions)
-  const fast = zigzag.filter(e => Math.abs(e.speedTo) > 30)
+  const fast = zigzag.filter((e, i, arr) => {
+    const prev = arr[i - 1]
+    return prev && Math.abs(speedBetween(prev, e)) > 30
+  })
 
-  return listToSum(fast.map(e => Math.abs(e.speedTo) * e.datNext)) / (listToSum(fast.map(e => e.datNext)) || 1)
+  return listToSum(fast.map((e, i, arr) => {
+    const prev = arr[i - 1]
+    const next = arr[i + 1]
+    const speedTo = prev ? Math.abs(speedBetween(prev, e)) : 0
+    const datNext = next ? next.at - e.at : 0
+    return speedTo * datNext
+  })) / (listToSum(fast.map((e, i, arr) => {
+    const next = arr[i + 1]
+    return next ? next.at - e.at : 0
+  })) || 1)
 }
 /**
  * while the device speed may be lower then the script's max speed
@@ -90,12 +132,15 @@ export function actionsRequiredMaxSpeed(actions: FunAction[]): speed {
 
   const requiredSpeeds: [speed, ms][] = []
 
-  let nextPeak: FunAction | undefined = actions[0]
-  for (const a of actions) {
-    if (nextPeak === a) {
-      nextPeak = nextPeak.nextAction
-      while (nextPeak && !nextPeak.isPeak) nextPeak = nextPeak.nextAction
+  let nextPeakIndex = 0
+  for (let i = 0; i < actions.length; i++) {
+    const a = actions[i]
+    if (nextPeakIndex === i) {
+      // Find next peak
+      nextPeakIndex = actions.findIndex((action, idx) => idx > i && isPeak(actions, idx) !== 0)
+      if (nextPeakIndex === -1) break
     }
+    const nextPeak = actions[nextPeakIndex]
     if (!nextPeak) break
     requiredSpeeds.push([Math.abs(speedBetween(a, nextPeak)), nextPeak.at - a.at])
   }
@@ -148,7 +193,7 @@ export function smoothCurve(
     }
   }
 
-  return FunAction.linkList(curve, {})
+  return curve
 }
 
 /**
@@ -160,7 +205,7 @@ export function splitToSegments(actions: FunAction[]): FunAction[][] {
 
   // Find segments between peaks
   for (let i = 0; i < actions.length; i++) {
-    if (actions[i].isPeak !== 0) {
+    if (isPeak(actions, i) !== 0) {
       if (prevPeakIndex !== -1) {
         segments.push(actions.slice(prevPeakIndex, i + 1))
       }
@@ -175,11 +220,8 @@ export function splitToSegments(actions: FunAction[]): FunAction[][] {
  * Connects segments back into a single array of actions
  */
 export function connectSegments(segments: FunAction[][]): FunAction[] {
-  return FunAction.linkList(
-    segments.flat()
-      .filter((e, i, a) => e !== a[i - 1]),
-    { parent: true },
-  )
+  return segments.flat()
+    .filter((e, i, a) => e !== a[i - 1])
 }
 
 /**
@@ -190,7 +232,7 @@ export function simplifyLinearCurve(
   threshold: number,
 ) {
   if (curve.length <= 2) {
-    return FunAction.linkList(curve, { parent: true }) // Nothing to simplify
+    return curve // Nothing to simplify
   }
 
   const segments = splitToSegments(curve)
@@ -240,7 +282,7 @@ const HANDY_MAX_STRAIGHT_THRESHOLD = 3
  * This function will smooth the actions to fit those constraints
  */
 export function handySmooth(actions: FunAction[]): FunAction[] {
-  actions = FunAction.cloneList(actions, { parent: true })
+  actions = actions.map(e => e.clone())
   // pass 0: round at values
   actions.map(e => e.pos = Math.round(e.pos))
 
@@ -300,7 +342,7 @@ export function handySmooth(actions: FunAction[]): FunAction[] {
     // merge only poins that have <30 speed
     const current = filteredActions[i]
     const prev = filteredActions[i - 1]
-    if (!current.isPeak && !prev.isPeak) continue
+    if (isPeak(filteredActions, i) === 0 && isPeak(filteredActions, i - 1) === 0) continue
     const speed = absSpeedBetween(prev, current)
     if (speed > 10) continue
 
@@ -327,7 +369,7 @@ export function handySmooth(actions: FunAction[]): FunAction[] {
     // }
   }
 
-  filteredActions = FunAction.linkList(filteredActions, { parent: true })
+  // filteredActions = filteredActions // linkList is noop
 
   // pass 4: if the speed between two points is too high, move them closer together
 
@@ -342,7 +384,7 @@ export function handySmooth(actions: FunAction[]): FunAction[] {
     e.pos = Math.round(e.pos)
   })
 
-  return FunAction.linkList(filteredActions, { parent: true })
+  return filteredActions
 }
 
 /**
@@ -376,7 +418,8 @@ export function limitPeakSpeed(actions: FunAction[], maxSpeed: number): FunActio
     const lchanges = Array.from({ length: poss.length }, () => 0)
     const rchanges = Array.from({ length: poss.length }, () => 0)
     for (let l = 0, r = 1; r < poss.length; l++, r++) {
-      const left = peaks[l], right = peaks[r], absSpeed = Math.abs(left.speedFrom)
+      const left = peaks[l], right = peaks[r]
+      const absSpeed = Math.abs(speedBetween(left, right))
       if (absSpeed <= maxSpeed) continue
       const height = right.pos - left.pos
       const changePercent = (absSpeed - maxSpeed) / absSpeed
@@ -401,7 +444,10 @@ export function limitPeakSpeed(actions: FunAction[], maxSpeed: number): FunActio
       peaks[i].pos = poss[i]
     }
 
-    const speed = Math.max(...peaks.map(peak => Math.abs(peak.speedFrom)))
+    const speed = Math.max(...peaks.map((peak, idx) => {
+      const next = peaks[idx + 1]
+      return next ? Math.abs(speedBetween(peak, next)) : 0
+    }))
     if (speed > maxSpeed) {
       retry = true
     }
@@ -431,7 +477,7 @@ export function toStats(actions: FunAction[], options: { durationSeconds: second
 
   return {
     Duration: secondsToDuration(options.durationSeconds),
-    Actions: actions.filter(e => e.isPeak).length,
+    Actions: actions.filter((_, i) => isPeak(actions, i) !== 0).length,
     MaxSpeed: Math.round(MaxSpeed),
     AvgSpeed: Math.round(AvgSpeed),
   }
