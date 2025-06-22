@@ -38,13 +38,19 @@ export function secondsToDuration(seconds: seconds): string {
     Math.floor(seconds % 60).toFixed(0).padStart(2, '0')}`
 }
 
-export function orderTrimJson(that: Record<string, any>, order: Record<string, any>, empty: Record<string, any>): Record<string, any> {
-  const copy: Record<string, any> = { ...order, ...that }
-  for (const [k, v] of Object.entries(empty)) {
-    if (!(k in copy)) continue
+export function orderTrimJson(that: Record<string, any>, overrides?: Record<string, any>): Record<string, any> {
+  const shape = (that as any).constructor?.jsonShape
+  if (!shape || typeof shape !== 'object') {
+    throw new Error('orderTrimJson: missing static jsonShape on constructor')
+  }
+
+  const copy: Record<string, any> = { ...shape, ...that, ...overrides }
+
+  for (const [k, v] of Object.entries(shape)) {
+    if (v === undefined || !(k in copy)) continue
     const copyValue = (copy as any)[k]
     if (copyValue === v) delete (copy as any)[k]
-    if (Array.isArray(v) && Array.isArray(copyValue) && copyValue.length === 0) {
+    if (Array.isArray(v) && Array.isArray(copyValue) && copyValue.length === 0 && v.length === 0) {
       delete (copy as any)[k]
     }
     else if (

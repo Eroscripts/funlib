@@ -13,14 +13,13 @@ export class FunAction implements JsonAction {
   }
 
   // --- JSON & Clone Section ---
-  static jsonOrder = { at: undefined, pos: undefined }
+  static jsonShape = { at: undefined, pos: undefined }
 
   toJSON() {
-    return orderTrimJson({
-      ...this,
+    return orderTrimJson(this, {
       at: +this.at.toFixed(1),
       pos: +this.pos.toFixed(1),
-    }, FunAction.jsonOrder, {})
+    })
   }
 
   clone(): this {
@@ -45,11 +44,9 @@ export class FunChapter implements JsonChapter {
   get endAt(): ms { return timeSpanToMs(this.endTime) }
   set endAt(v: ms) { this.endTime = msToTimeSpan(v) }
 
-  static jsonOrder = { startTime: undefined, endTime: undefined, name: undefined }
+  static jsonShape = { startTime: undefined, endTime: undefined, name: '' }
   toJSON() {
-    return orderTrimJson(this, FunChapter.jsonOrder, {
-      name: '',
-    })
+    return orderTrimJson(this)
   }
 
   clone(): this {
@@ -69,11 +66,9 @@ export class FunBookmark {
   get startAt(): ms { return timeSpanToMs(this.time) }
   set startAt(v: ms) { this.time = msToTimeSpan(v) }
 
-  static jsonOrder = { time: undefined, name: undefined }
+  static jsonShape = { time: undefined, name: '' }
   toJSON() {
-    return orderTrimJson(this, FunBookmark.jsonOrder, {
-      name: '',
-    })
+    return orderTrimJson(this)
   }
 }
 
@@ -105,38 +100,26 @@ export class FunMetadata implements JsonMetadata {
   }
 
   // --- JSON & Clone Section ---
-  static emptyJson = {
-    bookmarks: [],
-    chapters: [],
+  static jsonShape = {
+    title: '',
     creator: '',
     description: '',
+    duration: undefined,
+    chapters: [],
+    bookmarks: [],
     license: '',
     notes: '',
     performers: [],
     script_url: '',
     tags: [],
-    title: '',
     type: 'basic',
     video_url: '',
-    // Need to list all potential metadata fields here
-  }
-
-  static jsonOrder = {
-    title: undefined,
-    creator: undefined,
-    description: undefined,
-    duration: undefined,
-    chapters: undefined,
-    bookmarks: undefined,
-    // Need to list all potential metadata fields here in desired order
-    // TODO: add the rest
   }
 
   toJSON() {
-    return orderTrimJson({
-      ...this,
+    return orderTrimJson(this, {
       duration: +this.duration.toFixed(3),
-    }, FunMetadata.jsonOrder, FunMetadata.emptyJson)
+    })
   }
 
   clone(): this {
@@ -326,30 +309,24 @@ export class Funscript implements JsonFunscript {
   }
 
   // --- JSON & Clone Section ---
-  static emptyJson = {
-    axes: [],
+  static jsonShape = {
+    id: undefined,
     metadata: {},
+    actions: undefined,
+    axes: [],
     inverted: false,
     range: 100,
     version: '1.0',
   }
 
-  static jsonOrder = {
-    id: undefined,
-    metadata: undefined,
-    actions: undefined,
-    axes: undefined,
-  }
-
   toJSON(): Record<string, any> {
-    return orderTrimJson({
-      ...this,
+    return orderTrimJson(this, {
       axes: this.axes.slice().sort(orderByAxis).map(e => ({ ...e.toJSON(), metadata: undefined })),
       metadata: {
         ...this.metadata.toJSON(),
         duration: +this.duration.toFixed(3),
       },
-    }, Funscript.jsonOrder, Funscript.emptyJson)
+    })
   }
 
   toJsonText(options?: Parameters<typeof formatJson>[1]) {
