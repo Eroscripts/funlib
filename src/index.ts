@@ -130,7 +130,7 @@ export class FunMetadata implements JsonMetadata {
 }
 
 export class FunscriptFile {
-  axisName: axisLike = '' as never
+  axisName: axisLike | '' = ''
   title: string = ''
   dir: string = ''
   mergedFiles?: FunscriptFile[]
@@ -173,11 +173,14 @@ export class Funscript implements JsonFunscript {
   // AxisScript will be set after its declaration
 
   /** merge multi-axis scripts into one */
-  static mergeMultiAxis(scripts: Funscript[]): Funscript[] {
+  static mergeMultiAxis(scripts: Funscript[], options?: { allowMissingL0?: boolean }): Funscript[] {
     const multiaxisScripts = scripts.filter(e => e.axes.length)
     const singleaxisScripts = scripts.filter(e => !e.axes.length)
 
-    const groups = Object.groupBy(singleaxisScripts, e => e.file?.title ?? '[unnamed]')
+    const groups = Object.groupBy(
+      singleaxisScripts,
+      e => e.file ? e.file.dir + e.file.title : '[unnamed]',
+    )
     const mergedSingleaxisScripts = Object.entries(groups).flatMap<Funscript>(([_title, scripts]) => {
       if (!scripts) return []
 
@@ -187,16 +190,32 @@ export class Funscript implements JsonFunscript {
       if (axes.length === allScripts.length) {
         // merge them all into a single script
         const L0 = allScripts.find(e => e.id === 'L0')
-        if (!L0) throw new Error('Funscript.mergeMultiAxis: trying to merge multi-axis scripts without L0')
-        const result = new this(L0, {
-          axes: allScripts.filter(e => e !== L0),
-        })
-        if (L0.file) {
-          result.file = L0.file.clone()
-          result.file.mergedFiles = allScripts.map(e => e.file!)
+        if (L0) {
+          const result = new this(L0, {
+            axes: allScripts.filter(e => e !== L0),
+          })
+          if (L0.file) {
+            result.file = L0.file.clone()
+            result.file.mergedFiles = allScripts.map(e => e.file!)
+          }
+          return result
         }
-        return result
+
+        if (options?.allowMissingL0) {
+          const result = new this({ metadata: allScripts[0]!.metadata.clone(), actions: [] }, {
+            axes: allScripts,
+          })
+          if (allScripts[0]!.file) {
+            result.file = allScripts[0]!.file.clone()
+            result.file.axisName = ''
+            result.file.mergedFiles = allScripts.map(e => e.file!)
+          }
+          return result
+        }
+
+        throw new Error('Funscript.mergeMultiAxis: trying to merge multi-axis scripts without L0')
       }
+      console.log(allScripts.map(e => e.file?.filePath), axes)
       throw new Error('Funscript.mergeMultiAxis: multi-axis scripts are not implemented yet')
     })
     return [...multiaxisScripts, ...mergedSingleaxisScripts]
