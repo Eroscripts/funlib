@@ -1,6 +1,6 @@
-import type { Funscript } from '../index'
+import type { Funscript } from '..'
 import type { JsonAction, ms, pos, speed } from '../types'
-import { FunAction } from '../index'
+import { FunAction } from '..'
 import { clamplerp, clone, makeNonEnumerable, speedBetween } from '../misc'
 
 export class LinkedFunAction extends FunAction {

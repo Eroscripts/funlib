@@ -1,4 +1,4 @@
-import type { FunAction, Funscript } from '../index'
+import type { FunAction, Funscript } from '..'
 import type { axis, ms, pos, TCodeTuple } from '../types'
 import { TCodeList } from '../converter'
 

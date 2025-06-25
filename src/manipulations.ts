@@ -1,7 +1,47 @@
-import type { ms, seconds, speed } from './types'
+import type { ms, pos, seconds, speed } from './types'
 import { FunAction } from '.'
 import { secondsToDuration } from './converter'
-import { absSpeedBetween, lerp, listToSum, minBy, speedBetween, unlerp } from './misc'
+import { absSpeedBetween, clamplerp, lerp, listToSum, minBy, speedBetween, unlerp } from './misc'
+
+export function binaryFindLeftBorder(actions: FunAction[], at: ms): number {
+  if (actions.length <= 1) return 0
+  if (at < actions[0].at) return 0
+  if (at > actions.at(-1)!.at) return actions.length - 1
+
+  let left = 0
+  let right = actions.length - 1
+
+  while (left < right) {
+    const mid = Math.floor((left + right) / 2)
+    if (actions[mid].at < at) {
+      left = mid + 1
+    } else {
+      right = mid
+    }
+  }
+
+  // Always return the left border (the action at or before the time)
+  if (left > 0 && actions[left].at > at) {
+    return left - 1
+  }
+  return left
+}
+
+export function clerpAt(actions: FunAction[], at: ms): pos {
+  if (actions.length === 0) return 50 as pos
+  if (actions.length === 1) return actions[0].pos
+  if (at <= actions[0].at) return actions[0].pos
+  if (at >= actions.at(-1)!.at) return actions.at(-1)!.pos
+
+  const leftIndex = binaryFindLeftBorder(actions, at)
+  const leftAction = actions[leftIndex]
+  const rightAction = actions[leftIndex + 1]
+
+  if (at === leftAction.at) return leftAction.pos
+  if (!rightAction) return leftAction.pos
+
+  return clamplerp(at, leftAction.at, rightAction.at, leftAction.pos, rightAction.pos) as pos
+}
 
 /**
  * Determines if an action at given index is a peak

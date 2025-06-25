@@ -1,6 +1,7 @@
 import type { FunChapter } from './index'
 import type { chapterName, ms } from './types'
 import { FunAction, Funscript } from './index'
+import { clerpAt } from './manipulations'
 
 export function sliceActions(
   actions: FunAction[],
@@ -12,26 +13,16 @@ export function sliceActions(
 
   const newActions = actions.filter(action => action.at >= chapter.startAt && action.at <= chapter.endAt)
   if (lerpBorders === 'lerp') {
-    // action just after startAt
-    const actionNearStart = newActions[0]
-      ?? actions.find(action => action.at >= chapter.startAt)
-      ?? actions.at(-1)!
-
-    // action just before endAt
-    const actionNearEnd = newActions.at(-1)
-      ?? actions.findLast(action => action.at <= chapter.endAt)
-      ?? actions[0]
-
     if (!newActions[0] || newActions[0].at !== chapter.startAt) {
       newActions.unshift(new FunAction({
         at: chapter.startAt,
-        pos: actionNearStart.clerpAt(chapter.startAt),
+        pos: clerpAt(actions, chapter.startAt),
       }))
     }
     if (newActions.at(-1)!.at !== chapter.endAt) {
       newActions.push(new FunAction({
         at: chapter.endAt,
-        pos: actionNearEnd.clerpAt(chapter.endAt),
+        pos: clerpAt(actions, chapter.endAt),
       }))
     }
   }
