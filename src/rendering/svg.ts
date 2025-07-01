@@ -396,7 +396,7 @@ export function toSvgG(
     get axisText() { return round((this.top + this.svgBottom) / 2 + 4 + this.headerExtra / 2) }, // Y position for axis text (centered)
     headerText: round(headerHeight * 0.75), // Y position for header text (proportional to headerHeight)
     get statLabelText() { return round(headerHeight * 0.35 + this.headerExtra) }, // Y position for stat labels (proportional)
-    get statValueText() { return round(headerHeight * 0.95 + this.headerExtra) }, // Y position for stat values (proportional)
+    get statValueText() { return round(headerHeight * 0.92 + this.headerExtra) }, // Y position for stat values (proportional)
   }
   const bgGradientId = `funsvg-grad-${script.id}-${script.actions.length}-${script.actions[0]?.at || 0}`
 
@@ -410,7 +410,7 @@ export function toSvgG(
     axisWidth > 0 && `    <rect class="funsvg-bg-axis-drop" x="0" y="${yy.top}" width="${xx.axisEnd}" height="${yy.svgBottom - yy.top}" fill="#ccc" opacity="${round(graphOpacity * 1.5)}"></rect>`,
     `    <rect class="funsvg-bg-title-drop" x="${xx.titleStart}" width="${xx.graphWidth}" height="${yy.titleBottom}" fill="#ccc" opacity="${round(graphOpacity * 1.5)}"></rect>`,
     axisWidth > 0 && `    <rect class="funsvg-bg-axis" x="0" y="${yy.top}" width="${xx.axisEnd}" height="${yy.svgBottom - yy.top}" fill="${axisColor}" opacity="${axisOpacity}"></rect>`,
-    `    <rect class="funsvg-bg-title" x="${xx.titleStart}" width="${xx.graphWidth}" height="${yy.titleBottom}" fill="${solidHeaderBackground ? axisColor : `url(#${bgGradientId})`}" opacity="${round(solidHeaderBackground ? axisOpacity * headerOpacity : headerOpacity)}"></rect>`,
+    `    <rect class="funsvg-bg-title" x="${xx.titleStart}" width="${xx.graphWidth}" height="${yy.titleBottom}" fill="${solidHeaderBackground ? axisColor : `url(#${bgGradientId})`}" opacity="${round(solidHeaderBackground ? axisOpacity : headerOpacity)}"></rect>`,
     `    <rect class="funsvg-bg-graph" x="${xx.titleStart}" width="${xx.graphWidth}" y="${yy.graphTop}" height="${graphHeight}" fill="url(#${bgGradientId})" opacity="${round(graphOpacity)}"></rect>`,
     '  </g>',
 

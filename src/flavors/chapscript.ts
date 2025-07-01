@@ -14,7 +14,10 @@ export interface JsonChapChapter {
   axes?: { id: axis, actions: JsonAction[] }[]
 }
 
-export class ChapAction extends FunAction {
+/**
+ * Action in script.actions, converted from chap.actions
+ */
+export class ChapTimelineAction extends FunAction {
   chapter: chapterName = ''
   chapterAt: ms = 0
 
@@ -29,20 +32,23 @@ export class ChapAction extends FunAction {
   }
 }
 
+/**
+ * Chapter in script.chapters
+ */
 export class ChapChapter extends FunChapter {
   actions: FunAction[]
-  axes?: { id: axis, actions: ChapAction[] }[]
+  axes?: { id: axis, actions: FunAction[] }[]
 
   constructor(chapter?: JsonChapChapter) {
     super(chapter as any)
-    this.actions = chapter?.actions?.map(a => new ChapAction(a)) ?? []
+    this.actions = chapter?.actions?.map(a => new FunAction(a)) ?? []
     this.axes = chapter?.axes?.map(axisData => ({
       id: axisData.id,
-      actions: axisData.actions.map(a => new ChapAction(a)),
+      actions: axisData.actions.map(a => new FunAction(a)),
     }))
   }
 
-  into(timelineChapter: TimelineChapter, axis?: axis): ChapAction[] {
+  into(timelineChapter: TimelineChapter, axis?: axis): ChapTimelineAction[] {
     const actions = !axis
       ? this.actions
       : this.axes?.find(a => a.id === axis)?.actions ?? []
@@ -62,7 +68,7 @@ export class ChapChapter extends FunChapter {
         return actions.map((action) => {
           const at = action.at - timelineChapter.offset + loop * chapterDuration
 
-          return new ChapAction({
+          return new ChapTimelineAction({
             at: startAt + at / timelineChapter.speed,
             pos: action.pos,
             chapter: this.name,
@@ -95,6 +101,9 @@ export interface JsonTimelineChapter extends Partial<JsonChapter> {
   endAt?: ms
 }
 
+/**
+ * Chapter in script.metadata.chapters
+ */
 export class TimelineChapter extends FunChapter {
   /** shift relative to chapter start. Positive shift drops actions before the shift */
   offset: ms = 0
@@ -126,7 +135,7 @@ export class ChapMetadata extends FunMetadata {
 export class ChapScript extends Funscript {
   static override Metadata = ChapMetadata
   static override Chapter = ChapChapter
-  static override Action = ChapAction
+  static override Action = ChapTimelineAction
   declare metadata: ChapMetadata
 
   chapters: Record<chapterName, ChapChapter>
@@ -177,12 +186,12 @@ export class ChapScript extends Funscript {
     return this
   }
 
-  addTimelineChapter(timelineChapter: JsonTimelineChapter): this {
+  addTimelineChapter(timelineChapter: JsonTimelineChapter) {
     const chapter = new TimelineChapter(timelineChapter)
     this.metadata.chapters.push(chapter)
     // Sort chapters by start time
     this.metadata.chapters.sort((a, b) => a.startAt - b.startAt)
-    return this
+    return chapter
   }
 
   removeTimelineChapter(chapter: TimelineChapter): this {
@@ -248,7 +257,7 @@ export class ChapScript extends Funscript {
         sliceActionsMode,
       )
 
-      return slicedActions.map(action => new ChapAction({
+      return slicedActions.map(action => new ChapTimelineAction({
         at: action.at - chapter.startAt,
         pos: action.pos,
         chapter: chapter.name,
