@@ -1,4 +1,4 @@
-// Bun Snapshot v1, https://goo.gl/fbAQLP
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
 exports[`Script Merging should merge multi-axis scripts by filename 1`] = `
 [
@@ -45,66 +45,9 @@ exports[`Script Merging should merge multi-axis scripts by filename 1`] = `
         "pos": 25,
       },
     ],
-    "axes": [
-      AxisScript {
-        "actions": [
-          FunAction {
-            "at": 0,
-            "pos": 50,
-          },
-          FunAction {
-            "at": 75,
-            "pos": 50,
-          },
-          FunAction {
-            "at": 150,
-            "pos": 49,
-          },
-          FunAction {
-            "at": 225,
-            "pos": 50,
-          },
-          FunAction {
-            "at": 300,
-            "pos": 49,
-          },
-          FunAction {
-            "at": 375,
-            "pos": 50,
-          },
-          FunAction {
-            "at": 450,
-            "pos": 49,
-          },
-          FunAction {
-            "at": 525,
-            "pos": 50,
-          },
-          FunAction {
-            "at": 600,
-            "pos": 49,
-          },
-          FunAction {
-            "at": 675,
-            "pos": 50,
-          },
-        ],
-        "axes": [],
-        "file": FunscriptFile {
-          "axisName": "roll",
-          "dir": "",
-          "mergedFiles": undefined,
-          "title": "test-video",
-        },
-        "id": "R1",
-        "metadata": FunMetadata {
-          "bookmarks": [],
-          "chapters": [],
-          "duration": 0,
-        },
-        "parent": [Circular],
-      },
-      AxisScript {
+    "channel": "",
+    "channels": {
+      "pitch": AxisScript {
         "actions": [
           FunAction {
             "at": 0,
@@ -147,14 +90,14 @@ exports[`Script Merging should merge multi-axis scripts by filename 1`] = `
             "pos": 50,
           },
         ],
-        "axes": [],
+        "channel": "pitch",
+        "channels": {},
         "file": FunscriptFile {
-          "axisName": "pitch",
+          "channel": "pitch",
           "dir": "",
           "mergedFiles": undefined,
           "title": "test-video",
         },
-        "id": "R2",
         "metadata": FunMetadata {
           "bookmarks": [],
           "chapters": [],
@@ -162,25 +105,77 @@ exports[`Script Merging should merge multi-axis scripts by filename 1`] = `
         },
         "parent": [Circular],
       },
-    ],
+      "roll": AxisScript {
+        "actions": [
+          FunAction {
+            "at": 0,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 75,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 150,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 225,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 300,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 375,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 450,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 525,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 600,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 675,
+            "pos": 50,
+          },
+        ],
+        "channel": "roll",
+        "channels": {},
+        "file": FunscriptFile {
+          "channel": "roll",
+          "dir": "",
+          "mergedFiles": undefined,
+          "title": "test-video",
+        },
+        "metadata": FunMetadata {
+          "bookmarks": [],
+          "chapters": [],
+          "duration": 0,
+        },
+        "parent": [Circular],
+      },
+    },
     "file": FunscriptFile {
-      "axisName": "",
+      "channel": "",
       "dir": "",
       "mergedFiles": [
         FunscriptFile {
-          "axisName": "",
+          "channel": "roll",
           "dir": "",
           "mergedFiles": undefined,
           "title": "test-video",
         },
         FunscriptFile {
-          "axisName": "roll",
-          "dir": "",
-          "mergedFiles": undefined,
-          "title": "test-video",
-        },
-        FunscriptFile {
-          "axisName": "pitch",
+          "channel": "pitch",
           "dir": "",
           "mergedFiles": undefined,
           "title": "test-video",
@@ -188,7 +183,6 @@ exports[`Script Merging should merge multi-axis scripts by filename 1`] = `
       ],
       "title": "test-video",
     },
-    "id": "L0",
     "metadata": FunMetadata {
       "bookmarks": [],
       "chapters": [],
@@ -239,21 +233,14 @@ exports[`Script Merging should merge multi-axis scripts by filename 1`] = `
         "pos": 49,
       },
     ],
-    "axes": [],
+    "channel": "",
+    "channels": {},
     "file": FunscriptFile {
-      "axisName": "",
+      "channel": "",
       "dir": "",
-      "mergedFiles": [
-        FunscriptFile {
-          "axisName": "",
-          "dir": "",
-          "mergedFiles": undefined,
-          "title": "unrelated",
-        },
-      ],
+      "mergedFiles": undefined,
       "title": "unrelated",
     },
-    "id": "L0",
     "metadata": FunMetadata {
       "bookmarks": [],
       "chapters": [],
@@ -309,66 +296,9 @@ exports[`Script Merging should merge multi-axis scripts by filename 2`] = `
         "pos": 25,
       },
     ],
-    "axes": [
-      AxisScript {
-        "actions": [
-          FunAction {
-            "at": 0,
-            "pos": 50,
-          },
-          FunAction {
-            "at": 75,
-            "pos": 50,
-          },
-          FunAction {
-            "at": 150,
-            "pos": 49,
-          },
-          FunAction {
-            "at": 225,
-            "pos": 50,
-          },
-          FunAction {
-            "at": 300,
-            "pos": 49,
-          },
-          FunAction {
-            "at": 375,
-            "pos": 50,
-          },
-          FunAction {
-            "at": 450,
-            "pos": 49,
-          },
-          FunAction {
-            "at": 525,
-            "pos": 50,
-          },
-          FunAction {
-            "at": 600,
-            "pos": 49,
-          },
-          FunAction {
-            "at": 675,
-            "pos": 50,
-          },
-        ],
-        "axes": [],
-        "file": FunscriptFile {
-          "axisName": "roll",
-          "dir": "",
-          "mergedFiles": undefined,
-          "title": "test-video",
-        },
-        "id": "R1",
-        "metadata": FunMetadata {
-          "bookmarks": [],
-          "chapters": [],
-          "duration": 0,
-        },
-        "parent": [Circular],
-      },
-      AxisScript {
+    "channel": "",
+    "channels": {
+      "pitch": AxisScript {
         "actions": [
           FunAction {
             "at": 0,
@@ -411,14 +341,14 @@ exports[`Script Merging should merge multi-axis scripts by filename 2`] = `
             "pos": 50,
           },
         ],
-        "axes": [],
+        "channel": "pitch",
+        "channels": {},
         "file": FunscriptFile {
-          "axisName": "pitch",
+          "channel": "pitch",
           "dir": "",
           "mergedFiles": undefined,
           "title": "test-video",
         },
-        "id": "R2",
         "metadata": FunMetadata {
           "bookmarks": [],
           "chapters": [],
@@ -426,14 +356,71 @@ exports[`Script Merging should merge multi-axis scripts by filename 2`] = `
         },
         "parent": [Circular],
       },
-    ],
+      "roll": AxisScript {
+        "actions": [
+          FunAction {
+            "at": 0,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 75,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 150,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 225,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 300,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 375,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 450,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 525,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 600,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 675,
+            "pos": 50,
+          },
+        ],
+        "channel": "roll",
+        "channels": {},
+        "file": FunscriptFile {
+          "channel": "roll",
+          "dir": "",
+          "mergedFiles": undefined,
+          "title": "test-video",
+        },
+        "metadata": FunMetadata {
+          "bookmarks": [],
+          "chapters": [],
+          "duration": 0,
+        },
+        "parent": [Circular],
+      },
+    },
     "file": FunscriptFile {
-      "axisName": "",
+      "channel": "",
       "dir": "",
       "mergedFiles": undefined,
       "title": "test-video",
     },
-    "id": "L0",
     "metadata": FunMetadata {
       "bookmarks": [],
       "chapters": [],
@@ -484,14 +471,14 @@ exports[`Script Merging should merge multi-axis scripts by filename 2`] = `
         "pos": 49,
       },
     ],
-    "axes": [],
+    "channel": "",
+    "channels": {},
     "file": FunscriptFile {
-      "axisName": "",
+      "channel": "",
       "dir": "",
       "mergedFiles": undefined,
       "title": "unrelated",
     },
-    "id": "L0",
     "metadata": FunMetadata {
       "bookmarks": [],
       "chapters": [],

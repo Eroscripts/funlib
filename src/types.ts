@@ -11,6 +11,7 @@ export type axisPairs = [
   ['R1', 'roll'],
   ['R2', 'pitch'],
   ['A1', 'suck'],
+  // [string & B<'axis'>, string & B<'channel'>],
 ]
 
 export type mantissa = number & B<[any, 'mantissa']>
@@ -31,9 +32,10 @@ export type pos = number & B<['axis', 'u']> // 0-100
 // export type axisRaw = number & B<['axis', 'deg' | 'mantissa']>
 
 // axes
-export type axis = `${'L' | 'R' | 'A'}${0 | 1 | 2}` & B<['axis', 'name']>
-export type axisName = axisPairs[number][1]
-export type axisLike = axis | axisName
+export type axis = axisPairs[number][0] | string & B<'axis'>
+export type channel = string & B<'channel'>
+export type channelName = axisPairs[number][1] & channel
+export type axisLike = axis | channel
 export type AxisToName = { [K in axisPairs[number] as K[0]]: K[1] } & { [K in axisPairs[number] as K[1]]: K[0] }
 
 export type chapterName = string & B<['chapter', 'name']>
@@ -55,24 +57,31 @@ export interface JsonMetadata {
   bookmarks?: { name: string, time: timeSpan }[]
   chapters?: JsonChapter[]
   duration?: seconds
+  durationTime?: timeSpan
   // creator?: string
   // description?: string
   // license?: string
   // notes?: string
   // performers?: []
   // script_url?: string
-  // tags?: []
-  title?: string
   // type?: string
   // video_url?: string
+  title?: string
+  topic_url?: string
+  tags?: string[]
 }
 export interface JsonFunscript {
-  id?: axis
-  actions: JsonAction[]
   // ids are L0..R2
-  axes?: { id: axis, actions: JsonAction[] }[]
-  metadata?: JsonMetadata
+  /** @deprecated Use channel instead */
+  id?: axis
+  /** @deprecated Use channels instead */
+  axes?: { id: axis, actions: JsonAction[], channel?: channel }[]
   // inverted?: boolean
   // range?: number
   // version?: string
+
+  metadata?: JsonMetadata
+  actions: JsonAction[]
+  channel?: channel
+  channels?: Record<channel, { actions: JsonAction[] }>
 }

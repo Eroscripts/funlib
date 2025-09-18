@@ -1,7 +1,7 @@
 import type { Funscript } from '..'
 import type { ms } from '../types'
 import { FunAction } from '..'
-import { speedToHexCached } from '../converter'
+import { channelNameToAxis, speedToHexCached } from '../converter'
 import { actionsToLines, actionsToZigzag, mergeLinesSpeed, toStats } from '../manipulations'
 import { lerp } from '../misc'
 
@@ -269,7 +269,7 @@ export function toSvgElement(scripts: Funscript | Funscript[], ops: SvgOptions):
       onDoubleTitle: () => y += fullOps.headerHeight,
     }))
     y += fullOps.height + SPACING_BETWEEN_AXES
-    for (const a of s.axes) {
+    for (const a of s.listChannels) {
       // Axes never show title
       pieces.push(toSvgG(a, { ...fullOps, durationMs, title: fullOps.title ?? '' }, {
         transform: `translate(${SVG_PADDING}, ${y})`,
@@ -374,7 +374,7 @@ export function toSvgG(
   const graphHeight = height - headerHeight - headerSpacing
 
   const isForHandy = '_isForHandy' in script && script._isForHandy
-  let axis: string = script.id ?? 'L0'
+  let axis: string = script.channel ? channelNameToAxis(script.channel, script.channel) : 'L0'
   if (isForHandy) axis = '☞'
 
   // repair:
@@ -398,7 +398,7 @@ export function toSvgG(
     get statLabelText() { return round(headerHeight * 0.35 + this.headerExtra) }, // Y position for stat labels (proportional)
     get statValueText() { return round(headerHeight * 0.92 + this.headerExtra) }, // Y position for stat values (proportional)
   }
-  const bgGradientId = `funsvg-grad-${script.id}-${script.actions.length}-${script.actions[0]?.at || 0}`
+  const bgGradientId = `funsvg-grad-${script.channel ?? ''}-${script.actions.length}-${script.actions[0]?.at || 0}`
 
   const axisColor = speedToHexCached(stats.AvgSpeed)
   const axisOpacity = round(headerOpacity * Math.max(0.5, Math.min(1, stats.AvgSpeed / 100)))

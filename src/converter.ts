@@ -1,7 +1,7 @@
 import type { Funscript } from '.'
-import type { axis, axisLike, axisName, axisPairs, ms, pos, seconds, speed, TCodeTuple, timeSpan } from './types'
+import type { axis, axisLike, axisPairs, channel, ms, seconds, speed, timeSpan } from './types'
 import { oklch2hex } from 'colorizr'
-import { clamp, clamplerp, compareWithOrder } from './misc'
+import { clamplerp, compareWithOrder } from './misc'
 
 export function timeSpanToMs(timeSpan: timeSpan): ms {
   if (typeof timeSpan !== 'string') {
@@ -63,7 +63,7 @@ export function orderTrimJson(that: Record<string, any>, overrides?: Record<stri
   return copy
 }
 
-function fromEntries<A extends [any, any][]>(a: A): { [K in A[number] as K[0]]: K[1] } {
+function fromEntries<A extends [any, any][]>(a: A): { [K in A[number]as K[0]]: K[1] } {
   return Object.fromEntries(a)
 }
 
@@ -77,30 +77,31 @@ const axisPairs: axisPairs = [
   ['A1', 'suck'],
 ]
 
-export const axisToNameMap: Record<axis, axisName> = fromEntries(axisPairs)
-export const axisNameToAxisMap: Record<axisName, axis> = fromEntries(axisPairs.map(([a, b]) => [b, a]))
+export const axisToNameMap: Record<axis, channel> = fromEntries(axisPairs)
+export const channelNameToAxisMap: Record<channel, axis> = fromEntries(axisPairs.map(([a, b]) => [b, a]))
 export const axisIds: axis[] = axisPairs.map(e => e[0])
-export const axisNames: axisName[] = axisPairs.map(e => e[1])
+export const channelNames: channel[] = axisPairs.map(e => e[1])
 export const axisLikes: axisLike[] = axisPairs.flat()
 
-export function axisNameToAxis(name?: axisName): axis {
-  if (name && name in axisNameToAxisMap) return axisNameToAxisMap[name]
+export function channelNameToAxis(name?: channel, fallback?: any): axis {
+  if (name && name in channelNameToAxisMap) return channelNameToAxisMap[name]
+  if (fallback !== undefined) return fallback
   throw new Error(`axisNameToAxis: ${name} is not supported`)
 }
-export function axisToName(axis?: axis): axisName {
+export function axisToChannelName(axis?: axis): channel {
   if (axis && axis in axisToNameMap) return (axisToNameMap as any)[axis]
   throw new Error(`axisToName: ${axis} is not supported`)
 }
 export function axisLikeToAxis(axisLike?: axisLike | 'singleaxis'): axis {
   if (!axisLike) return 'L0'
   if (axisIds.includes(axisLike as any)) return axisLike as any
-  if (axisNames.includes(axisLike as any)) return axisNameToAxisMap[axisLike as axisName]
+  if (channelNames.includes(axisLike as any)) return channelNameToAxisMap[axisLike as channel]
   if (axisLike === 'singleaxis') return 'L0'
   throw new Error(`axisLikeToAxis: ${axisLike} is not supported`)
 }
 
-export function orderByAxis(a: Funscript, b: Funscript) {
-  return compareWithOrder(a.id, b.id, axisIds)
+export function orderByChannel(a: Funscript, b: Funscript) {
+  return compareWithOrder(a.channel, b.channel, channelNames)
 }
 
 export function fileNameToInfo(filePath?: string) {
@@ -232,48 +233,4 @@ export function formatTCode(tcode: string, format = true) {
     (s, a, b, c, d, e) =>
       `${a}${b}${c.padStart(4, '_')}${d ? '_' + d : ''}${e ? e.padStart(4, '_') : ''}`,
   )
-}
-
-export class TCodeAction extends
-  (Array<number | string> as any as (new(...a: any[]) => readonly [axis: axis, pos: pos, type?: 'I' | 'S', target?: ms | speed])) {
-  static from(a: TCodeTuple | [TCodeTuple]) {
-    return new TCodeAction(...a)
-  }
-
-  constructor(...a: TCodeTuple | [TCodeTuple]) {
-    super()
-    ;(this as any as any[]).push(...(Array.isArray(a[0]) ? a[0] : a))
-  }
-
-  toString(ops?: { precision?: number, format?: boolean }) {
-    const d = ops?.format ? '_' : ''
-
-    let mantissa = clamp(this[1] / 100, 0, 1).toFixed(ops?.precision ?? 4)
-    if (mantissa.startsWith('1')) mantissa = '0.999999999'
-    mantissa = mantissa.slice(2).slice(0, ops?.precision ?? 4)
-    if (d) mantissa = mantissa.padStart(ops?.precision ?? 4, '_')
-    else mantissa = mantissa.replace(/(?<=.)0+$/, '')
-
-    const target = this[3] ?? 0
-    const speedText = clamp(target, 0, 9999).toFixed(0)
-    const intervalText = clamp(target, 0, 99999).toFixed(0)
-    const postfix
-      = this[2] === 'I'
-        ? `${d}I${d}${intervalText.padStart(d ? 3 : 0, '_')}`
-        : this[2] === 'S'
-          ? `${d}S${d}${speedText.padStart(d ? 3 : 0, '_')}`
-          : ''
-    return `${this[0]}${d}${mantissa}${postfix}`
-  }
-}
-
-export class TCodeList extends Array<TCodeAction> {
-  static from(arrayLike: TCodeTuple[]): TCodeList {
-    return new TCodeList(...arrayLike.map(e => new TCodeAction(e)))
-  }
-
-  toString(ops?: { precision?: number, format?: boolean }) {
-    if (!this.length) return ''
-    return this.map(e => e.toString(ops)).join(' ') + '\n'
-  }
 }

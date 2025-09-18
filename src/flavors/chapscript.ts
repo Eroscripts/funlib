@@ -1,7 +1,7 @@
 import type { axis, chapterName, JsonAction, JsonChapter, JsonFunscript, JsonMetadata, ms, pos, timeSpan } from '..'
 import { FunAction, FunChapter, FunMetadata, Funscript } from '..'
 import { sliceActions } from '../chapters'
-import { axisIds, orderByAxis, orderTrimJson } from '../converter'
+import { axisIds, orderByChannel, orderTrimJson } from '../converter'
 import { clerpAt } from '../manipulations'
 import { compareWithOrder, mapObject } from '../misc'
 
@@ -167,7 +167,7 @@ export class ChapScript extends Funscript {
         this.axes.push(new base.AxisScript({ actions: [] }, { id: x, parent: this }))
       }
     }
-    this.axes.sort(orderByAxis)
+    this.axes.sort(orderByChannel)
   }
 
   recalculateActions(): this {

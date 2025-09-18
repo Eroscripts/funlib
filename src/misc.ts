@@ -102,3 +102,15 @@ export function clone<T>(obj: T, ...args: any[]): T {
 export function mapObject<K extends string, T, R>(obj: Record<K, T>, fn: (value: T, key: K) => R): Record<K, R> {
   return Object.fromEntries(Object.entries(obj).map(([key, value]) => [key, fn(value as T, key as K)])) as Record<K, R>
 }
+
+export function isEmpty(o?: object) {
+  if (!o) return true
+  if (Array.isArray(o)) return o.length === 0
+  return Object.keys(o).length === 0
+}
+
+export function toValues<T>(o?: Record<any, T> | T[]): T[] {
+  if (!o) return []
+  if (Array.isArray(o)) return [...o]
+  return Object.values(o)
+}
