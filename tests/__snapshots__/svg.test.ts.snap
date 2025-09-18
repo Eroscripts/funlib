@@ -1,0 +1,579 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SVG Generation should generate SVG element for a funscript 1`] = `
+"<svg class="funsvg" width="690" height="52" xmlns="http://www.w3.org/2000/svg"
+    font-size="16px" font-family="Arial, sans-serif"
+  >
+    <g transform="translate(0, 0)">
+  <g class="funsvg-bgs">
+    <defs>
+      <linearGradient id="funsvg-grad-L0-10-0">
+        <stop offset="0" stop-color="#e8bd00"></stop>
+          <stop offset="1" stop-color="#e8bd00"></stop>
+      </linearGradient></defs>
+    <rect class="funsvg-bg-axis-drop" x="0" y="0" width="46" height="52" fill="#ccc" opacity="0.3"></rect>
+    <rect class="funsvg-bg-title-drop" x="46" width="644" height="20" fill="#ccc" opacity="0.3"></rect>
+    <rect class="funsvg-bg-axis" x="0" y="0" width="46" height="52" fill="#acd400" opacity="0.7"></rect>
+    <rect class="funsvg-bg-title" x="46" width="644" height="20" fill="url(#funsvg-grad-L0-10-0)" opacity="0.7"></rect>
+    <rect class="funsvg-bg-graph" x="46" width="644" y="20" height="32" fill="url(#funsvg-grad-L0-10-0)" opacity="0.2"></rect>
+  </g>
+  <g class="funsvg-lines" transform="translate(46, 20)" stroke-width="0.5" fill="none" stroke-linecap="round">
+    <path d="M 0.5 8.25 L 71.94 23.75" stroke="#e8bd00"></path>
+    <path d="M 71.94 23.75 L 143.39 8.25" stroke="#e8bd00"></path>
+    <path d="M 143.39 8.25 L 214.83 23.75" stroke="#e8bd00"></path>
+    <path d="M 214.83 23.75 L 286.28 8.25" stroke="#e8bd00"></path>
+    <path d="M 286.28 8.25 L 357.72 23.75" stroke="#e8bd00"></path>
+    <path d="M 357.72 23.75 L 429.17 8.25" stroke="#e8bd00"></path>
+    <path d="M 429.17 8.25 L 500.61 23.75" stroke="#e8bd00"></path>
+    <path d="M 500.61 23.75 L 572.06 8.25" stroke="#e8bd00"></path>
+    <path d="M 572.06 8.25 L 643.5 23.75" stroke="#e8bd00"></path>
+  </g>
+  <g class="funsvg-titles">
+    <g class="funsvg-titles-halo" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent">
+      <text class="funsvg-title-halo" x="49" y="15">  </text>
+      <text class="funsvg-stat-label-halo" x="683" y="7" font-weight="bold" font-size="8px" text-anchor="end"> AvgSpeed </text>
+      <text class="funsvg-stat-value-halo" x="683" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 219 </text>
+      <text class="funsvg-stat-label-halo" x="637" y="7" font-weight="bold" font-size="8px" text-anchor="end"> MaxSpeed </text>
+      <text class="funsvg-stat-value-halo" x="637" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 250 </text>
+      <text class="funsvg-stat-label-halo" x="591" y="7" font-weight="bold" font-size="8px" text-anchor="end"> Actions </text>
+      <text class="funsvg-stat-value-halo" x="591" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 10 </text>
+      <text class="funsvg-stat-label-halo" x="545" y="7" font-weight="bold" font-size="8px" text-anchor="end"> Duration </text>
+      <text class="funsvg-stat-value-halo" x="545" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 0:02 </text>
+    </g>
+    <text class="funsvg-axis" x="23" y="30" font-size="34.5px" font-family="Consolas, monospace" text-anchor="middle" dominant-baseline="middle"> L0 </text>
+    <text class="funsvg-title" x="49" y="15">  </text>
+    <text class="funsvg-stat-label" x="683" y="7" font-weight="bold" font-size="8px" text-anchor="end"> AvgSpeed </text>
+    <text class="funsvg-stat-value" x="683" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 219 </text>
+    <text class="funsvg-stat-label" x="637" y="7" font-weight="bold" font-size="8px" text-anchor="end"> MaxSpeed </text>
+    <text class="funsvg-stat-value" x="637" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 250 </text>
+    <text class="funsvg-stat-label" x="591" y="7" font-weight="bold" font-size="8px" text-anchor="end"> Actions </text>
+    <text class="funsvg-stat-value" x="591" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 10 </text>
+    <text class="funsvg-stat-label" x="545" y="7" font-weight="bold" font-size="8px" text-anchor="end"> Duration </text>
+    <text class="funsvg-stat-value" x="545" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 0:02 </text>
+  </g>
+</g>
+  </svg>"
+`;
+
+exports[`SVG Generation should generate SVG for multiple independent scripts 1`] = `
+"<svg class="funsvg" width="690" height="108" xmlns="http://www.w3.org/2000/svg"
+    font-size="16px" font-family="Arial, sans-serif"
+  >
+    <g transform="translate(0, 0)">
+  <g class="funsvg-bgs">
+    <defs>
+      <linearGradient id="funsvg-grad-L0-6-0">
+        <stop offset="0" stop-color="#e8bd00"></stop>
+          <stop offset="1" stop-color="#e8bd00"></stop>
+      </linearGradient></defs>
+    <rect class="funsvg-bg-axis-drop" x="0" y="0" width="46" height="52" fill="#ccc" opacity="0.3"></rect>
+    <rect class="funsvg-bg-title-drop" x="46" width="644" height="20" fill="#ccc" opacity="0.3"></rect>
+    <rect class="funsvg-bg-axis" x="0" y="0" width="46" height="52" fill="#40e700" opacity="0.7"></rect>
+    <rect class="funsvg-bg-title" x="46" width="644" height="20" fill="url(#funsvg-grad-L0-6-0)" opacity="0.7"></rect>
+    <rect class="funsvg-bg-graph" x="46" width="644" y="20" height="32" fill="url(#funsvg-grad-L0-6-0)" opacity="0.2"></rect>
+  </g>
+  <g class="funsvg-lines" transform="translate(46, 20)" stroke-width="0.5" fill="none" stroke-linecap="round">
+    <path d="M 0.5 8.25 L 129.1 23.75" stroke="#e8bd00"></path>
+    <path d="M 129.1 23.75 L 257.7 8.25" stroke="#e8bd00"></path>
+    <path d="M 257.7 8.25 L 386.3 23.75" stroke="#e8bd00"></path>
+    <path d="M 386.3 23.75 L 514.9 8.25" stroke="#e8bd00"></path>
+    <path d="M 514.9 8.25 L 643.5 23.75" stroke="#e8bd00"></path>
+  </g>
+  <g class="funsvg-titles">
+    <g class="funsvg-titles-halo" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent">
+      <text class="funsvg-title-halo" x="49" y="15"> script1.funscript </text>
+      <text class="funsvg-stat-label-halo" x="683" y="7" font-weight="bold" font-size="8px" text-anchor="end"> AvgSpeed </text>
+      <text class="funsvg-stat-value-halo" x="683" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 188 </text>
+      <text class="funsvg-stat-label-halo" x="637" y="7" font-weight="bold" font-size="8px" text-anchor="end"> MaxSpeed </text>
+      <text class="funsvg-stat-value-halo" x="637" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 250 </text>
+      <text class="funsvg-stat-label-halo" x="591" y="7" font-weight="bold" font-size="8px" text-anchor="end"> Actions </text>
+      <text class="funsvg-stat-value-halo" x="591" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 6 </text>
+      <text class="funsvg-stat-label-halo" x="545" y="7" font-weight="bold" font-size="8px" text-anchor="end"> Duration </text>
+      <text class="funsvg-stat-value-halo" x="545" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 0:01 </text>
+    </g>
+    <text class="funsvg-axis" x="23" y="30" font-size="34.5px" font-family="Consolas, monospace" text-anchor="middle" dominant-baseline="middle"> L0 </text>
+    <text class="funsvg-title" x="49" y="15"> script1.funscript </text>
+    <text class="funsvg-stat-label" x="683" y="7" font-weight="bold" font-size="8px" text-anchor="end"> AvgSpeed </text>
+    <text class="funsvg-stat-value" x="683" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 188 </text>
+    <text class="funsvg-stat-label" x="637" y="7" font-weight="bold" font-size="8px" text-anchor="end"> MaxSpeed </text>
+    <text class="funsvg-stat-value" x="637" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 250 </text>
+    <text class="funsvg-stat-label" x="591" y="7" font-weight="bold" font-size="8px" text-anchor="end"> Actions </text>
+    <text class="funsvg-stat-value" x="591" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 6 </text>
+    <text class="funsvg-stat-label" x="545" y="7" font-weight="bold" font-size="8px" text-anchor="end"> Duration </text>
+    <text class="funsvg-stat-value" x="545" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 0:01 </text>
+  </g>
+</g>
+<g transform="translate(0, 56)">
+  <g class="funsvg-bgs">
+    <defs>
+      <linearGradient id="funsvg-grad-L0-15-0">
+        <stop offset="0" stop-color="#3300ff"></stop>
+          <stop offset="1" stop-color="#3300ff"></stop>
+      </linearGradient></defs>
+    <rect class="funsvg-bg-axis-drop" x="0" y="0" width="46" height="52" fill="#ccc" opacity="0.3"></rect>
+    <rect class="funsvg-bg-title-drop" x="46" width="644" height="20" fill="#ccc" opacity="0.3"></rect>
+    <rect class="funsvg-bg-axis" x="0" y="0" width="46" height="52" fill="#004cc5" opacity="0.7"></rect>
+    <rect class="funsvg-bg-title" x="46" width="644" height="20" fill="url(#funsvg-grad-L0-15-0)" opacity="0.7"></rect>
+    <rect class="funsvg-bg-graph" x="46" width="644" y="20" height="32" fill="url(#funsvg-grad-L0-15-0)" opacity="0.2"></rect>
+  </g>
+  <g class="funsvg-lines" transform="translate(46, 20)" stroke-width="0.5" fill="none" stroke-linecap="round">
+    <path d="M 0.5 16 L 46.43 9.49" stroke="#ff00bb"></path>
+    <path d="M 92.36 22.82 L 138.29 16.31" stroke="#ff00c0"></path>
+    <path d="M 138.29 16.31 L 184.21 9.49" stroke="#ff00c0"></path>
+    <path d="M 230.14 22.82 L 276.07 16.31" stroke="#ff00c0"></path>
+    <path d="M 276.07 16.31 L 322 9.49" stroke="#ff00c0"></path>
+    <path d="M 367.93 22.82 L 413.86 16.31" stroke="#ff00c0"></path>
+    <path d="M 413.86 16.31 L 459.79 9.49" stroke="#ff00c0"></path>
+    <path d="M 505.71 22.82 L 551.64 16.31" stroke="#ff00c0"></path>
+    <path d="M 551.64 16.31 L 597.57 9.49" stroke="#ff00c0"></path>
+    <path d="M 46.43 9.49 L 92.36 22.82" stroke="#3f4f00"></path>
+    <path d="M 184.21 9.49 L 230.14 22.82" stroke="#3f4f00"></path>
+    <path d="M 322 9.49 L 367.93 22.82" stroke="#3f4f00"></path>
+    <path d="M 459.79 9.49 L 505.71 22.82" stroke="#3f4f00"></path>
+    <path d="M 597.57 9.49 L 643.5 22.82" stroke="#3f4f00"></path>
+  </g>
+  <g class="funsvg-titles">
+    <g class="funsvg-titles-halo" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent">
+      <text class="funsvg-title-halo" x="49" y="15"> script2.funscript </text>
+      <text class="funsvg-stat-label-halo" x="683" y="7" font-weight="bold" font-size="8px" text-anchor="end"> AvgSpeed </text>
+      <text class="funsvg-stat-value-halo" x="683" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 827 </text>
+      <text class="funsvg-stat-label-halo" x="637" y="7" font-weight="bold" font-size="8px" text-anchor="end"> MaxSpeed </text>
+      <text class="funsvg-stat-value-halo" x="637" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 538 </text>
+      <text class="funsvg-stat-label-halo" x="591" y="7" font-weight="bold" font-size="8px" text-anchor="end"> Actions </text>
+      <text class="funsvg-stat-value-halo" x="591" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 11 </text>
+      <text class="funsvg-stat-label-halo" x="545" y="7" font-weight="bold" font-size="8px" text-anchor="end"> Duration </text>
+      <text class="funsvg-stat-value-halo" x="545" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 0:01 </text>
+    </g>
+    <text class="funsvg-axis" x="23" y="30" font-size="34.5px" font-family="Consolas, monospace" text-anchor="middle" dominant-baseline="middle"> L0 </text>
+    <text class="funsvg-title" x="49" y="15"> script2.funscript </text>
+    <text class="funsvg-stat-label" x="683" y="7" font-weight="bold" font-size="8px" text-anchor="end"> AvgSpeed </text>
+    <text class="funsvg-stat-value" x="683" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 827 </text>
+    <text class="funsvg-stat-label" x="637" y="7" font-weight="bold" font-size="8px" text-anchor="end"> MaxSpeed </text>
+    <text class="funsvg-stat-value" x="637" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 538 </text>
+    <text class="funsvg-stat-label" x="591" y="7" font-weight="bold" font-size="8px" text-anchor="end"> Actions </text>
+    <text class="funsvg-stat-value" x="591" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 11 </text>
+    <text class="funsvg-stat-label" x="545" y="7" font-weight="bold" font-size="8px" text-anchor="end"> Duration </text>
+    <text class="funsvg-stat-value" x="545" y="19" font-weight="bold" font-size="14.4px" text-anchor="end"> 0:01 </text>
+  </g>
+</g>
+  </svg>"
+`;
+
+exports[`SVG Generation should generate SVG with all options overridden 1`] = `
+"<svg class="funsvg" width="800" height="100" xmlns="http://www.w3.org/2000/svg"
+    font-size="24px" font-family="Helvetica"
+  >
+    <g transform="translate(0, 0)">
+  <g class="funsvg-bgs">
+    <defs>
+      <linearGradient id="funsvg-grad-L0-8-0">
+        <stop offset="0" stop-color="#00f1ff" stop-opacity="0.06"></stop>
+          <stop offset="0.43" stop-color="#00f1ff" stop-opacity="0.06"></stop>
+          <stop offset="0.93" stop-color="#00f1ff" stop-opacity="0.07"></stop>
+          <stop offset="1" stop-color="#00f1ff" stop-opacity="0.07"></stop>
+      </linearGradient></defs>
+    <rect class="funsvg-bg-axis-drop" x="0" y="0" width="60" height="100" fill="#ccc" opacity="0.75"></rect>
+    <rect class="funsvg-bg-title-drop" x="60" width="740" height="30" fill="#ccc" opacity="0.75"></rect>
+    <rect class="funsvg-bg-axis" x="0" y="0" width="60" height="100" fill="#00eeff" opacity="0.45"></rect>
+    <rect class="funsvg-bg-title" x="60" width="740" height="30" fill="#00eeff" opacity="0.41"></rect>
+    <rect class="funsvg-bg-graph" x="60" width="740" y="30" height="70" fill="url(#funsvg-grad-L0-8-0)" opacity="0.5"></rect>
+  </g>
+  <g class="funsvg-lines" transform="translate(60, 30)" stroke-width="2" fill="none" stroke-linecap="round">
+    <path d="M 2 35 L 107.14 35" stroke="#00eeff"></path>
+    <path d="M 107.14 35 L 212.29 35.66" stroke="#00f1ff"></path>
+    <path d="M 212.29 35.66 L 317.43 35" stroke="#00f1ff"></path>
+    <path d="M 317.43 35 L 422.57 35.66" stroke="#00f1ff"></path>
+    <path d="M 422.57 35.66 L 527.71 35" stroke="#00f1ff"></path>
+    <path d="M 527.71 35 L 632.86 35.66" stroke="#00f1ff"></path>
+    <path d="M 632.86 35.66 L 738 35" stroke="#00f1ff"></path>
+  </g>
+  <g class="funsvg-titles">
+    <text class="funsvg-axis" x="30" y="54" font-size="45px" font-family="Arial" text-anchor="middle" dominant-baseline="middle"> L0 </text>
+    <text class="funsvg-title" x="63" y="22.5"> Custom Title </text>
+    <text class="funsvg-stat-label" x="789.5" y="10.5" font-weight="bold" font-size="12px" text-anchor="end"> AvgSpeed </text>
+    <text class="funsvg-stat-value" x="789.5" y="28.5" font-weight="bold" font-size="21.6px" text-anchor="end"> 0 </text>
+    <text class="funsvg-stat-label" x="720.5" y="10.5" font-weight="bold" font-size="12px" text-anchor="end"> MaxSpeed </text>
+    <text class="funsvg-stat-value" x="720.5" y="28.5" font-weight="bold" font-size="21.6px" text-anchor="end"> 7 </text>
+    <text class="funsvg-stat-label" x="651.5" y="10.5" font-weight="bold" font-size="12px" text-anchor="end"> Actions </text>
+    <text class="funsvg-stat-value" x="651.5" y="28.5" font-weight="bold" font-size="21.6px" text-anchor="end"> 8 </text>
+    <text class="funsvg-stat-label" x="582.5" y="10.5" font-weight="bold" font-size="12px" text-anchor="end"> Duration </text>
+    <text class="funsvg-stat-value" x="582.5" y="28.5" font-weight="bold" font-size="21.6px" text-anchor="end"> 0:01 </text>
+  </g>
+</g>
+  </svg>"
+`;
+
+exports[`SVG Generation should clone merged script and match same snapshot 1`] = `
+Funscript {
+  "actions": [
+    FunAction {
+      "at": 0,
+      "pos": 75,
+    },
+    FunAction {
+      "at": 200,
+      "pos": 25,
+    },
+    FunAction {
+      "at": 400,
+      "pos": 75,
+    },
+    FunAction {
+      "at": 600,
+      "pos": 25,
+    },
+    FunAction {
+      "at": 800,
+      "pos": 75,
+    },
+    FunAction {
+      "at": 1000,
+      "pos": 25,
+    },
+    FunAction {
+      "at": 1200,
+      "pos": 75,
+    },
+    FunAction {
+      "at": 1400,
+      "pos": 25,
+    },
+  ],
+  "axes": [
+    AxisScript {
+      "actions": [
+        FunAction {
+          "at": 0,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 75,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 150,
+          "pos": 49,
+        },
+        FunAction {
+          "at": 225,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 300,
+          "pos": 49,
+        },
+        FunAction {
+          "at": 375,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 450,
+          "pos": 49,
+        },
+        FunAction {
+          "at": 525,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 600,
+          "pos": 49,
+        },
+        FunAction {
+          "at": 675,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 750,
+          "pos": 49,
+        },
+        FunAction {
+          "at": 825,
+          "pos": 50,
+        },
+      ],
+      "axes": [],
+      "file": FunscriptFile {
+        "axisName": "roll",
+        "dir": "",
+        "mergedFiles": undefined,
+        "title": "test-video",
+      },
+      "id": "R1",
+      "metadata": FunMetadata {
+        "bookmarks": [],
+        "chapters": [],
+        "duration": 0,
+      },
+      "parent": [Circular],
+    },
+    AxisScript {
+      "actions": [
+        FunAction {
+          "at": 0,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 100,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 200,
+          "pos": 49,
+        },
+        FunAction {
+          "at": 300,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 400,
+          "pos": 49,
+        },
+        FunAction {
+          "at": 500,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 600,
+          "pos": 49,
+        },
+        FunAction {
+          "at": 700,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 800,
+          "pos": 49,
+        },
+        FunAction {
+          "at": 900,
+          "pos": 50,
+        },
+      ],
+      "axes": [],
+      "file": FunscriptFile {
+        "axisName": "pitch",
+        "dir": "",
+        "mergedFiles": undefined,
+        "title": "test-video",
+      },
+      "id": "R2",
+      "metadata": FunMetadata {
+        "bookmarks": [],
+        "chapters": [],
+        "duration": 0,
+      },
+      "parent": [Circular],
+    },
+  ],
+  "file": FunscriptFile {
+    "axisName": "",
+    "dir": "",
+    "mergedFiles": [
+      FunscriptFile {
+        "axisName": "",
+        "dir": "",
+        "mergedFiles": undefined,
+        "title": "test-video",
+      },
+      FunscriptFile {
+        "axisName": "roll",
+        "dir": "",
+        "mergedFiles": undefined,
+        "title": "test-video",
+      },
+      FunscriptFile {
+        "axisName": "pitch",
+        "dir": "",
+        "mergedFiles": undefined,
+        "title": "test-video",
+      },
+    ],
+    "title": "test-video",
+  },
+  "id": "L0",
+  "metadata": FunMetadata {
+    "bookmarks": [],
+    "chapters": [],
+    "duration": 0,
+  },
+  "parent": undefined,
+}
+`;
+
+exports[`SVG Generation should clone merged script and match same snapshot 2`] = `
+Funscript {
+  "actions": [
+    FunAction {
+      "at": 0,
+      "pos": 75,
+    },
+    FunAction {
+      "at": 200,
+      "pos": 25,
+    },
+    FunAction {
+      "at": 400,
+      "pos": 75,
+    },
+    FunAction {
+      "at": 600,
+      "pos": 25,
+    },
+    FunAction {
+      "at": 800,
+      "pos": 75,
+    },
+    FunAction {
+      "at": 1000,
+      "pos": 25,
+    },
+    FunAction {
+      "at": 1200,
+      "pos": 75,
+    },
+    FunAction {
+      "at": 1400,
+      "pos": 25,
+    },
+  ],
+  "axes": [
+    AxisScript {
+      "actions": [
+        FunAction {
+          "at": 0,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 75,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 150,
+          "pos": 49,
+        },
+        FunAction {
+          "at": 225,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 300,
+          "pos": 49,
+        },
+        FunAction {
+          "at": 375,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 450,
+          "pos": 49,
+        },
+        FunAction {
+          "at": 525,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 600,
+          "pos": 49,
+        },
+        FunAction {
+          "at": 675,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 750,
+          "pos": 49,
+        },
+        FunAction {
+          "at": 825,
+          "pos": 50,
+        },
+      ],
+      "axes": [],
+      "file": FunscriptFile {
+        "axisName": "roll",
+        "dir": "",
+        "mergedFiles": undefined,
+        "title": "test-video",
+      },
+      "id": "R1",
+      "metadata": FunMetadata {
+        "bookmarks": [],
+        "chapters": [],
+        "duration": 0,
+      },
+      "parent": [Circular],
+    },
+    AxisScript {
+      "actions": [
+        FunAction {
+          "at": 0,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 100,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 200,
+          "pos": 49,
+        },
+        FunAction {
+          "at": 300,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 400,
+          "pos": 49,
+        },
+        FunAction {
+          "at": 500,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 600,
+          "pos": 49,
+        },
+        FunAction {
+          "at": 700,
+          "pos": 50,
+        },
+        FunAction {
+          "at": 800,
+          "pos": 49,
+        },
+        FunAction {
+          "at": 900,
+          "pos": 50,
+        },
+      ],
+      "axes": [],
+      "file": FunscriptFile {
+        "axisName": "pitch",
+        "dir": "",
+        "mergedFiles": undefined,
+        "title": "test-video",
+      },
+      "id": "R2",
+      "metadata": FunMetadata {
+        "bookmarks": [],
+        "chapters": [],
+        "duration": 0,
+      },
+      "parent": [Circular],
+    },
+  ],
+  "file": FunscriptFile {
+    "axisName": "",
+    "dir": "",
+    "mergedFiles": undefined,
+    "title": "test-video",
+  },
+  "id": "L0",
+  "metadata": FunMetadata {
+    "bookmarks": [],
+    "chapters": [],
+    "duration": 0,
+  },
+  "parent": undefined,
+}
+`;

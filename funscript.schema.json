@@ -1,0 +1,179 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Funscript",
+  "description": "Schema for the Funscript format.",
+  "type": "object",
+  "properties": {
+    "version": {
+      "description": "Funscript version string.",
+      "type": "string"
+    },
+    "inverted": {
+      "description": "Indicates if the axes movement is inverted. Deprecated: Not widely supported.",
+      "type": "boolean",
+      "deprecated": true
+    },
+    "range": {
+      "description": "Specifies the range of motion (0-100). Deprecated: Not widely supported.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "deprecated": true
+    },
+    "actions": {
+      "description": "Default actions for the primary axis (usually L0/stroke).",
+      "type": "array",
+      "items": { "$ref": "#/$defs/action" }
+    },
+    "axes": {
+      "description": "Actions defined per axis.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "$ref": "#/$defs/axisId" },
+          "actions": {
+            "description": "Actions for this specific axis.",
+            "type": "array",
+            "items": { "$ref": "#/$defs/action" }
+          }
+        },
+        "required": ["id", "actions"]
+      }
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    }
+  },
+  "required": ["actions"],
+
+  "$defs": {
+    "axisId": {
+      "description": "Identifier for an axis (L0-L2, R0-R2, A0-A2, V0-V2). Further axes /[LRAV][3-9]/ are not used by any known device.",
+      "type": "string",
+      "enum": ["L0", "L1", "L2", "R0", "R1", "R2", "A0", "A1", "A2", "V0", "V1", "V2"]
+    },
+    "action": {
+      "description": "A single action point with time and position.",
+      "type": "object",
+      "properties": {
+        "pos": {
+          "description": "Position value (0-100). Should be an integer, as some players don't support floats.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "at": {
+          "description": "Time in milliseconds. Should be an integer, as some players don't support floats.",
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": ["at", "pos"]
+    },
+    "timeSpan": {
+      "description": "Time represented as a string, typically HH:MM:SS.ms or just seconds.",
+      "type": "string",
+      "pattern": "^(\\d+:)*\\d+(\\.\\d+)?$"
+    },
+    "chapter": {
+      "description": "Defines a chapter or segment within the script.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Name of the chapter.",
+          "type": "string"
+        },
+        "startTime": {
+          "$ref": "#/$defs/timeSpan",
+          "description": "Start time of the chapter."
+        },
+        "endTime": {
+          "$ref": "#/$defs/timeSpan",
+          "description": "End time of the chapter."
+        }
+      },
+      "required": ["name", "startTime", "endTime"]
+    },
+    "bookmark": {
+      "description": "A named time marker.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the bookmark."
+        },
+        "time": {
+          "$ref": "#/$defs/timeSpan",
+          "description": "Time position of the bookmark."
+        }
+      },
+      "required": ["name", "time"]
+    },
+    "metadata": {
+      "description": "Optional metadata about the script.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Title of the script or video."
+        },
+        "duration": {
+          "type": "integer",
+          "description": "Duration of the video in seconds. Should be an integer, as some players don't support floats.",
+          "minimum": 0
+        },
+        "chapters": {
+          "type": "array",
+          "description": "List of chapters.",
+          "items": { "$ref": "#/$defs/chapter" }
+        },
+        "bookmarks": {
+          "type": "array",
+          "description": "List of bookmarks.",
+          "items": { "$ref": "#/$defs/bookmark" }
+        },
+        "creator": {
+          "type": "string",
+          "description": "Name of the script creator."
+        },
+        "description": {
+          "type": "string",
+          "description": "General description."
+        },
+        "license": {
+          "type": "string",
+          "description": "License information."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional notes."
+        },
+        "performers": {
+          "type": "array",
+          "description": "Names of performers.",
+          "items": { "type": "string" }
+        },
+        "script_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to the script source."
+        },
+        "tags": {
+          "type": "array",
+          "description": "Tags associated with the script. We recommend adding 'handy' tag for scripts supporting one.",
+          "items": { "type": "string" }
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of the script."
+        },
+        "video_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to the associated video."
+        }
+      }
+    }
+  }
+}

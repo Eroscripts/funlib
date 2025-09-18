@@ -1,0 +1,503 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Script Merging should merge multi-axis scripts by filename 1`] = `
+[
+  Funscript {
+    "actions": [
+      FunAction {
+        "at": 0,
+        "pos": 75,
+      },
+      FunAction {
+        "at": 200,
+        "pos": 25,
+      },
+      FunAction {
+        "at": 400,
+        "pos": 75,
+      },
+      FunAction {
+        "at": 600,
+        "pos": 25,
+      },
+      FunAction {
+        "at": 800,
+        "pos": 75,
+      },
+      FunAction {
+        "at": 1000,
+        "pos": 25,
+      },
+      FunAction {
+        "at": 1200,
+        "pos": 75,
+      },
+      FunAction {
+        "at": 1400,
+        "pos": 25,
+      },
+      FunAction {
+        "at": 1600,
+        "pos": 75,
+      },
+      FunAction {
+        "at": 1800,
+        "pos": 25,
+      },
+    ],
+    "axes": [
+      AxisScript {
+        "actions": [
+          FunAction {
+            "at": 0,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 75,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 150,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 225,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 300,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 375,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 450,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 525,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 600,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 675,
+            "pos": 50,
+          },
+        ],
+        "axes": [],
+        "file": FunscriptFile {
+          "axisName": "roll",
+          "dir": "",
+          "mergedFiles": undefined,
+          "title": "test-video",
+        },
+        "id": "R1",
+        "metadata": FunMetadata {
+          "bookmarks": [],
+          "chapters": [],
+          "duration": 0,
+        },
+        "parent": [Circular],
+      },
+      AxisScript {
+        "actions": [
+          FunAction {
+            "at": 0,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 100,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 200,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 300,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 400,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 500,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 600,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 700,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 800,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 900,
+            "pos": 50,
+          },
+        ],
+        "axes": [],
+        "file": FunscriptFile {
+          "axisName": "pitch",
+          "dir": "",
+          "mergedFiles": undefined,
+          "title": "test-video",
+        },
+        "id": "R2",
+        "metadata": FunMetadata {
+          "bookmarks": [],
+          "chapters": [],
+          "duration": 0,
+        },
+        "parent": [Circular],
+      },
+    ],
+    "file": FunscriptFile {
+      "axisName": "",
+      "dir": "",
+      "mergedFiles": [
+        FunscriptFile {
+          "axisName": "",
+          "dir": "",
+          "mergedFiles": undefined,
+          "title": "test-video",
+        },
+        FunscriptFile {
+          "axisName": "roll",
+          "dir": "",
+          "mergedFiles": undefined,
+          "title": "test-video",
+        },
+        FunscriptFile {
+          "axisName": "pitch",
+          "dir": "",
+          "mergedFiles": undefined,
+          "title": "test-video",
+        },
+      ],
+      "title": "test-video",
+    },
+    "id": "L0",
+    "metadata": FunMetadata {
+      "bookmarks": [],
+      "chapters": [],
+      "duration": 0,
+    },
+    "parent": undefined,
+  },
+  Funscript {
+    "actions": [
+      FunAction {
+        "at": 0,
+        "pos": 50,
+      },
+      FunAction {
+        "at": 40,
+        "pos": 71,
+      },
+      FunAction {
+        "at": 80,
+        "pos": 28,
+      },
+      FunAction {
+        "at": 120,
+        "pos": 49,
+      },
+      FunAction {
+        "at": 160,
+        "pos": 71,
+      },
+      FunAction {
+        "at": 200,
+        "pos": 28,
+      },
+      FunAction {
+        "at": 240,
+        "pos": 49,
+      },
+      FunAction {
+        "at": 280,
+        "pos": 71,
+      },
+      FunAction {
+        "at": 320,
+        "pos": 28,
+      },
+      FunAction {
+        "at": 360,
+        "pos": 49,
+      },
+    ],
+    "axes": [],
+    "file": FunscriptFile {
+      "axisName": "",
+      "dir": "",
+      "mergedFiles": [
+        FunscriptFile {
+          "axisName": "",
+          "dir": "",
+          "mergedFiles": undefined,
+          "title": "unrelated",
+        },
+      ],
+      "title": "unrelated",
+    },
+    "id": "L0",
+    "metadata": FunMetadata {
+      "bookmarks": [],
+      "chapters": [],
+      "duration": 0,
+    },
+    "parent": undefined,
+  },
+]
+`;
+
+exports[`Script Merging should merge multi-axis scripts by filename 2`] = `
+[
+  Funscript {
+    "actions": [
+      FunAction {
+        "at": 0,
+        "pos": 75,
+      },
+      FunAction {
+        "at": 200,
+        "pos": 25,
+      },
+      FunAction {
+        "at": 400,
+        "pos": 75,
+      },
+      FunAction {
+        "at": 600,
+        "pos": 25,
+      },
+      FunAction {
+        "at": 800,
+        "pos": 75,
+      },
+      FunAction {
+        "at": 1000,
+        "pos": 25,
+      },
+      FunAction {
+        "at": 1200,
+        "pos": 75,
+      },
+      FunAction {
+        "at": 1400,
+        "pos": 25,
+      },
+      FunAction {
+        "at": 1600,
+        "pos": 75,
+      },
+      FunAction {
+        "at": 1800,
+        "pos": 25,
+      },
+    ],
+    "axes": [
+      AxisScript {
+        "actions": [
+          FunAction {
+            "at": 0,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 75,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 150,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 225,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 300,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 375,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 450,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 525,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 600,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 675,
+            "pos": 50,
+          },
+        ],
+        "axes": [],
+        "file": FunscriptFile {
+          "axisName": "roll",
+          "dir": "",
+          "mergedFiles": undefined,
+          "title": "test-video",
+        },
+        "id": "R1",
+        "metadata": FunMetadata {
+          "bookmarks": [],
+          "chapters": [],
+          "duration": 0,
+        },
+        "parent": [Circular],
+      },
+      AxisScript {
+        "actions": [
+          FunAction {
+            "at": 0,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 100,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 200,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 300,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 400,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 500,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 600,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 700,
+            "pos": 50,
+          },
+          FunAction {
+            "at": 800,
+            "pos": 49,
+          },
+          FunAction {
+            "at": 900,
+            "pos": 50,
+          },
+        ],
+        "axes": [],
+        "file": FunscriptFile {
+          "axisName": "pitch",
+          "dir": "",
+          "mergedFiles": undefined,
+          "title": "test-video",
+        },
+        "id": "R2",
+        "metadata": FunMetadata {
+          "bookmarks": [],
+          "chapters": [],
+          "duration": 0,
+        },
+        "parent": [Circular],
+      },
+    ],
+    "file": FunscriptFile {
+      "axisName": "",
+      "dir": "",
+      "mergedFiles": undefined,
+      "title": "test-video",
+    },
+    "id": "L0",
+    "metadata": FunMetadata {
+      "bookmarks": [],
+      "chapters": [],
+      "duration": 0,
+    },
+    "parent": undefined,
+  },
+  Funscript {
+    "actions": [
+      FunAction {
+        "at": 0,
+        "pos": 50,
+      },
+      FunAction {
+        "at": 40,
+        "pos": 71,
+      },
+      FunAction {
+        "at": 80,
+        "pos": 28,
+      },
+      FunAction {
+        "at": 120,
+        "pos": 49,
+      },
+      FunAction {
+        "at": 160,
+        "pos": 71,
+      },
+      FunAction {
+        "at": 200,
+        "pos": 28,
+      },
+      FunAction {
+        "at": 240,
+        "pos": 49,
+      },
+      FunAction {
+        "at": 280,
+        "pos": 71,
+      },
+      FunAction {
+        "at": 320,
+        "pos": 28,
+      },
+      FunAction {
+        "at": 360,
+        "pos": 49,
+      },
+    ],
+    "axes": [],
+    "file": FunscriptFile {
+      "axisName": "",
+      "dir": "",
+      "mergedFiles": undefined,
+      "title": "unrelated",
+    },
+    "id": "L0",
+    "metadata": FunMetadata {
+      "bookmarks": [],
+      "chapters": [],
+      "duration": 0,
+    },
+    "parent": undefined,
+  },
+]
+`;

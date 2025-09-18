@@ -10,4 +10,8 @@ export default antfu({
     'style/max-statements-per-line': 'off',
     'one-var': 'off',
     'node/prefer-global/process': ['warn', 'always'],
+    'style/brace-style': 'off',
+    'prefer-template': 'off',
+    'ts/explicit-function-return-type': ['warn', {}],
+    'ts/no-redeclare': 'off',
   })
