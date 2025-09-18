@@ -21,7 +21,7 @@
   },
   "module": "src/index.ts",
   "scripts": {
-    "lint": "eslint --fix",
+    "lint": "oxlint --type-aware --fix && eslint --fix",
     "build:iife": "bun build src/iife.ts --target browser --outdir dist --format iife",
     "build:esm": "bun build src/index.ts --target browser --outfile dist/funlib.js --format esm",
     "build:dts": "bunx dts-bundle-generator -o dist/funlib.d.ts src/index.ts",
@@ -35,9 +35,11 @@
     "colorizr": "^3.0.7"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^4.12.0",
+    "@antfu/eslint-config": "latest",
     "@types/bun": "latest",
-    "@types/w3c-web-serial": "^1.0.8",
-    "bun-types": "^1.2.11"
+    "@types/w3c-web-serial": "latest",
+    "eslint": "latest",
+    "oxlint": "latest",
+    "oxlint-tsgolint": "latest"
   }
 }

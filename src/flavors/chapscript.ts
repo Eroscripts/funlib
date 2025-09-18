@@ -161,9 +161,7 @@ export class ChapScript extends Funscript {
     this.chapters = mapObject(funscript?.chapters ?? {}, c => new ChapChapter(c as any))
 
     const base = this.constructor as typeof Funscript
-    const allChapterAxes = new Set([
-      ...Object.values(this.chapters).flatMap(c => c.axes?.map(a => a.id) ?? []),
-    ])
+    const allChapterAxes = new Set(Object.values(this.chapters).flatMap(c => c.axes?.map(a => a.id) ?? []))
     for (const x of allChapterAxes) {
       if (!this.axes.find(a => a.id === x)) {
         this.axes.push(new base.AxisScript({ actions: [] }, { id: x, parent: this }))
@@ -250,7 +248,7 @@ export class ChapScript extends Funscript {
   static fromFunscript(
     funscript: Funscript,
     { chapters, sliceActionsMode }:
-      { chapters: FunChapter[], sliceActionsMode: 'lerp' | 'empty' },
+    { chapters: FunChapter[], sliceActionsMode: 'lerp' | 'empty' },
   ): ChapScript {
     const cs = new ChapScript(funscript)
 

@@ -258,11 +258,11 @@ export class TCodeAction extends
     const speedText = clamp(target, 0, 9999).toFixed(0)
     const intervalText = clamp(target, 0, 99999).toFixed(0)
     const postfix
-     = this[2] === 'I'
-       ? `${d}I${d}${intervalText.padStart(d ? 3 : 0, '_')}`
-       : this[2] === 'S'
-         ? `${d}S${d}${speedText.padStart(d ? 3 : 0, '_')}`
-         : ''
+      = this[2] === 'I'
+        ? `${d}I${d}${intervalText.padStart(d ? 3 : 0, '_')}`
+        : this[2] === 'S'
+          ? `${d}S${d}${speedText.padStart(d ? 3 : 0, '_')}`
+          : ''
     return `${this[0]}${d}${mantissa}${postfix}`
   }
 }

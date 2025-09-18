@@ -59,44 +59,44 @@ export function scriptToOsr2(script: Funscript): Funscript {
 }
 
 function mergeLintoR(L0: FunAction[], Lx: FunAction[], Ry: FunAction[]) {
-    const allTimestamps = [...new Set([...L0, ...Lx, ...Ry].map(a => a.at))].sort((a, b) => a - b)
-    return allTimestamps.map(at => {
-        const l0 = clerpAt(L0, at)
-        const lx = clerpAt(Lx, at)
-        const ry = clerpAt(Ry, at)
+  const allTimestamps = [...new Set([...L0, ...Lx, ...Ry].map(a => a.at))].sort((a, b) => a - b)
+  return allTimestamps.map((at) => {
+    const l0 = clerpAt(L0, at)
+    const lx = clerpAt(Lx, at)
+    const ry = clerpAt(Ry, at)
 
-        const r1 = ry + Math.atan2(l0, l2) * (180 / Math.PI)
-        const r2 = ry + Math.atan2(lx, l0) * (180 / Math.PI)
+    const r1 = ry + Math.atan2(l0, l2) * (180 / Math.PI)
+    const r2 = ry + Math.atan2(lx, l0) * (180 / Math.PI)
 
-        return new FunAction({ at, pos: r1 })
-    })
-//   L0 = L0.slice(); Lx = Lx.slice(); Ry = Ry.slice()
+    return new FunAction({ at, pos: r1 })
+  })
+  //   L0 = L0.slice(); Lx = Lx.slice(); Ry = Ry.slice()
 
-//   // Collect all unique timestamps from all three arrays
-//   const allTimestamps = [...new Set([...L0, ...Lx, ...Ry].map(a => a.at))].sort((a, b) => a - b)
+  //   // Collect all unique timestamps from all three arrays
+  //   const allTimestamps = [...new Set([...L0, ...Lx, ...Ry].map(a => a.at))].sort((a, b) => a - b)
 
-//   // Helper function to ensure an array has actions at all timestamps
-//   function fillMissingActions(actions: FunAction[], timestamps: ms[]) {
-//     const existingTimes = new Set(actions.map(a => a.at))
+  //   // Helper function to ensure an array has actions at all timestamps
+  //   function fillMissingActions(actions: FunAction[], timestamps: ms[]) {
+  //     const existingTimes = new Set(actions.map(a => a.at))
 
-//     for (const timestamp of timestamps) {
-//       if (!existingTimes.has(timestamp)) {
-//         // Interpolate position at this timestamp
-//         const interpolatedPos = clerpAt(actions, timestamp)
+  //     for (const timestamp of timestamps) {
+  //       if (!existingTimes.has(timestamp)) {
+  //         // Interpolate position at this timestamp
+  //         const interpolatedPos = clerpAt(actions, timestamp)
 
-//         // Create new action and insert it in the correct position
-//         const newAction = new FunAction({ at: timestamp, pos: interpolatedPos })
+  //         // Create new action and insert it in the correct position
+  //         const newAction = new FunAction({ at: timestamp, pos: interpolatedPos })
 
-//         // Find insertion point to maintain sorted order
-//         const insertIndex = actions.findIndex(a => a.at > timestamp)
-//         if (insertIndex === -1) {
-//           actions.push(newAction)
-//         } else {
-//           actions.splice(insertIndex, 0, newAction)
-//         }
-//       }
-//     }
-//   }
+  //         // Find insertion point to maintain sorted order
+  //         const insertIndex = actions.findIndex(a => a.at > timestamp)
+  //         if (insertIndex === -1) {
+  //           actions.push(newAction)
+  //         } else {
+  //           actions.splice(insertIndex, 0, newAction)
+  //         }
+  //       }
+  //     }
+  //   }
 
 //   // Fill missing actions for each array
 //   fillMissingActions(L0, allTimestamps)
