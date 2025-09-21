@@ -206,14 +206,14 @@ export class Funscript implements JsonFunscript {
           actions: [],
           channels: { [allScripts[0].channel!]: allScripts[0] },
           channel: undefined,
-        })]
+        }, { isMerging: true })]
       }
       const mainScript = allScripts.find(e => !e.channel)
       const secondaryScripts = allScripts.filter(e => e.channel)
       if (!mainScript && !allowMissingActions) {
         throw new Error('Funscript.mergeMultiAxis: cannot merge scripts with no base script')
       }
-      return [new Funscript(mainScript, { channels: secondaryScripts })]
+      return [new Funscript(mainScript, { channels: secondaryScripts, isMerging: true })]
     })
     return [...multiaxisScripts, ...mergedSingleaxisScripts]
   }
@@ -236,6 +236,7 @@ export class Funscript implements JsonFunscript {
       file?: string
       channels?: Record<channel, JsonFunscript> | JsonFunscript[]
       parent?: Funscript
+      isMerging?: boolean
     },
   ) {
     Object.assign(this, funscript)
@@ -267,8 +268,12 @@ export class Funscript implements JsonFunscript {
       return new base.AxisScript(e, { parent: this })
     })
 
-    if (this.file && !isEmpty(this.channels)) {
-      this.file.mergedFiles = this.listChannels.map(e => e.file).filter(e => e !== undefined)
+    if (extras?.isMerging) {
+      const baseFile = this.file ?? this.listChannels.map(e => e.file).find(e => e !== undefined)
+      const newFile = new base.File(baseFile ?? '[unnamed]')
+      newFile.mergedFiles = [this.file, ...this.listChannels.map(e => e.file)].filter(e => e !== undefined)
+      if (newFile.mergedFiles.length)
+        this.file = newFile
     }
 
     if (extras?.parent) this.parent = extras.parent
@@ -354,6 +359,7 @@ export class Funscript implements JsonFunscript {
     return orderTrimJson(this, {
       id: undefined,
       axes: undefined,
+      channel: undefined,
       channels: mapObject(this.channels, e => e.toJSON()),
       metadata: {
         ...this.metadata.toJSON(),
@@ -395,6 +401,13 @@ export class AxisScript extends Funscript {
 
   clone(): this {
     return this.parent.clone().channels[this.channel]! as any
+  }
+
+  toJSON(): Record<string, any> {
+    let json = super.toJSON();
+    if (JSON.stringify(json.metadata) === JSON.stringify(this.metadata))
+      delete json.metadata
+    return json
   }
 }
 
