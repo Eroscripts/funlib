@@ -32,5 +32,9 @@ describe('Script Merging', () => {
     expect(
       merged.map(e => e.clone()),
     ).toMatchSnapshot()
+
+    expect(merged[0].toJsonText()).toMatchSnapshot()
+    expect(merged[0].toJsonText({ version: '1.1' })).toMatchSnapshot()
+    expect(merged[0].toJsonText({ version: '1.0' })).toMatchSnapshot()
   })
 })

@@ -494,3 +494,65 @@ exports[`Script Merging should merge multi-axis scripts by filename 2`] = `
   },
 ]
 `;
+
+exports[`Script Merging should merge multi-axis scripts by filename 3`] = `
+"{
+  "metadata": {
+    "duration": 1.8,
+    "durationTime": "00:00:01.800"
+  },
+  "actions": [
+    {"at":0,"pos":75},{"at":200,"pos":25},{"at":400,"pos":75},{"at":600,"pos":25},{"at":800,"pos":75},{"at":1000,"pos":25},{"at":1200,"pos":75},{"at":1400,"pos":25},{"at":1600,"pos":75},{"at":1800,"pos":25}
+  ],
+  "channels": {
+    "roll": {
+      "actions": [
+        {"at":0,"pos":50},{"at":75,"pos":50},{"at":150,"pos":49},{"at":225,"pos":50},{"at":300,"pos":49},{"at":375,"pos":50},{"at":450,"pos":49},{"at":525,"pos":50},{"at":600,"pos":49},{"at":675,"pos":50}
+      ]
+    },
+    "pitch": {
+      "actions": [
+        {"at":0,"pos":50},{"at":100,"pos":50},{"at":200,"pos":49},{"at":300,"pos":50},{"at":400,"pos":49},{"at":500,"pos":50},{"at":600,"pos":49},{"at":700,"pos":50},{"at":800,"pos":49},{"at":900,"pos":50}
+      ]
+    }
+  }
+}"
+`;
+
+exports[`Script Merging should merge multi-axis scripts by filename 4`] = `
+"{
+  "metadata": {
+    "duration": 1.8,
+    "durationTime": "00:00:01.800"
+  },
+  "actions": [
+    {"at":0,"pos":75},{"at":200,"pos":25},{"at":400,"pos":75},{"at":600,"pos":25},{"at":800,"pos":75},{"at":1000,"pos":25},{"at":1200,"pos":75},{"at":1400,"pos":25},{"at":1600,"pos":75},{"at":1800,"pos":25}
+  ],
+  "axes": [
+    {
+      "id": "R1",
+      "actions": [
+        {"at":0,"pos":50},{"at":75,"pos":50},{"at":150,"pos":49},{"at":225,"pos":50},{"at":300,"pos":49},{"at":375,"pos":50},{"at":450,"pos":49},{"at":525,"pos":50},{"at":600,"pos":49},{"at":675,"pos":50}
+      ]
+    },
+    {
+      "id": "R2",
+      "actions": [
+        {"at":0,"pos":50},{"at":100,"pos":50},{"at":200,"pos":49},{"at":300,"pos":50},{"at":400,"pos":49},{"at":500,"pos":50},{"at":600,"pos":49},{"at":700,"pos":50},{"at":800,"pos":49},{"at":900,"pos":50}
+      ]
+    }
+  ]
+}"
+`;
+
+exports[`Script Merging should merge multi-axis scripts by filename 5`] = `
+"{
+  "metadata": {
+    "duration": 1.8,
+    "durationTime": "00:00:01.800"
+  },
+  "actions": [
+    {"at":0,"pos":75},{"at":200,"pos":25},{"at":400,"pos":75},{"at":600,"pos":25},{"at":800,"pos":75},{"at":1000,"pos":25},{"at":1200,"pos":75},{"at":1400,"pos":25},{"at":1600,"pos":75},{"at":1800,"pos":25}
+  ]
+}"
+`;

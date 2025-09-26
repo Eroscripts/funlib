@@ -103,6 +103,7 @@ export class FunMetadata implements JsonMetadata {
     creator: '',
     description: '',
     duration: undefined,
+    durationTime: undefined,
     chapters: [],
     bookmarks: [],
     license: '',
@@ -113,7 +114,6 @@ export class FunMetadata implements JsonMetadata {
     tags: [],
     type: 'basic',
     video_url: '',
-    durationTime: undefined,
   }
 
   toJSON() {
@@ -353,28 +353,23 @@ export class Funscript implements JsonFunscript {
     version: '1.0',
   }
 
-  toJSON(options?: { version?: 'axes' | '2.0' }): Record<string, any> {
-    const channels = mapObject(this.channels, e => e.toJSON())
+  toJSON(options?: { version?: '1.0' | '1.1' | '2.0' }): Record<string, any> {
+    const v = options?.version ?? (this.channels ? '2.0' : '1.0')
+    const ops = { ...options, root: false }
     return orderTrimJson(this, {
-      id: undefined,
+      id: v === '1.1' && this.parent ? channelNameToAxis(this.channel!, this.channel!) : undefined,
+      axes: v === '1.1' ? Object.values(this.channels).map(axis => axis.toJSON(ops)) : undefined,
       channel: undefined,
-      ...(options?.version === 'axes'
-        ? {
-            axes: Object.entries(channels).map(([channel, axis]) => ({
-              id: channelNameToAxis(channel),
-              ...axis.toJSON,
-            })),
-            channels: undefined,
-          }
-        : { axes: undefined, channels }),
+      channels: v === '2.0' ? mapObject(this.channels, e => e.toJSON(ops)) : undefined,
       metadata: {
         ...this.metadata.toJSON(),
         duration: +this.duration.toFixed(3),
+        durationTime: msToTimeSpan(this.duration * 1000),
       },
     })
   }
 
-  toJsonText(options?: Parameters<typeof formatJson>[1] & { version?: 'axes' | '2.0' }) {
+  toJsonText(options?: Parameters<typeof formatJson>[1] & { version?: '1.0' | '1.1' | '2.0' }) {
     const json = this.toJSON(options)
     return formatJson(JSON.stringify(json, null, 2), options ?? {})
   }
@@ -410,10 +405,20 @@ export class AxisScript extends Funscript {
     return this.parent.clone().channels[this.channel]! as any
   }
 
-  toJSON(): Record<string, any> {
-    const json = super.toJSON()
-    if (JSON.stringify(json.metadata) === JSON.stringify(this.parent.metadata))
-      delete json.metadata
+  toJSON(options?: { version?: '1.0' | '1.1' | '2.0', root?: boolean }): Record<string, any> {
+    const json = super.toJSON(options)
+    if (options?.root === false) {
+      const parentMetadata = JSON.stringify(this.parent.metadata)
+      if (Object.keys(json.metadata)
+        .every(e => ['duration', 'durationTime'].includes(e)
+          || JSON.stringify(json.metadata[e]) === JSON.stringify(parentMetadata[e as any]))) {
+        delete json.metadata
+      }
+      delete json.channel
+      delete json.axes
+      delete json.channels
+      delete json.version
+    }
     return json
   }
 }

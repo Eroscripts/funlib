@@ -134,7 +134,8 @@ export function formatJson(
   { lineLength?: number, maxPrecision?: number, compress?: boolean } = {},
 ): string {
   function removeNewlines(s: string) { return s.replaceAll(/ *\n\s*/g, ' ') }
-  const inArrayRegex = /(?<=\[)((?:[^[\]]|\[[^[\]]*\])*)(?=\])/g
+  const _inArrayRegexNested = /(?<=\[)((?:[^[\]]|\[[^[\]]*\])*)(?=\])/g
+  const inArrayRegex = /(?<=\[)([^[\]]*)(?=\])/g
 
   json = json.replaceAll(/\{\s*"(at|time|startTime)":[^{}]+\}/g, removeNewlines)
 
