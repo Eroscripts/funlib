@@ -43,15 +43,15 @@ describe('SVG Generation', () => {
       lineWidth: 2,
       title: 'Custom Title',
       font: 'Helvetica',
-      axisFont: 'Arial',
+      iconFont: 'Arial',
       halo: false,
-      solidHeaderBackground: true,
+      solidTitleBackground: true,
       graphOpacity: 0.5,
-      headerOpacity: 0.9,
+      titleOpacity: 0.9,
       normalize: false,
       titleEllipsis: false,
-      headerHeight: 30,
-      axisWidth: 60,
+      titleHeight: 30,
+      iconWidth: 60,
     })
     expect(svgElement).toMatchSnapshot()
   })

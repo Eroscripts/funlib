@@ -169,6 +169,12 @@ exports[`Script Merging should merge multi-axis scripts by filename 1`] = `
       "dir": "",
       "mergedFiles": [
         FunscriptFile {
+          "channel": "",
+          "dir": "",
+          "mergedFiles": undefined,
+          "title": "test-video",
+        },
+        FunscriptFile {
           "channel": "roll",
           "dir": "",
           "mergedFiles": undefined,

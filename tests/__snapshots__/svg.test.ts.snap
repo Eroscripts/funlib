@@ -3,8 +3,8 @@
 exports[`SVG Generation should generate SVG element for a funscript 1`] = `
 "<svg class="funsvg" width="690" height="52" xmlns="http://www.w3.org/2000/svg"
     font-size="16px" font-family="Arial, sans-serif"
-  >
-    <g transform="translate(0, 0)">
+>
+<g transform="translate(0, 0)">
   <g class="funsvg-bgs">
     <defs>
       <linearGradient id="funsvg-grad--10-0">
@@ -53,14 +53,14 @@ exports[`SVG Generation should generate SVG element for a funscript 1`] = `
     <text class="funsvg-stat-value" x="545" y="18.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 0:02 </text>
   </g>
 </g>
-  </svg>"
+</svg>"
 `;
 
 exports[`SVG Generation should generate SVG for multiple independent scripts 1`] = `
 "<svg class="funsvg" width="690" height="108" xmlns="http://www.w3.org/2000/svg"
     font-size="16px" font-family="Arial, sans-serif"
-  >
-    <g transform="translate(0, 0)">
+>
+<g transform="translate(0, 0)">
   <g class="funsvg-bgs">
     <defs>
       <linearGradient id="funsvg-grad--6-0">
@@ -158,14 +158,14 @@ exports[`SVG Generation should generate SVG for multiple independent scripts 1`]
     <text class="funsvg-stat-value" x="545" y="18.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 0:01 </text>
   </g>
 </g>
-  </svg>"
+</svg>"
 `;
 
 exports[`SVG Generation should generate SVG with all options overridden 1`] = `
 "<svg class="funsvg" width="800" height="100" xmlns="http://www.w3.org/2000/svg"
     font-size="24px" font-family="Helvetica"
-  >
-    <g transform="translate(0, 0)">
+>
+<g transform="translate(0, 0)">
   <g class="funsvg-bgs">
     <defs>
       <linearGradient id="funsvg-grad--8-0">
@@ -202,7 +202,7 @@ exports[`SVG Generation should generate SVG with all options overridden 1`] = `
     <text class="funsvg-stat-value" x="582.5" y="27.6" font-weight="bold" font-size="21.6px" text-anchor="end"> 0:01 </text>
   </g>
 </g>
-  </svg>"
+</svg>"
 `;
 
 exports[`SVG Generation should clone merged script and match same snapshot 1`] = `
@@ -372,6 +372,12 @@ Funscript {
     "channel": "",
     "dir": "",
     "mergedFiles": [
+      FunscriptFile {
+        "channel": "",
+        "dir": "",
+        "mergedFiles": undefined,
+        "title": "test-video",
+      },
       FunscriptFile {
         "channel": "roll",
         "dir": "",

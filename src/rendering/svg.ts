@@ -10,19 +10,21 @@ export interface SvgOptions {
   /** width of graph lines */
   lineWidth?: number
   /** text to display in the header */
-  title?: ((script: Funscript) => string) | string | null
+  title?: ((script: Funscript, suggested: string) => string) | string | null
+  /** text to display in the left square */
+  icon?: ((script: Funscript, suggested: string) => string) | string | null
   /** font to use for text */
   font?: string
   /** font to use for axis text */
-  axisFont?: string
+  iconFont?: string
   /** halo around text */
   halo?: boolean
-  /** replace header heatmap with solid color */
-  solidHeaderBackground?: boolean
+  /** replace title heatmap with solid color */
+  solidTitleBackground?: boolean
   /** opacity of the graph background (heatmap) */
   graphOpacity?: number
-  /** opacity of the header background (heatmap) */
-  headerOpacity?: number
+  /** opacity of the title background (heatmap) */
+  titleOpacity?: number
   /** heatmap precition */
   mergeLimit?: number
   /** normalize actions before rendering */
@@ -38,13 +40,13 @@ export interface SvgOptions {
   /** height of funscript axis */
   height?: number
   /** height of header */
-  headerHeight?: number
+  titleHeight?: number
   /** spacing between header and graph */
-  headerSpacing?: number
+  titleSpacing?: number
   /** width of funscript axis */
-  axisWidth?: number
+  iconWidth?: number
   /** margin between funscript axis and graph */
-  axisSpacing?: number
+  iconSpacing?: number
   /** duration in milliseconds. Set to 0 to use script.actualDuration */
   durationMs?: ms | 0
 }
@@ -55,25 +57,28 @@ const SPACING_BETWEEN_FUNSCRIPTS = 4
 /** padding around the svg, reduces width and adds to y */
 const SVG_PADDING = 0
 
+const HANDY_ICON = '☞'
+
 export const svgDefaultOptions: Required<SvgOptions> = {
   title: null,
+  icon: null,
   lineWidth: 0.5,
   font: 'Arial, sans-serif',
-  axisFont: 'Consolas, monospace',
+  iconFont: 'Consolas, monospace',
   halo: true,
-  solidHeaderBackground: false,
+  solidTitleBackground: false,
   graphOpacity: 0.2,
-  headerOpacity: 0.7,
+  titleOpacity: 0.7,
   mergeLimit: 500,
   normalize: true,
   titleEllipsis: true,
   titleSeparateLine: 'auto',
   width: 690,
   height: 52,
-  headerHeight: 20,
-  headerSpacing: 0,
-  axisWidth: 46,
-  axisSpacing: 0,
+  titleHeight: 20,
+  titleSpacing: 0,
+  iconWidth: 46,
+  iconSpacing: 0,
   durationMs: 0,
 }
 
@@ -266,7 +271,7 @@ export function toSvgElement(scripts: Funscript | Funscript[], ops: SvgOptions):
     // Only show title for the first script
     pieces.push(toSvgG(s, { ...fullOps, durationMs, title: fullOps.title }, {
       transform: `translate(${SVG_PADDING}, ${y})`,
-      onDoubleTitle: () => y += fullOps.headerHeight,
+      onDoubleTitle: () => y += fullOps.titleHeight,
     }))
     y += fullOps.height + SPACING_BETWEEN_AXES
     for (const a of s.listChannels) {
@@ -274,7 +279,7 @@ export function toSvgElement(scripts: Funscript | Funscript[], ops: SvgOptions):
       pieces.push(toSvgG(a, { ...fullOps, durationMs, title: fullOps.title ?? '' }, {
         transform: `translate(${SVG_PADDING}, ${y})`,
         isSecondaryAxis: true,
-        onDoubleTitle: () => y += fullOps.headerHeight,
+        onDoubleTitle: () => y += fullOps.titleHeight,
       }))
       y += fullOps.height + SPACING_BETWEEN_AXES
     }
@@ -284,10 +289,10 @@ export function toSvgElement(scripts: Funscript | Funscript[], ops: SvgOptions):
   y += SVG_PADDING
 
   return `<svg class="funsvg" width="${round(fullOps.width)}" height="${round(y)}" xmlns="http://www.w3.org/2000/svg"
-    font-size="${round(fullOps.headerHeight * 0.8)}px" font-family="${fullOps.font}"
-  >
-    ${pieces.join('\n')}
-  </svg>`
+    font-size="${round(fullOps.titleHeight * 0.8)}px" font-family="${fullOps.font}"
+>
+${pieces.join('\n')}
+</svg>`
 }
 
 /**
@@ -298,40 +303,56 @@ export function toSvgElement(scripts: Funscript | Funscript[], ops: SvgOptions):
 export function toSvgG(
   script: Funscript,
   ops: SvgSubOptions<keyof SvgOptions>,
-  ctx: { transform: string, onDoubleTitle: () => void, isSecondaryAxis?: boolean },
+  ctx: {
+    transform: string
+    onDoubleTitle: () => void
+    isSecondaryAxis?: boolean
+    isForHandy?: boolean
+  },
 ): string {
   const {
-    title: rawTitle,
+    title,
+    icon,
     lineWidth: w,
     graphOpacity,
-    headerOpacity,
-    headerHeight,
-    headerSpacing,
+    titleOpacity,
+    titleHeight,
+    titleSpacing,
     height,
-    axisFont,
+    iconFont,
     width,
-    solidHeaderBackground,
+    solidTitleBackground,
     titleEllipsis,
     titleSeparateLine,
     font,
     durationMs,
+    iconWidth,
   } = ops
-  const { isSecondaryAxis } = ctx
-  const axisWidth = ops.axisWidth
-  const axisSpacing = axisWidth === 0 ? 0 : ops.axisSpacing
+  const { isSecondaryAxis, isForHandy } = ctx
+  const iconSpacing = iconWidth === 0 ? 0 : ops.iconSpacing
 
-  // Resolve title to string once
-  let title: string = ''
-  if (rawTitle !== null) {
-    title = typeof rawTitle === 'function' ? rawTitle(script) : rawTitle
-  } else {
-    if (script.file?.filePath) {
-      title = script.file.filePath
-    } else if (script.parent?.file) {
-      // title = '<' + axisToName(script.id) + '>'
-      title = ''
-    }
+  let titleText: string = ''
+  if (script.file?.filePath) {
+    titleText = script.file.filePath
+  } else if (script.parent?.file) {
+    // title = '<' + axisToName(script.id) + '>'
+    titleText = ''
   }
+  if (typeof title === 'function') {
+    titleText = title(script, titleText)
+  } else if (typeof title === 'string') {
+    titleText = title
+  }
+
+  let iconText: string = isForHandy && !isSecondaryAxis
+    ? HANDY_ICON
+    : script.channel ? channelNameToAxis(script.channel, script.channel) : 'L0'
+  if (typeof icon === 'function') {
+    iconText = icon(script, iconText)
+  } else if (typeof icon === 'string') {
+    iconText = icon
+  }
+
   const stats = toStats(script.actions, { durationSeconds: durationMs / 1000 })
   if (isSecondaryAxis) delete (stats as Partial<typeof stats>).Duration
 
@@ -339,98 +360,94 @@ export function toSvgG(
 
   const round = (x: number) => +x.toFixed(2)
 
-  const proportionalFontSize = round(headerHeight * 0.8)
-  const statLabelFontSize = round(headerHeight * 0.4)
-  const statValueFontSize = round(headerHeight * 0.72)
+  const proportionalFontSize = round(titleHeight * 0.8)
+  const statLabelFontSize = round(titleHeight * 0.4)
+  const statValueFontSize = round(titleHeight * 0.72)
 
   let useSeparateLine = false
 
   // Define x positions for key SVG elements
   const xx = {
-    axisStart: 0, // Start of axis area
-    axisEnd: axisWidth, // End of axis area
-    titleStart: axisWidth + axisSpacing, // Start of title/graph area (after axis + spacing)
+    iconStart: 0, // Start of axis area
+    iconEnd: iconWidth, // End of axis area
+    titleStart: iconWidth + iconSpacing, // Start of title/graph area (after axis + spacing)
     svgEnd: width, // End of SVG (full width)
-    graphWidth: width - axisWidth - axisSpacing, // Width of the graph area
-    statText: (i: number) => round(width - (7 + i * 46) * (headerHeight / 20)), // X position for stat labels/values
-    get axisText() { return round(this.axisEnd / 2) }, // X position for axis text (centered)
-    get headerText() { return round(this.titleStart + headerHeight * 0.2) }, // X position for header text (proportional to header height)
-    get textWidth() { return this.statText(useSeparateLine ? 0 : statCount) - this.headerText },
+    graphWidth: width - iconWidth - iconSpacing, // Width of the graph area
+    statText: (i: number) => round(width - (7 + i * 46) * (titleHeight / 20)), // X position for stat labels/values
+    get iconText() { return round(this.iconEnd / 2) }, // X position for axis text (centered)
+    get titleText() { return round(this.titleStart + titleHeight * 0.2) }, // X position for title text (proportional to title height)
+    get textWidth() { return this.statText(useSeparateLine ? 0 : statCount) - this.titleText },
   }
 
-  if (title && titleSeparateLine !== false
-    && textToSvgLength(title, `${proportionalFontSize}px ${font}`) > xx.textWidth) {
+  if (titleText && titleSeparateLine !== false
+    && textToSvgLength(titleText, `${proportionalFontSize}px ${font}`) > xx.textWidth) {
     useSeparateLine = true
   }
-  if (title && titleEllipsis
-    && textToSvgLength(title, `${proportionalFontSize}px ${font}`) > xx.textWidth) {
-    title = truncateTextWithEllipsis(title, xx.textWidth, `${proportionalFontSize}px ${font}`)
+  if (titleText && titleEllipsis
+    && textToSvgLength(titleText, `${proportionalFontSize}px ${font}`) > xx.textWidth) {
+    titleText = truncateTextWithEllipsis(titleText, xx.textWidth, `${proportionalFontSize}px ${font}`)
   }
   if (useSeparateLine) {
     ctx.onDoubleTitle()
   }
 
   // Calculate the actual graph height from total height
-  const graphHeight = height - headerHeight - headerSpacing
+  const graphHeight = height - titleHeight - titleSpacing
 
-  const isForHandy = '_isForHandy' in script && script._isForHandy
-  let axis: string = script.channel ? channelNameToAxis(script.channel, script.channel) : 'L0'
-  if (isForHandy) axis = '☞'
-
-  // repair:
+  // Warn if encountered NaN actions
   const badActions = script.actions.filter(e => !Number.isFinite(e.pos))
   if (badActions.length) {
     console.log('badActions', badActions)
     badActions.map(e => e.pos = 120)
-    title += '::bad'
-    axis = '!!!'
+    titleText += '::bad'
+    iconText = '!!!'
   }
 
   // Define y positions for key SVG elements
   const yy = {
     top: 0, // Top of SVG
-    get headerExtra() { return useSeparateLine ? headerHeight : 0 },
-    get titleBottom() { return round(headerHeight + this.headerExtra) }, // Bottom of title area
-    get graphTop() { return round(this.titleBottom + headerSpacing) }, // Top of graph area
-    get svgBottom() { return round(height + this.headerExtra) }, // Bottom of SVG (total block height)
-    get axisText() { return round((this.top + this.svgBottom) / 2 + 4 + this.headerExtra / 2) }, // Y position for axis text (centered)
-    headerText: round(headerHeight * 0.75), // Y position for header text (proportional to headerHeight)
-    get statLabelText() { return round(headerHeight * 0.35 + this.headerExtra) }, // Y position for stat labels (proportional)
-    get statValueText() { return round(headerHeight * 0.92 + this.headerExtra) }, // Y position for stat values (proportional)
+    get titleExtra() { return useSeparateLine ? titleHeight : 0 },
+    get titleBottom() { return round(titleHeight + this.titleExtra) }, // Bottom of title area
+    get graphTop() { return round(this.titleBottom + titleSpacing) }, // Top of graph area
+    get svgBottom() { return round(height + this.titleExtra) }, // Bottom of SVG (total block height)
+    get iconText() { return round((this.top + this.svgBottom) / 2 + 4 + this.titleExtra / 2) }, // Y position for axis text (centered)
+    titleText: round(titleHeight * 0.75), // Y position for title text (proportional to titleHeight)
+    get statLabelText() { return round(titleHeight * 0.35 + this.titleExtra) }, // Y position for stat labels (proportional)
+    get statValueText() { return round(titleHeight * 0.92 + this.titleExtra) }, // Y position for stat values (proportional)
   }
   const bgGradientId = `funsvg-grad-${script.channel ?? ''}-${script.actions.length}-${script.actions[0]?.at || 0}`
 
-  const axisColor = speedToHexCached(stats.AvgSpeed)
-  const axisOpacity = round(headerOpacity * Math.max(0.5, Math.min(1, stats.AvgSpeed / 100)))
+  const iconColor = speedToHexCached(stats.AvgSpeed)
+  const iconOpacity = round(titleOpacity * Math.max(0.5, Math.min(1, stats.AvgSpeed / 100)))
 
   return [
     `<g transform="${ctx.transform}">`,
     '  <g class="funsvg-bgs">',
     `    <defs>${toSvgBackgroundGradient(script, { durationMs }, bgGradientId)}</defs>`,
-    axisWidth > 0 && `    <rect class="funsvg-bg-axis-drop" x="0" y="${yy.top}" width="${xx.axisEnd}" height="${yy.svgBottom - yy.top}" fill="#ccc" opacity="${round(graphOpacity * 1.5)}"></rect>`,
+    iconWidth > 0 && `    <rect class="funsvg-bg-axis-drop" x="0" y="${yy.top}" width="${xx.iconEnd}" height="${yy.svgBottom - yy.top}" fill="#ccc" opacity="${round(graphOpacity * 1.5)}"></rect>`,
     `    <rect class="funsvg-bg-title-drop" x="${xx.titleStart}" width="${xx.graphWidth}" height="${yy.titleBottom}" fill="#ccc" opacity="${round(graphOpacity * 1.5)}"></rect>`,
-    axisWidth > 0 && `    <rect class="funsvg-bg-axis" x="0" y="${yy.top}" width="${xx.axisEnd}" height="${yy.svgBottom - yy.top}" fill="${axisColor}" opacity="${axisOpacity}"></rect>`,
-    `    <rect class="funsvg-bg-title" x="${xx.titleStart}" width="${xx.graphWidth}" height="${yy.titleBottom}" fill="${solidHeaderBackground ? axisColor : `url(#${bgGradientId})`}" opacity="${round(solidHeaderBackground ? axisOpacity : headerOpacity)}"></rect>`,
+    iconWidth > 0 && `    <rect class="funsvg-bg-axis" x="0" y="${yy.top}" width="${xx.iconEnd}" height="${yy.svgBottom - yy.top}" fill="${iconColor}" opacity="${iconOpacity}"></rect>`,
+    `    <rect class="funsvg-bg-title" x="${xx.titleStart}" width="${xx.graphWidth}" height="${yy.titleBottom}" fill="${solidTitleBackground ? iconColor : `url(#${bgGradientId})`}" opacity="${round(solidTitleBackground ? iconOpacity : titleOpacity)}"></rect>`,
     `    <rect class="funsvg-bg-graph" x="${xx.titleStart}" width="${xx.graphWidth}" y="${yy.graphTop}" height="${graphHeight}" fill="url(#${bgGradientId})" opacity="${round(graphOpacity)}"></rect>`,
     '  </g>',
 
     `  <g class="funsvg-lines" transform="translate(${xx.titleStart}, ${yy.graphTop})" stroke-width="${w}" fill="none" stroke-linecap="round">`,
-    ...toSvgLines(script, ops, { width: xx.graphWidth, height: graphHeight }).map(line => `    ${line}`),
+    toSvgLines(script, ops, { width: xx.graphWidth, height: graphHeight }).map(line => `    ${line}`),
     '  </g>',
 
     '  <g class="funsvg-titles">',
     ops.halo && [
       `    <g class="funsvg-titles-halo" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent">`,
-      `      <text class="funsvg-title-halo" x="${xx.headerText}" y="${yy.headerText}"> ${textToSvgText(title)} </text>`,
-      ...Object.entries(stats).reverse().map(([k, v], i) => [
+      `      <text class="funsvg-title-halo" x="${xx.titleText}" y="${yy.titleText}"> ${textToSvgText(titleText)} </text>`,
+      Object.entries(stats).reverse().map(([k, v], i) => [
         `      <text class="funsvg-stat-label-halo" x="${xx.statText(i)}" y="${yy.statLabelText}" font-weight="bold" font-size="${statLabelFontSize}px" text-anchor="end"> ${k} </text>`,
         `      <text class="funsvg-stat-value-halo" x="${xx.statText(i)}" y="${yy.statValueText}" font-weight="bold" font-size="${statValueFontSize}px" text-anchor="end"> ${v} </text>`,
       ]),
       '    </g>',
     ],
-    axisWidth > 0 && `    <text class="funsvg-axis" x="${xx.axisText}" y="${yy.axisText}" font-size="${round(Math.max(12, axisWidth * 0.75))}px" font-family="${axisFont}" text-anchor="middle" dominant-baseline="middle"> ${axis} </text>`,
-    `    <text class="funsvg-title" x="${xx.headerText}" y="${yy.headerText}"> ${textToSvgText(title)} </text>`,
-    ...Object.entries(stats).reverse().map(([k, v], i) => [
+    iconWidth > 0 && `    <text class="funsvg-axis" x="${xx.iconText}" y="${yy.iconText}" font-size="${round(Math.max(12, iconWidth * 0.75))}px" font-family="${iconFont}" text-anchor="middle" dominant-baseline="middle"> ${textToSvgText(iconText)} </text>`,
+    `    <text class="funsvg-title" x="${xx.titleText}" y="${yy.titleText}"> ${textToSvgText(titleText)} </text>`,
+    Object.entries(stats).reverse().map(([k, v], i) => [
       `    <text class="funsvg-stat-label" x="${xx.statText(i)}" y="${yy.statLabelText}" font-weight="bold" font-size="${statLabelFontSize}px" text-anchor="end"> ${k} </text>`,
       `    <text class="funsvg-stat-value" x="${xx.statText(i)}" y="${yy.statValueText}" font-weight="bold" font-size="${statValueFontSize}px" text-anchor="end"> ${v} </text>`,
     ]),
@@ -440,19 +457,6 @@ export function toSvgG(
     .flat(4)
     .filter((e): e is string => !!e)
     .join('\n')
-  //  lengthAdjust="spacingAndGlyphs" ${textToSvgLength(title, `14px ${ops.font}`) > xx.graphWidth - 6 ? `textLength="${xx.graphWidth - 6}"` : ''
-  //             }
-  // <g class="funsvg-borders">
-  //   ${(
-  //       axisTitleTop === yy[0]
-  //         ? ''
-  //         : `<rect x="0" y="0" width="${xx[1]}" height="20" stroke="${color}" stroke-width="0.2" fill="none"></rect>`
-  //     )}
-  //   <rect x="0" y="${axisTitleTop}" width="${xx[1]}" height="${yy[3] - axisTitleTop}" stroke="${color}" stroke-width="0.2" fill="none"></rect>
-  //   <rect x="${xx[2]}" y="0" width="${graphWidth}" height="20" stroke="${color}" stroke-width="0.2" fill="none"></rect>
-  //   <rect x="${xx[2]}" y="${yy[2]}" width="${graphWidth}" height="32" stroke="${color}" stroke-width="0.2" fill="none"></rect>
-  //   <rect x="${-sw / 2}" y="${-sw / 2}" width="${xx[3] - 4 + sw}" height="${yy[3] + sw}" stroke="${'#eee'}" stroke-width="${sw}" fill="none"></rect>
-  // </g>
 }
 
 /**

@@ -1,5 +1,5 @@
 import type { channel, chapterName, JsonAction, JsonChapter, JsonFunscript, JsonMetadata, ms, pos, seconds, timeSpan } from './types'
-import { axisLikes, axisToChannelName, formatJson, msToTimeSpan, orderByChannel, orderTrimJson, timeSpanToMs } from './converter'
+import { axisLikes, axisToChannelName, channelNameToAxis, formatJson, msToTimeSpan, orderByChannel, orderTrimJson, timeSpanToMs } from './converter'
 import { clamp, clone, isEmpty, makeNonEnumerable, mapObject } from './misc'
 
 export class FunAction implements JsonAction {
@@ -192,10 +192,8 @@ export class Funscript implements JsonFunscript {
       const allScripts = scripts.sort(orderByChannel)
       const usedChannels = [...new Set(allScripts.map(e => e.channel))]
       if (usedChannels.length !== allScripts.length) {
-        throw new Error(`Funscript.mergeMultiAxis: some of the ${
-          JSON.stringify(title)
-        } channels ${
-          JSON.stringify(allScripts.map(e => e.channel))
+        throw new Error(`Funscript.mergeMultiAxis: some of the ${JSON.stringify(title)
+        } channels ${JSON.stringify(allScripts.map(e => e.channel))
         } are duplicate`)
       }
       if (allScripts.length === 1) {
@@ -355,12 +353,20 @@ export class Funscript implements JsonFunscript {
     version: '1.0',
   }
 
-  toJSON(): Record<string, any> {
+  toJSON(options?: { version?: 'axes' | '2.0' }): Record<string, any> {
+    const channels = mapObject(this.channels, e => e.toJSON())
     return orderTrimJson(this, {
       id: undefined,
-      axes: undefined,
       channel: undefined,
-      channels: mapObject(this.channels, e => e.toJSON()),
+      ...(options?.version === 'axes'
+        ? {
+            axes: Object.entries(channels).map(([channel, axis]) => ({
+              id: channelNameToAxis(channel),
+              ...axis.toJSON,
+            })),
+            channels: undefined,
+          }
+        : { axes: undefined, channels }),
       metadata: {
         ...this.metadata.toJSON(),
         duration: +this.duration.toFixed(3),
@@ -368,8 +374,9 @@ export class Funscript implements JsonFunscript {
     })
   }
 
-  toJsonText(options?: Parameters<typeof formatJson>[1]) {
-    return formatJson(JSON.stringify(this, null, 2), options ?? {})
+  toJsonText(options?: Parameters<typeof formatJson>[1] & { version?: 'axes' | '2.0' }) {
+    const json = this.toJSON(options)
+    return formatJson(JSON.stringify(json, null, 2), options ?? {})
   }
 
   clone(): this {
@@ -404,8 +411,8 @@ export class AxisScript extends Funscript {
   }
 
   toJSON(): Record<string, any> {
-    let json = super.toJSON();
-    if (JSON.stringify(json.metadata) === JSON.stringify(this.metadata))
+    const json = super.toJSON()
+    if (JSON.stringify(json.metadata) === JSON.stringify(this.parent.metadata))
       delete json.metadata
     return json
   }
