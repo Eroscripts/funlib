@@ -1,9 +1,9 @@
 import type { axis, chapterName, JsonAction, JsonChapter, JsonFunscript, JsonMetadata, ms, pos, timeSpan } from '..'
 import { FunAction, FunChapter, FunMetadata, Funscript } from '..'
-import { sliceActions } from '../chapters'
-import { axisIds, orderByChannel, orderTrimJson } from '../converter'
-import { clerpAt } from '../manipulations'
-import { compareWithOrder, mapObject } from '../misc'
+import { sliceActions } from '../utils/chapters'
+import { axisIds, orderByChannel, orderTrimJson } from '../utils/converter'
+import { clerpAt } from '../utils/manipulations'
+import { compareWithOrder, mapObject } from '../utils/misc'
 
 export interface JsonChapChapter {
   id?: axis

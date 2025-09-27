@@ -1,5 +1,5 @@
-import type { FunAction } from '.'
-import type { mantissaText, pos, speed } from './types'
+import type { FunAction } from '..'
+import type { mantissaText, pos, speed } from '../types'
 
 export { oklch2rgb } from 'colorizr'
 

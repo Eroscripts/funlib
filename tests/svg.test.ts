@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
-import { Funscript } from '../src/index'
-import { toSvgElement } from '../src/rendering/svg'
+import { Funscript } from './index'
+import { toSvgElement } from './rendering/svg'
 import { createSine, createZigzag } from './utils/test-data'
 
 describe('SVG Generation', () => {

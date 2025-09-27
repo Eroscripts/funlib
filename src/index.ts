@@ -1,6 +1,6 @@
 import type { channel, chapterName, JsonAction, JsonChapter, JsonFunscript, JsonMetadata, ms, pos, seconds, timeSpan } from './types'
-import { axisLikes, axisToChannelName, channelNameToAxis, formatJson, msToTimeSpan, orderByChannel, orderTrimJson, timeSpanToMs } from './converter'
-import { clamp, clone, isEmpty, makeNonEnumerable, mapObject } from './misc'
+import { axisLikes, axisToChannelName, channelNameToAxis, formatJson, msToTimeSpan, orderByChannel, orderTrimJson, timeSpanToMs } from './utils/converter'
+import { clamp, clone, isEmpty, makeNonEnumerable, mapObject } from './utils/misc'
 
 export class FunAction implements JsonAction {
   // --- Public Instance Properties ---

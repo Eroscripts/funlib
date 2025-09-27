@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import { FunAction } from '../src/index'
-import { limitPeakSpeed } from '../src/manipulations'
-import { speedBetween } from '../src/misc'
+import { limitPeakSpeed } from '../src/utils/manipulations'
+import { speedBetween } from '../src/utils/misc'
 
 describe('limitPeakSpeed', () => {
   it('should properly limit speed in a 0-100-0-100-0 pattern', () => {

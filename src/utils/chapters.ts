@@ -1,6 +1,6 @@
-import type { FunChapter } from './index'
-import type { chapterName, ms } from './types'
-import { FunAction, Funscript } from './index'
+import type { FunChapter } from '../index'
+import type { chapterName, ms } from '../types'
+import { FunAction, Funscript } from '../index'
 import { clerpAt } from './manipulations'
 
 export function sliceActions(

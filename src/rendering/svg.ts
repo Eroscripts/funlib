@@ -1,9 +1,9 @@
 import type { Funscript } from '..'
 import type { ms } from '../types'
 import { FunAction } from '..'
-import { channelNameToAxis, speedToHexCached } from '../converter'
-import { actionsToLines, actionsToZigzag, mergeLinesSpeed, toStats } from '../manipulations'
+import { actionsToLines, actionsToZigzag, mergeLinesSpeed, toStats } from '../utils/manipulations'
 import { lerp } from '../misc'
+import { channelNameToAxis, speedToHexCached } from '../utils/converter'
 
 export interface SvgOptions {
   // rendering

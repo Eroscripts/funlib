@@ -1,5 +1,5 @@
-import type { Funscript } from '.'
-import type { axis, axisLike, axisPairs, channel, ms, seconds, speed, timeSpan } from './types'
+import type { Funscript } from '..'
+import type { axis, axisLike, axisPairs, channel, ms, seconds, speed, timeSpan } from '../types'
 import { oklch2hex } from 'colorizr'
 import { clamplerp, compareWithOrder } from './misc'
 
