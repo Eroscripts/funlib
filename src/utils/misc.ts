@@ -75,8 +75,10 @@ export function compareWithOrder(a: string | undefined, b: string | undefined, o
   return 0
 }
 
-export function toMantissa(value: pos): mantissaText {
-  return clamp(value / 100, 0, 0.9999).toFixed(4).slice(2).replace(/(?<=.)0+$/, '') as mantissaText
+export function toMantissa(value: pos, trim = false): mantissaText {
+  let text = clamp(value / 100, 0, 0.9999).toFixed(4).slice(2)
+  if (trim) text = text.replace(/(?<=.)0+$/, '')
+  return text as mantissaText
 }
 
 export function makeNonEnumerable<T extends object, K extends keyof T>(

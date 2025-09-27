@@ -1,9 +1,22 @@
 <html>
-    <head>
-        <title>Funlib</title>
-        <script src="../src/integrations/iife.ts"></script>
-    </head>
-  <body>
-    <h1>Hello, world!</h1>
-  </body>
+
+<head>
+  <title>Funlib</title>
+  <script src="../src/integrations/iife.ts"></script>
+</head>
+
+<body>
+  <h1>Hello, world!</h1>
+  <button id="connect">
+    Connect
+  </button>
+  <script type="module" defer>
+    document.getElementById('connect').addEventListener('click', async () => {
+      const p = await Fun.serialport.TCodeSerialPort.open();
+      console.log(p);
+      Object.assign(globalThis, { p });
+    });
+  </script>
+</body>
+
 </html>
