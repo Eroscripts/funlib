@@ -26,6 +26,7 @@ export type speed = number & B<['speed', 'u/s']>
 // export type speed10 = number & B<['speed', '0.1u/s']>
 
 // axis value variants
+/** 0-100 */
 export type pos = number & B<['axis', 'u']> // 0-100
 // export type axisNorm = number & B<['axis', 'mantissa']> // 0-1
 // export type axisAngle = number & B<['axis', 'deg']> // in degrees

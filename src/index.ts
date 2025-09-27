@@ -375,6 +375,10 @@ export class Funscript implements JsonFunscript {
     return formatJson(JSON.stringify(json, null, 2), options ?? {})
   }
 
+  toString() {
+    return this.toJsonText()
+  }
+
   clone(): this {
     const cloned = clone(this)
     cloned.file = this.file?.clone()

@@ -1,4 +1,5 @@
 import * as Fun from '..'
+import * as serialport from '../integrations/serialport'
 import * as svg from '../rendering/svg'
 import * as types from '../types'
 import * as chapters from '../utils/chapters'
@@ -17,5 +18,7 @@ Object.assign(window, {
     manipulations: { ...manipulations },
     chapters: { ...chapters },
     types: { ...types },
+
+    serialport: { ...serialport },
   },
 })
