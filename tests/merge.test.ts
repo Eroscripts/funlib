@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { Funscript } from './index'
+import { Funscript } from '../src'
 import { createSine, createZigzag } from './utils/test-data'
 
 describe('Script Merging', () => {

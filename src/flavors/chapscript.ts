@@ -1,4 +1,4 @@
-import type { axis, chapterName, JsonAction, JsonChapter, JsonFunscript, JsonMetadata, ms, pos, timeSpan } from '..'
+import type { axis, channel, chapterName, JsonAction, JsonChapter, JsonFunscript, JsonMetadata, ms, pos, timeSpan } from '..'
 import { FunAction, FunChapter, FunMetadata, Funscript } from '..'
 import { sliceActions } from '../utils/chapters'
 import { axisIds, orderByChannel, orderTrimJson } from '../utils/converter'
@@ -6,12 +6,12 @@ import { clerpAt } from '../utils/manipulations'
 import { compareWithOrder, mapObject } from '../utils/misc'
 
 export interface JsonChapChapter {
-  id?: axis
+  channel?: channel
   startTime: timeSpan
   endTime: timeSpan
   name?: string
   actions?: JsonAction[]
-  axes?: { id: axis, actions: JsonAction[] }[]
+  channels?: Record<channel, { actions: JsonAction[] }>
 }
 
 /**
@@ -37,7 +37,7 @@ export class ChapTimelineAction extends FunAction {
  */
 export class ChapChapter extends FunChapter {
   actions: FunAction[]
-  axes?: { id: axis, actions: FunAction[] }[]
+  channels: Record<channel, { actions: FunAction[] }>
 
   get durationMs() {
     return this.endAt - this.startAt
@@ -50,16 +50,17 @@ export class ChapChapter extends FunChapter {
   constructor(chapter?: JsonChapChapter) {
     super(chapter as any)
     this.actions = chapter?.actions?.map(a => new FunAction(a)) ?? []
-    this.axes = chapter?.axes?.map(axisData => ({
-      id: axisData.id,
-      actions: axisData.actions.map(a => new FunAction(a)),
-    }))
+    this.channels = !chapter?.channels
+      ? {}
+      : mapObject(chapter.channels, channelData => ({
+          actions: channelData.actions.map(a => new FunAction(a)),
+        }))
   }
 
-  into(timelineChapter: TimelineChapter, axis?: axis): ChapTimelineAction[] {
-    const actions = !axis
+  into(timelineChapter: TimelineChapter, channel?: channel): ChapTimelineAction[] {
+    const actions = !channel
       ? this.actions
-      : this.axes?.find(a => a.id === axis)?.actions ?? []
+      : this.channels?.[channel]?.actions ?? []
 
     if (!actions.length) return []
     const { startAt, endAt } = timelineChapter
@@ -93,7 +94,7 @@ export class ChapChapter extends FunChapter {
     endTime: undefined,
     name: '',
     actions: [],
-    axes: [],
+    channels: {},
   }
 
   toJSON() {
@@ -161,13 +162,11 @@ export class ChapScript extends Funscript {
     this.chapters = mapObject(funscript?.chapters ?? {}, c => new ChapChapter(c as any))
 
     const base = this.constructor as typeof Funscript
-    const allChapterAxes = new Set(Object.values(this.chapters).flatMap(c => c.axes?.map(a => a.id) ?? []))
+    const allChapterAxes = new Set(Object.values(this.chapters).flatMap(c => Object.keys(c.channels) ?? []))
     for (const x of allChapterAxes) {
-      if (!this.axes.find(a => a.id === x)) {
-        this.axes.push(new base.AxisScript({ actions: [] }, { id: x, parent: this }))
-      }
+      this.channels[x] ??= new base.Channel({ actions: [] }, { channel: x, parent: this })
     }
-    this.axes.sort(orderByChannel)
+    this.listChannels.sort(orderByChannel)
   }
 
   recalculateActions(): this {
@@ -177,9 +176,9 @@ export class ChapScript extends Funscript {
       .sort((a, b) => a.at - b.at)
 
     // Update existing axes actions only (assume all axes exist)
-    this.axes.forEach((axisScript) => {
+    this.listChannels.forEach((axisScript) => {
       const axisActions = this.metadata.chapters
-        .flatMap(c => this.chapters[c.name]?.into(c, axisScript.id) ?? [])
+        .flatMap(c => this.chapters[c.name]?.into(c, axisScript.channel) ?? [])
         .sort((a, b) => a.at - b.at)
 
       // Convert ChapActions to FunActions for the axis
@@ -280,8 +279,8 @@ export class ChapScript extends Funscript {
         chapter.actions = sliceAxisActions(funscript.actions, chapter)
 
         // Process multi-axis actions if present
-        if (funscript.axes?.length) {
-          chapter.axes = funscript.axes.map(axisScript => ({
+        if (funscript.listChannels.length) {
+          chapter.channels = funscript.axes.map(axisScript => ({
             id: axisScript.id,
             actions: sliceAxisActions(axisScript.actions, chapter),
           })).filter(axisData => axisData.actions.length)
@@ -299,7 +298,7 @@ export class ChapScript extends Funscript {
     return clerpAt(actions ?? [], at)
   }
 }
-ChapScript.AxisScript = ChapScript as never
+ChapScript.Channel = ChapScript as never
 
 /*
 TODO: Multi-Axis ChapScript Implementation Checklist

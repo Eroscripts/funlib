@@ -515,7 +515,8 @@ exports[`Script Merging should merge multi-axis scripts by filename 3`] = `
         {"at":0,"pos":50},{"at":100,"pos":50},{"at":200,"pos":49},{"at":300,"pos":50},{"at":400,"pos":49},{"at":500,"pos":50},{"at":600,"pos":49},{"at":700,"pos":50},{"at":800,"pos":49},{"at":900,"pos":50}
       ]
     }
-  }
+  },
+  "version": "2.0"
 }"
 `;
 
@@ -541,7 +542,8 @@ exports[`Script Merging should merge multi-axis scripts by filename 4`] = `
         {"at":0,"pos":50},{"at":100,"pos":50},{"at":200,"pos":49},{"at":300,"pos":50},{"at":400,"pos":49},{"at":500,"pos":50},{"at":600,"pos":49},{"at":700,"pos":50},{"at":800,"pos":49},{"at":900,"pos":50}
       ]
     }
-  ]
+  ],
+  "version": "1.1"
 }"
 `;
 

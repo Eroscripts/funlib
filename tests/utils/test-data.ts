@@ -1,5 +1,5 @@
 import type { JsonAction } from '../../src/types'
-import { clamp } from '../../src/misc'
+import { clamp } from '../../src/utils/misc'
 
 export function createSine(
   { points = 10, timeStep = 50, amplitude = 25, period = 1000 }: { points?: number, timeStep?: number, amplitude?: number, period?: number } = {},

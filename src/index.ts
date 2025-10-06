@@ -166,8 +166,8 @@ export class Funscript implements JsonFunscript {
   static Bookmark = FunBookmark
   static Metadata = FunMetadata
   static File = FunscriptFile
-  static AxisScript = null! as typeof AxisScript
-  // AxisScript will be set after its declaration
+  static Channel = null! as typeof FunChannel
+  // FunChannel will be set after its declaration
 
   /** merge multi-axis scripts into one */
   static mergeMultiAxis(scripts: Funscript[], options?: {
@@ -177,14 +177,14 @@ export class Funscript implements JsonFunscript {
     const allowMissingActions = options?.allowMissingActions ?? false
     const combineSingleSecondaryChannel = options?.combineSingleSecondaryChannel ?? false
 
-    const multiaxisScripts = scripts.filter(e => e.listChannels.length)
-    const singleaxisScripts = scripts.filter(e => !e.listChannels.length)
+    const multiScriptChannels = scripts.filter(e => e.listChannels.length)
+    const singleScriptChannels = scripts.filter(e => !e.listChannels.length)
 
     const groups = Object.groupBy(
-      singleaxisScripts,
+      singleScriptChannels,
       e => e.file ? e.file.dir + e.file.title : '[unnamed]',
     )
-    const mergedSingleaxisScripts = Object.entries(groups).flatMap<Funscript>(([title, scripts]) => {
+    const mergedSingleScriptChannels = Object.entries(groups).flatMap<Funscript>(([title, scripts]) => {
       if (!scripts) return []
 
       // base case: no duplicate axes
@@ -213,13 +213,13 @@ export class Funscript implements JsonFunscript {
       }
       return [new Funscript(mainScript, { channels: secondaryScripts, isMerging: true })]
     })
-    return [...multiaxisScripts, ...mergedSingleaxisScripts]
+    return [...multiScriptChannels, ...mergedSingleScriptChannels]
   }
 
   // --- Public Instance Properties ---
   channel?: channel
   actions: FunAction[] = []
-  channels: Record<channel, AxisScript> = {}
+  channels: Record<channel, FunChannel> = {}
   metadata!: FunMetadata
 
   // --- Non-enumerable Properties ---
@@ -262,8 +262,8 @@ export class Funscript implements JsonFunscript {
           channelsOrAxes.map<[channel, JsonFunscript]>(e => ['channel' in e ? e.channel! : axisToChannelName(e.id), e] as const),
         )
       : channelsOrAxes
-    this.channels = mapObject(channels ?? ({} as never), (e) => {
-      return new base.AxisScript(e, { parent: this })
+    this.channels = mapObject(channels ?? ({} as never), (e, channel) => {
+      return new base.Channel(e, { parent: this, channel })
     })
 
     if (extras?.isMerging) {
@@ -306,8 +306,12 @@ export class Funscript implements JsonFunscript {
     return metadataDuration
   }
 
-  get listChannels(): AxisScript[] {
+  get listChannels(): FunChannel[] {
     return Object.values(this.channels)
+  }
+
+  get allChannels(): Funscript[] {
+    return [this, ...this.listChannels]
   }
 
   // --- Public Instance Methods ---
@@ -353,14 +357,17 @@ export class Funscript implements JsonFunscript {
     version: '1.0',
   }
 
-  toJSON(options?: { version?: '1.0' | '1.1' | '2.0' }): Record<string, any> {
+  toJSON(options?: { version?: '1.0' | '1.1' | '2.0' | '1.0-list' }): Record<string, any> {
     const v = options?.version ?? (this.channels ? '2.0' : '1.0')
+    if (v === '1.0-list') {
+      return [this, ...this.listChannels].map(e => e.toJSON({ version: '1.0' }))
+    }
     const ops = { ...options, root: false }
     return orderTrimJson(this, {
       version: v,
       id: v === '1.1' && this.parent ? channelNameToAxis(this.channel!, this.channel!) : undefined,
       axes: v === '1.1' ? Object.values(this.channels).map(axis => axis.toJSON(ops)) : undefined,
-      channel: undefined,
+      channel: v === '1.0' ? this.channel || undefined : undefined,
       channels: v === '2.0' ? mapObject(this.channels, e => e.toJSON(ops)) : undefined,
       metadata: {
         ...this.metadata.toJSON(),
@@ -370,7 +377,7 @@ export class Funscript implements JsonFunscript {
     })
   }
 
-  toJsonText(options?: Parameters<typeof formatJson>[1] & { version?: '1.0' | '1.1' | '2.0' }) {
+  toJsonText(options?: Parameters<typeof formatJson>[1] & { version?: '1.0' | '1.1' | '2.0' | '1.0-list' }) {
     const json = this.toJSON(options)
     return formatJson(JSON.stringify(json, null, 2), options ?? {})
   }
@@ -386,7 +393,7 @@ export class Funscript implements JsonFunscript {
   }
 }
 
-export class AxisScript extends Funscript {
+export class FunChannel extends Funscript {
   declare channel: channel
   declare channels: Record<channel, never>
   declare parent: Funscript
@@ -402,16 +409,17 @@ export class AxisScript extends Funscript {
   ) {
     super(funscript, extras)
 
-    if (!this.channel) throw new Error('AxisScript: axis is not defined')
-    if (!this.parent) throw new Error('AxisScript: parent is not defined')
+    if (!this.channel) throw new Error('ScriptChannel: channel is not defined')
+    if (!this.parent) throw new Error('ScriptChannel: parent is not defined')
   }
 
   clone(): this {
     return this.parent.clone().channels[this.channel]! as any
   }
 
-  toJSON(options?: { version?: '1.0' | '1.1' | '2.0', root?: boolean }): Record<string, any> {
+  toJSON(options?: { version?: '1.0' | '1.1' | '2.0' | '1.0-list', root?: boolean }): Record<string, any> {
     const json = super.toJSON(options)
+    if (options?.version === '1.0-list') return json
     if (options?.root === false) {
       const parentMetadata = JSON.stringify(this.parent.metadata)
       if (Object.keys(json.metadata)
@@ -419,17 +427,18 @@ export class AxisScript extends Funscript {
           || JSON.stringify(json.metadata[e]) === JSON.stringify(parentMetadata[e as any]))) {
         delete json.metadata
       }
-      delete json.channel
       delete json.axes
       delete json.channels
       delete json.version
+      if (options?.version !== '1.0')
+        delete json.channel
     }
     return json
   }
 }
 
-// Set the AxisScript reference after it's declared
-Funscript.AxisScript = AxisScript
+// Set the ScriptChannel reference after it's declared
+Funscript.Channel = FunChannel
 
 // export general types that are always needed. This is not a barrel file.
 export type * from './types'
