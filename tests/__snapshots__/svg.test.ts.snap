@@ -243,7 +243,7 @@ Funscript {
   ],
   "channel": "",
   "channels": {
-    "pitch": AxisScript {
+    "pitch": FunChannel {
       "actions": [
         FunAction {
           "at": 0,
@@ -301,7 +301,7 @@ Funscript {
       },
       "parent": [Circular],
     },
-    "roll": AxisScript {
+    "roll": FunChannel {
       "actions": [
         FunAction {
           "at": 0,
@@ -440,7 +440,7 @@ Funscript {
   ],
   "channel": "",
   "channels": {
-    "pitch": AxisScript {
+    "pitch": FunChannel {
       "actions": [
         FunAction {
           "at": 0,
@@ -498,7 +498,7 @@ Funscript {
       },
       "parent": [Circular],
     },
-    "roll": AxisScript {
+    "roll": FunChannel {
       "actions": [
         FunAction {
           "at": 0,

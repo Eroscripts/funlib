@@ -1,3 +1,5 @@
+import { writeFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { describe, expect, it } from 'bun:test'
 import { Funscript } from '../src'
 import { toSvgElement } from '../src/rendering/svg'
@@ -11,6 +13,10 @@ describe('SVG Generation', () => {
 
     const svgElement = toSvgElement(script, {})
     expect(svgElement).toMatchSnapshot()
+
+    // Write SVG file for viewing
+    const svgContent = svgElement.replace(/^"/, '').replace(/"$/, '')
+    writeFileSync(join(__dirname, '__snapshots__', 'single-script.svg'), svgContent)
   })
 
   it('should generate SVG for multiple independent scripts', () => {
@@ -28,6 +34,10 @@ describe('SVG Generation', () => {
     const scripts = [script1, script2]
     const svgElement = toSvgElement(scripts, {})
     expect(svgElement).toMatchSnapshot()
+
+    // Write SVG file for viewing
+    const svgContent = svgElement.replace(/^"/, '').replace(/"$/, '')
+    writeFileSync(join(__dirname, '__snapshots__', 'multiple-scripts.svg'), svgContent)
   })
 
   it('should generate SVG with all options overridden', () => {
@@ -54,6 +64,10 @@ describe('SVG Generation', () => {
       iconWidth: 60,
     })
     expect(svgElement).toMatchSnapshot()
+
+    // Write SVG file for viewing
+    const svgContent = svgElement.replace(/^"/, '').replace(/"$/, '')
+    writeFileSync(join(__dirname, '__snapshots__', 'custom-options.svg'), svgContent)
   })
 
   it('should clone merged script and match same snapshot', () => {

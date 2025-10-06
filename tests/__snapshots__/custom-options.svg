@@ -1,0 +1,41 @@
+<svg class="funsvg" width="800" height="100" xmlns="http://www.w3.org/2000/svg"
+    font-size="24px" font-family="Helvetica"
+>
+<g transform="translate(0, 0)">
+  <g class="funsvg-bgs">
+    <defs>
+      <linearGradient id="funsvg-grad--8-0">
+        <stop offset="0" stop-color="#00f1ff" stop-opacity="0.06"></stop>
+          <stop offset="0.43" stop-color="#00f1ff" stop-opacity="0.06"></stop>
+          <stop offset="0.93" stop-color="#00f1ff" stop-opacity="0.07"></stop>
+          <stop offset="1" stop-color="#00f1ff" stop-opacity="0.07"></stop>
+      </linearGradient></defs>
+    <rect class="funsvg-bg-axis-drop" x="0" y="0" width="60" height="100" fill="#ccc" opacity="0.75"></rect>
+    <rect class="funsvg-bg-title-drop" x="60" width="740" height="30" fill="#ccc" opacity="0.75"></rect>
+    <rect class="funsvg-bg-axis" x="0" y="0" width="60" height="100" fill="#00eeff" opacity="0.45"></rect>
+    <rect class="funsvg-bg-title" x="60" width="740" height="30" fill="#00eeff" opacity="0.45"></rect>
+    <rect class="funsvg-bg-graph" x="60" width="740" y="30" height="70" fill="url(#funsvg-grad--8-0)" opacity="0.5"></rect>
+  </g>
+  <g class="funsvg-lines" transform="translate(60, 30)" stroke-width="2" fill="none" stroke-linecap="round">
+    <path d="M 2 35 L 107.14 35" stroke="#00eeff"></path>
+    <path d="M 107.14 35 L 212.29 35.66" stroke="#00f1ff"></path>
+    <path d="M 212.29 35.66 L 317.43 35" stroke="#00f1ff"></path>
+    <path d="M 317.43 35 L 422.57 35.66" stroke="#00f1ff"></path>
+    <path d="M 422.57 35.66 L 527.71 35" stroke="#00f1ff"></path>
+    <path d="M 527.71 35 L 632.86 35.66" stroke="#00f1ff"></path>
+    <path d="M 632.86 35.66 L 738 35" stroke="#00f1ff"></path>
+  </g>
+  <g class="funsvg-titles">
+    <text class="funsvg-axis" x="30" y="54" font-size="45px" font-family="Arial" text-anchor="middle" dominant-baseline="middle"> L0 </text>
+    <text class="funsvg-title" x="66" y="22.5"> Custom Title </text>
+    <text class="funsvg-stat-label" x="789.5" y="10.5" font-weight="bold" font-size="12px" text-anchor="end"> AvgSpeed </text>
+    <text class="funsvg-stat-value" x="789.5" y="27.6" font-weight="bold" font-size="21.6px" text-anchor="end"> 0 </text>
+    <text class="funsvg-stat-label" x="720.5" y="10.5" font-weight="bold" font-size="12px" text-anchor="end"> MaxSpeed </text>
+    <text class="funsvg-stat-value" x="720.5" y="27.6" font-weight="bold" font-size="21.6px" text-anchor="end"> 7 </text>
+    <text class="funsvg-stat-label" x="651.5" y="10.5" font-weight="bold" font-size="12px" text-anchor="end"> Actions </text>
+    <text class="funsvg-stat-value" x="651.5" y="27.6" font-weight="bold" font-size="21.6px" text-anchor="end"> 8 </text>
+    <text class="funsvg-stat-label" x="582.5" y="10.5" font-weight="bold" font-size="12px" text-anchor="end"> Duration </text>
+    <text class="funsvg-stat-value" x="582.5" y="27.6" font-weight="bold" font-size="21.6px" text-anchor="end"> 0:01 </text>
+  </g>
+</g>
+</svg>
