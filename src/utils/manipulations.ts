@@ -1,8 +1,14 @@
+import type { Funscript } from '..'
 import type { ms, pos, seconds, speed } from '../types'
 import { FunAction } from '..'
 import { secondsToDuration } from './converter'
 import { absSpeedBetween, clamplerp, lerp, listToSum, minBy, speedBetween, unlerp } from './misc'
 
+/**
+ * Finds the index of the action at or immediately before the specified time.
+ * Returns `0` if the time is before the first action.
+ * Returns rightmost of actions with same `at`
+ */
 export function binaryFindLeftBorder(actions: FunAction[], at: ms): number {
   if (actions.length <= 1) return 0
   if (at < actions[0].at) return 0
@@ -45,11 +51,9 @@ export function clerpAt(actions: FunAction[], at: ms): pos {
 
 /**
  * Determines if an action at given index is a peak
- * @param actions - Array of actions
- * @param index - Index to check
  * @returns -1 for valley, 0 for neither, 1 for peak
  */
-function isPeak(actions: FunAction[], index: number): -1 | 0 | 1 {
+export function isPeak(actions: FunAction[], index: number): -1 | 0 | 1 {
   const action = actions[index]
   const prevAction = actions[index - 1]
   const nextAction = actions[index + 1]

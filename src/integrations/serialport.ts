@@ -1,4 +1,4 @@
-import type { axis, TCodeTuple } from '../types'
+import type { axis, pos, TCodeTuple } from '../types'
 import { channelNameToAxis } from '../utils/converter'
 import { toMantissa } from '../utils/misc'
 
@@ -74,10 +74,12 @@ export class TCodeSerialPort extends SerialPort {
   }
 
   // --- I/O ---
-  async write(command: string | TCodeTuple): Promise<void> {
+  async write(command: string | TCodeTuple | TCodeTuple[]): Promise<void> {
     if (!this._writer) throw new Error('Serial port is not open')
-    if (typeof command !== 'string') command = this.tcodeTupleToString(command)
-    command = command.replaceAll('_', '')
+    if (Array.isArray(command)) {
+      if (typeof command[0] === 'string') command = [command as TCodeTuple]
+      command = (command as TCodeTuple[]).map(t => this.tcodeTupleToString(t)).join(' ')
+    }
     await this._writer.write(command + '\n')
   }
 
@@ -163,7 +165,7 @@ export class TCodeSerialPort extends SerialPort {
     return `${axis}${text}`
   }
 
-  async setLimits(axis: axis, min: number, max: number) {
+  async setLimits(axis: axis, min: pos, max: pos) {
     this.limits[axis].min = min
     this.limits[axis].max = max
     // $L0-0000-9999

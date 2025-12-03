@@ -2,6 +2,7 @@ import type { FunChapter } from '../index'
 import type { chapterName, ms } from '../types'
 import { FunAction, Funscript } from '../index'
 import { clerpAt } from './manipulations'
+import { mapObject } from './misc'
 
 export function sliceActions(
   actions: FunAction[],
@@ -42,7 +43,7 @@ export function extractChapter(funscript: Funscript, chapter: FunChapter, lerpBo
 
   return new Funscript({
     actions,
-    axes: funscript.axes.map(axis => extractChapter(axis, chapter, lerpBorders)),
+    channels: mapObject(funscript.channels, channel => extractChapter(channel, chapter, lerpBorders)),
     metadata: {
       ...funscript.metadata.toJSON(),
       chapters: [clonedChapter],

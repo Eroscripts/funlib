@@ -41,9 +41,9 @@ export type AxisToName = { [K in axisPairs[number] as K[0]]: K[1] } & { [K in ax
 
 export type chapterName = string & B<['chapter', 'name']>
 
-export type TCodeTuple = [axis: axis | channelName, pos: pos]
-  | [axis: axis | channelName, pos: pos, 'I', interval: ms]
-  | [axis: axis | channelName, pos: pos, 'S', speed: speed]
+export type TCodeTuple = [axis: axis, pos: pos]
+  | [axis: axis, pos: pos, 'I', interval: ms]
+  | [axis: axis, pos: pos, 'S', speed: speed]
 
 export interface JsonAction {
   at: ms
