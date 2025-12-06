@@ -1,4 +1,6 @@
 import type { JsonAction } from '../../src/types'
+import { writeFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { clamp } from '../../src/utils/misc'
 
 export function createSine(
@@ -17,4 +19,8 @@ export function createZigzag(
     at: i * timeStep,
     pos: ~~clamp(50 + amplitude * (i % 2 === 0 ? 1 : -1), 0, 100),
   }))
+}
+
+export function writeSnapshotFile(svgElement: string, filename: string) {
+  writeFileSync(join(__dirname, '..', '__snapshots__', filename), svgElement)
 }

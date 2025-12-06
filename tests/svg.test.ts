@@ -1,9 +1,9 @@
-import { writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import type { JsonChapter } from '../src'
 import { describe, expect, it } from 'bun:test'
 import { Funscript } from '../src'
 import { toSvgElement } from '../src/rendering/svg'
-import { createSine, createZigzag } from './utils/test-data'
+import { msToTimeSpan } from '../src/utils/converter'
+import { createSine, createZigzag, writeSnapshotFile } from './utils/test-data'
 
 describe('SVG Generation', () => {
   it('should generate SVG element for a funscript', () => {
@@ -14,9 +14,7 @@ describe('SVG Generation', () => {
     const svgElement = toSvgElement(script, {})
     expect(svgElement).toMatchSnapshot()
 
-    // Write SVG file for viewing
-    const svgContent = svgElement.replace(/^"/, '').replace(/"$/, '')
-    writeFileSync(join(__dirname, '__snapshots__', 'single-script.svg'), svgContent)
+    writeSnapshotFile(svgElement, 'single-script.svg')
   })
 
   it('should generate SVG for multiple independent scripts', () => {
@@ -35,9 +33,84 @@ describe('SVG Generation', () => {
     const svgElement = toSvgElement(scripts, {})
     expect(svgElement).toMatchSnapshot()
 
-    // Write SVG file for viewing
-    const svgContent = svgElement.replace(/^"/, '').replace(/"$/, '')
-    writeFileSync(join(__dirname, '__snapshots__', 'multiple-scripts.svg'), svgContent)
+    writeSnapshotFile(svgElement, 'multiple-scripts.svg')
+  })
+
+  it('should render chapter bar when chapters are provided', () => {
+    const script = new Funscript({
+      actions: createZigzag({ timeStep: 400, points: 12 }),
+      metadata: {
+        title: 'Chaptered Script',
+        chapters: [
+          { name: 'Intro', startTime: '00:00:00.000', endTime: '00:00:02.000' },
+          { name: 'Middle', startTime: '00:00:02.000', endTime: '00:00:03.600' },
+          { name: 'Finale', startTime: '00:00:03.600', endTime: '00:00:05.000' },
+        ],
+        duration: 5,
+      },
+    })
+
+    const svgElement = toSvgElement(script, {})
+    expect(svgElement).toMatchSnapshot()
+
+    writeSnapshotFile(svgElement, 'chaptered-script.svg')
+  })
+
+  it('should render chapter bar when a chapter is very short', () => {
+    const chapters: JsonChapter[] = []
+    let t = 0
+    const add = (name: string, len: number): void => {
+      chapters.push({
+        name,
+        startTime: msToTimeSpan(t * 1000),
+        endTime: msToTimeSpan((t + len) * 1000),
+      })
+      t += len
+    }
+    // Base increasing chapters (~1-9%)
+    ;[1, 2, 3, 4, 5, 6, 7, 8, 9].forEach((len, i) => add(`Ch${i + 1}`, len))
+    // 30 small 1% chapters to showcase palette
+    for (let i = 0; i < 30; i++) {
+      add(`Ch${i + 10}`, 1)
+    }
+    add(`Gap`, 1)
+    add(`Ch${chapters.length + 1}`, 100 - t - 1)
+    // Drop gap
+    chapters.splice(-2, 1)
+
+    const script = new Funscript({
+      actions: createZigzag({ timeStep: 2500, points: 41 }),
+      metadata: {
+        title: 'Short Chapter Script',
+        chapters,
+        duration: 100,
+      },
+    })
+
+    const svgElement = toSvgElement(script, {})
+    expect(svgElement).toMatchSnapshot()
+
+    writeSnapshotFile(svgElement, 'chaptered-short.svg')
+  })
+
+  it('should render chapter bar when chapters overlap', () => {
+    const script = new Funscript({
+      actions: createZigzag({ timeStep: 300, points: 10 }),
+      metadata: {
+        title: 'Overlapping Chapters',
+        chapters: [
+          { name: 'Overlap A', startTime: '00:00:00.000', endTime: '00:00:03.000' },
+          { name: 'Overlap B', startTime: '00:00:02.000', endTime: '00:00:05.000' },
+          { name: 'Overlap C', startTime: '00:00:04.000', endTime: '00:00:06.000' },
+        ],
+        duration: 6,
+      },
+    })
+
+    const svgElement = toSvgElement(script, {})
+    expect(svgElement).toMatchSnapshot()
+
+    writeSnapshotFile(svgElement, 'chaptered-overlap.svg')
   })
 
   it('should generate SVG with all options overridden', () => {
@@ -65,9 +138,7 @@ describe('SVG Generation', () => {
     })
     expect(svgElement).toMatchSnapshot()
 
-    // Write SVG file for viewing
-    const svgContent = svgElement.replace(/^"/, '').replace(/"$/, '')
-    writeFileSync(join(__dirname, '__snapshots__', 'custom-options.svg'), svgContent)
+    writeSnapshotFile(svgElement, 'custom-options.svg')
   })
 
   it('should clone merged script and match same snapshot', () => {
