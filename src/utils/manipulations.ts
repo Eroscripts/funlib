@@ -1,4 +1,3 @@
-import type { Funscript } from '..'
 import type { ms, pos, seconds, speed } from '../types'
 import { FunAction } from '..'
 import { secondsToDuration } from './converter'

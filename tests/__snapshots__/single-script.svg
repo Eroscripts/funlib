@@ -10,9 +10,9 @@
           <stop offset="0.95" stop-color="#00eeff" stop-opacity="0"></stop>
       </linearGradient></defs>
     <rect class="funsvg-bg-axis-drop" x="0" y="0" width="46" height="52" fill="#ccc" opacity="0.3"></rect>
-    <rect class="funsvg-bg-title-drop" x="46" width="644" height="20" fill="#ccc" opacity="0.3"></rect>
+    <rect class="funsvg-bg-title-drop" x="46" y="0" width="644" height="20" fill="#ccc" opacity="0.3"></rect>
     <rect class="funsvg-bg-axis" x="0" y="0" width="46" height="52" fill="#acd400" opacity="0.7"></rect>
-    <rect class="funsvg-bg-title" x="46" width="644" height="20" fill="url(#funsvg-grad--10-0)" opacity="0.7"></rect>
+    <rect class="funsvg-bg-title" x="46" y="0" width="644" height="20" fill="url(#funsvg-grad--10-0)" opacity="0.7"></rect>
     <rect class="funsvg-bg-graph" x="46" width="644" y="20" height="32" fill="url(#funsvg-grad--10-0)" opacity="0.2"></rect>
   </g>
   <g class="funsvg-lines" transform="translate(46, 20)" stroke-width="0.5" fill="none" stroke-linecap="round">

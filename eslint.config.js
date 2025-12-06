@@ -14,4 +14,5 @@ export default antfu({
     'prefer-template': 'off',
     'ts/explicit-function-return-type': ['warn', {}],
     'ts/no-redeclare': 'off',
+    'antfu/consistent-chaining': 'off',
   })

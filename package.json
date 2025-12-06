@@ -1,7 +1,7 @@
 {
   "name": "@eroscripts/funlib",
   "type": "module",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "packageManager": "bun@1.2.22",
   "description": "A library for working with .funscript files",
   "author": "Dimava",
@@ -38,6 +38,7 @@
     "@antfu/eslint-config": "latest",
     "@types/bun": "latest",
     "@types/w3c-web-serial": "latest",
+    "dts-bundle-generator": "latest",
     "eslint": "latest",
     "oxlint": "latest",
     "oxlint-tsgolint": "latest"

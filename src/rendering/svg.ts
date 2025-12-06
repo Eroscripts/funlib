@@ -1,9 +1,25 @@
-import type { Funscript } from '..'
+import type { FunChapter, Funscript } from '..'
 import type { ms } from '../types'
+import { oklch2hex } from 'colorizr'
 import { FunAction } from '..'
 import { channelNameToAxis, speedToHexCached } from '../utils/converter'
 import { actionsToLines, actionsToZigzag, mergeLinesSpeed, toStats } from '../utils/manipulations'
 import { lerp } from '../utils/misc'
+
+/**
+ * Chapter colors: 8 OKLCH colors cycling through the color wheel (45° apart).
+ * Starting at red, going through orange, yellow, green, cyan, blue, purple, magenta.
+ */
+const CHAPTER_COLORS = Array.from({ length: 15 }).fill(0)
+  .map((_, i, a) => i * 720 / a.length + 30)
+  .map(h => oklch2hex({ l: 0.8, c: 0.3, h: h % 360 }))
+
+/**
+ * Generate a color for a chapter based on its index.
+ */
+export function chapterIndexToColor(index: number): string {
+  return CHAPTER_COLORS[index % CHAPTER_COLORS.length]
+}
 
 export interface SvgOptions {
   // rendering
@@ -49,6 +65,12 @@ export interface SvgOptions {
   iconSpacing?: number
   /** duration in milliseconds. Set to 0 to use script.actualDuration */
   durationMs?: ms | 0
+  /** display chapter bar at the top of the heatmap */
+  showChapters?: boolean
+  /** height of chapter bar in pixels */
+  chapterHeight?: number
+  /** layer chapters to avoid overlap */
+  chapterLayers?: boolean
 }
 /** y between one axis G and the next */
 const SPACING_BETWEEN_AXES = 0
@@ -80,6 +102,9 @@ export const svgDefaultOptions: Required<SvgOptions> = {
   iconWidth: 46,
   iconSpacing: 0,
   durationMs: 0,
+  showChapters: true,
+  chapterHeight: 10,
+  chapterLayers: true,
 }
 
 export type SvgSubOptions<K extends keyof SvgOptions> = {
@@ -254,6 +279,22 @@ export function toSvgBackground(
 }
 
 /**
+ * Calculates the height needed for the chapter bar based on layers.
+ */
+export function getChapterBarHeight(script: Funscript, ops: SvgSubOptions<'chapterHeight' | 'chapterLayers' | 'showChapters'>): number {
+  const { chapterHeight, chapterLayers, showChapters } = ops
+  const chapters = script.metadata.chapters
+
+  if (!showChapters || !chapters.length) {
+    return 0
+  }
+
+  const layeredChapters = chapterLayers ? layerChapters(chapters) : chapters.map(chapter => ({ layer: 0, chapter }))
+  const maxLayer = Math.max(0, ...layeredChapters.map(c => c.layer))
+  return (maxLayer + 1) * chapterHeight
+}
+
+/**
  * Creates a complete SVG document containing multiple Funscripts arranged vertically.
  * Each script and its axes are rendered as separate visual blocks with proper spacing.
  */
@@ -268,18 +309,22 @@ export function toSvgElement(scripts: Funscript | Funscript[], ops: SvgOptions):
   for (let s of scripts) {
     if (fullOps.normalize) s = s.clone().normalize()
     const durationMs = fullOps.durationMs || s.actualDuration * 1000
+    // Calculate chapter bar height for primary script
+    const chapterBarHeight = getChapterBarHeight(s, fullOps)
     // Only show title for the first script
     pieces.push(toSvgG(s, { ...fullOps, durationMs, title: fullOps.title }, {
       transform: `translate(${SVG_PADDING}, ${y})`,
       onDoubleTitle: () => y += fullOps.titleHeight,
+      chapterBarHeight,
     }))
-    y += fullOps.height + SPACING_BETWEEN_AXES
+    y += fullOps.height + chapterBarHeight + SPACING_BETWEEN_AXES
     for (const a of s.listChannels) {
-      // Axes never show title
+      // Axes never show title or chapters
       pieces.push(toSvgG(a, { ...fullOps, durationMs, title: fullOps.title ?? '' }, {
         transform: `translate(${SVG_PADDING}, ${y})`,
         isSecondaryAxis: true,
         onDoubleTitle: () => y += fullOps.titleHeight,
+        chapterBarHeight: 0,
       }))
       y += fullOps.height + SPACING_BETWEEN_AXES
     }
@@ -308,6 +353,7 @@ export function toSvgG(
     onDoubleTitle: () => void
     isSecondaryAxis?: boolean
     isForHandy?: boolean
+    chapterBarHeight: number
   },
 ): string {
   const {
@@ -328,7 +374,7 @@ export function toSvgG(
     durationMs,
     iconWidth,
   } = ops
-  const { isSecondaryAxis, isForHandy } = ctx
+  const { isSecondaryAxis, isForHandy, chapterBarHeight } = ctx
   const iconSpacing = iconWidth === 0 ? 0 : ops.iconSpacing
 
   let titleText: string = ''
@@ -404,16 +450,19 @@ export function toSvgG(
   }
 
   // Define y positions for key SVG elements
+  // Chapter bar is at the top, then title, then graph
   const yy = {
-    top: 0, // Top of SVG
+    chapterTop: 0, // Top of chapter bar
+    get chapterBottom() { return chapterBarHeight }, // Bottom of chapter bar
+    get top() { return this.chapterBottom }, // Top of title/main content (after chapter bar)
     get titleExtra() { return useSeparateLine ? titleHeight : 0 },
-    get titleBottom() { return round(titleHeight + this.titleExtra) }, // Bottom of title area
+    get titleBottom() { return round(this.top + titleHeight + this.titleExtra) }, // Bottom of title area
     get graphTop() { return round(this.titleBottom + titleSpacing) }, // Top of graph area
-    get svgBottom() { return round(height + this.titleExtra) }, // Bottom of SVG (total block height)
+    get svgBottom() { return round(this.top + height + this.titleExtra) }, // Bottom of SVG (total block height)
     get iconText() { return round((this.top + this.svgBottom) / 2 + 4 + this.titleExtra / 2) }, // Y position for axis text (centered)
-    titleText: round(titleHeight * 0.75), // Y position for title text (proportional to titleHeight)
-    get statLabelText() { return round(titleHeight * 0.35 + this.titleExtra) }, // Y position for stat labels (proportional)
-    get statValueText() { return round(titleHeight * 0.92 + this.titleExtra) }, // Y position for stat values (proportional)
+    get titleText() { return round(this.top + titleHeight * 0.75) }, // Y position for title text (proportional to titleHeight)
+    get statLabelText() { return round(this.top + titleHeight * 0.35 + this.titleExtra) }, // Y position for stat labels (proportional)
+    get statValueText() { return round(this.top + titleHeight * 0.92 + this.titleExtra) }, // Y position for stat values (proportional)
   }
   const bgGradientId = `funsvg-grad-${script.channel ?? ''}-${script.actions.length}-${script.actions[0]?.at || 0}`
 
@@ -425,9 +474,9 @@ export function toSvgG(
     '  <g class="funsvg-bgs">',
     `    <defs>${toSvgBackgroundGradient(script, { durationMs }, bgGradientId)}</defs>`,
     iconWidth > 0 && `    <rect class="funsvg-bg-axis-drop" x="0" y="${yy.top}" width="${xx.iconEnd}" height="${yy.svgBottom - yy.top}" fill="#ccc" opacity="${round(graphOpacity * 1.5)}"></rect>`,
-    `    <rect class="funsvg-bg-title-drop" x="${xx.titleStart}" width="${xx.graphWidth}" height="${yy.titleBottom}" fill="#ccc" opacity="${round(graphOpacity * 1.5)}"></rect>`,
+    `    <rect class="funsvg-bg-title-drop" x="${xx.titleStart}" y="${yy.top}" width="${xx.graphWidth}" height="${yy.titleBottom - yy.top}" fill="#ccc" opacity="${round(graphOpacity * 1.5)}"></rect>`,
     iconWidth > 0 && `    <rect class="funsvg-bg-axis" x="0" y="${yy.top}" width="${xx.iconEnd}" height="${yy.svgBottom - yy.top}" fill="${iconColor}" opacity="${iconOpacity}"></rect>`,
-    `    <rect class="funsvg-bg-title" x="${xx.titleStart}" width="${xx.graphWidth}" height="${yy.titleBottom}" fill="${solidTitleBackground ? iconColor : `url(#${bgGradientId})`}" opacity="${round(solidTitleBackground ? iconOpacity : titleOpacity)}"></rect>`,
+    `    <rect class="funsvg-bg-title" x="${xx.titleStart}" y="${yy.top}" width="${xx.graphWidth}" height="${yy.titleBottom - yy.top}" fill="${solidTitleBackground ? iconColor : `url(#${bgGradientId})`}" opacity="${round(solidTitleBackground ? iconOpacity : titleOpacity)}"></rect>`,
     `    <rect class="funsvg-bg-graph" x="${xx.titleStart}" width="${xx.graphWidth}" y="${yy.graphTop}" height="${graphHeight}" fill="url(#${bgGradientId})" opacity="${round(graphOpacity)}"></rect>`,
     '  </g>',
 
@@ -452,6 +501,9 @@ export function toSvgG(
       `    <text class="funsvg-stat-value" x="${xx.statText(i)}" y="${yy.statValueText}" font-weight="bold" font-size="${statValueFontSize}px" text-anchor="end"> ${v} </text>`,
     ]),
     '  </g>',
+
+    renderChapters(script, ops, { chapterBarHeight }),
+
     '</g>',
   ]
     .flat(4)
@@ -467,4 +519,101 @@ export function toSvgBlobUrl(script: Funscript | Funscript[], ops: SvgOptions) {
   const svg = toSvgElement(script, ops)
   const blob = new Blob([svg], { type: 'image/svg+xml' })
   return URL.createObjectURL(blob)
+}
+
+export function layerChapters(chapters: FunChapter[]): { layer: number, chapter: FunChapter }[] {
+  const lastLayerChapters: FunChapter[] = []
+  return chapters.map((chapter) => {
+    let layer = 0
+    // Find the first layer where this chapter doesn't overlap with existing chapter
+    while (lastLayerChapters[layer] && lastLayerChapters[layer].endAt > chapter.startAt) {
+      layer++
+    }
+    lastLayerChapters[layer] = chapter
+    return {
+      layer,
+      chapter,
+    }
+  })
+}
+
+export function renderChapters(
+  script: Funscript,
+  ops: SvgSubOptions<'chapterHeight' | 'chapterLayers' | 'durationMs' | 'width' | 'iconWidth' | 'iconSpacing' | 'titleHeight' | 'showChapters'>,
+  ctx: {
+    chapterBarHeight: number
+  },
+): string[] {
+  const { chapterHeight, chapterLayers, durationMs, width, iconWidth, titleHeight, showChapters } = ops
+  const iconSpacing = iconWidth === 0 ? 0 : ops.iconSpacing
+  const chapters = script.metadata.chapters
+
+  if (!showChapters || !chapters.length) {
+    return []
+  }
+
+  const round = (x: number) => +x.toFixed(2)
+  const layeredChapters = chapterLayers ? layerChapters(chapters) : chapters.map(chapter => ({ layer: 0, chapter }))
+  const maxLayer = Math.max(0, ...layeredChapters.map(c => c.layer))
+
+  // X positioning (same as graph area)
+  const graphStart = iconWidth + iconSpacing
+  const graphWidth = width - graphStart
+
+  // Chapter bar radius for rounded tops
+  const cornerRadius = Math.min(4, chapterHeight / 2)
+
+  // Font size for chapter text (similar to stat label size)
+  const chapterFontSize = round(titleHeight * 0.4)
+
+  const clipId = `chapter-clip-${graphStart}-${graphWidth}-${ctx.chapterBarHeight}`
+
+  const result: string[] = [
+    `  <g class="funsvg-chapters" clip-path="url(#${clipId})">`,
+    // ClipPath to cut off bottom of rounded rects (keeping only rounded top)
+    `    <defs>`,
+    `      <clipPath id="${clipId}">`,
+    `        <rect x="${graphStart}" y="0" width="${graphWidth}" height="${ctx.chapterBarHeight}" />`,
+    `      </clipPath>`,
+    `    </defs>`,
+  ]
+
+  // Render layers from highest to lowest (so layer 0 is rendered last = on top)
+  for (let layer = maxLayer; layer >= 0; layer--) {
+    const chaptersInLayer = layeredChapters.filter(c => c.layer === layer)
+
+    for (const { chapter } of chaptersInLayer) {
+      const chapterIndex = chapters.indexOf(chapter)
+      const color = chapterIndexToColor(chapterIndex)
+
+      // X position based on chapter start time
+      const x = round(graphStart + (chapter.startAt / durationMs) * graphWidth)
+      const chapterWidth = round(((chapter.endAt - chapter.startAt) / durationMs) * graphWidth)
+
+      // Y position: layer 0 at bottom of chapter bar, higher layers go up
+      const y = round(ctx.chapterBarHeight - (layer + 1) * chapterHeight)
+
+      // Draw rounded rect (extends below clip area to reach bottom, clip will cut bottom corners)
+      // Height extends from y to chapterBarHeight + cornerRadius so bottom gets clipped cleanly
+      const rectHeight = round(ctx.chapterBarHeight - y + cornerRadius)
+      result.push(
+        `    <rect x="${x}" y="${y}" width="${chapterWidth}" height="${rectHeight}" rx="${cornerRadius}" ry="${cornerRadius}" fill="${color}" opacity="0.8">`,
+        `      <title>${textToSvgText(chapter.name)}</title>`,
+        `    </rect>`,
+      )
+
+      // Add text label if chapter is wide enough (black text, same style as stat numbers)
+      const minWidthForText = chapterFontSize * 2
+      if (chapterWidth >= minWidthForText) {
+        const textX = round(x + chapterWidth / 2)
+        const textY = round(y + chapterHeight / 2 + chapterFontSize * 0.35)
+        result.push(
+          `    <text x="${textX}" y="${textY}" font-size="${chapterFontSize}px" font-weight="bold" text-anchor="middle" fill="black"> ${textToSvgText(chapter.name)} </text>`,
+        )
+      }
+    }
+  }
+
+  result.push('  </g>')
+  return result
 }

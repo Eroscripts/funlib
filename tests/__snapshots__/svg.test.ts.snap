@@ -13,9 +13,9 @@ exports[`SVG Generation should generate SVG element for a funscript 1`] = `
           <stop offset="0.95" stop-color="#00eeff" stop-opacity="0"></stop>
       </linearGradient></defs>
     <rect class="funsvg-bg-axis-drop" x="0" y="0" width="46" height="52" fill="#ccc" opacity="0.3"></rect>
-    <rect class="funsvg-bg-title-drop" x="46" width="644" height="20" fill="#ccc" opacity="0.3"></rect>
+    <rect class="funsvg-bg-title-drop" x="46" y="0" width="644" height="20" fill="#ccc" opacity="0.3"></rect>
     <rect class="funsvg-bg-axis" x="0" y="0" width="46" height="52" fill="#acd400" opacity="0.7"></rect>
-    <rect class="funsvg-bg-title" x="46" width="644" height="20" fill="url(#funsvg-grad--10-0)" opacity="0.7"></rect>
+    <rect class="funsvg-bg-title" x="46" y="0" width="644" height="20" fill="url(#funsvg-grad--10-0)" opacity="0.7"></rect>
     <rect class="funsvg-bg-graph" x="46" width="644" y="20" height="32" fill="url(#funsvg-grad--10-0)" opacity="0.2"></rect>
   </g>
   <g class="funsvg-lines" transform="translate(46, 20)" stroke-width="0.5" fill="none" stroke-linecap="round">
@@ -68,9 +68,9 @@ exports[`SVG Generation should generate SVG for multiple independent scripts 1`]
           <stop offset="1" stop-color="#e8bd00"></stop>
       </linearGradient></defs>
     <rect class="funsvg-bg-axis-drop" x="0" y="0" width="46" height="52" fill="#ccc" opacity="0.3"></rect>
-    <rect class="funsvg-bg-title-drop" x="46" width="644" height="20" fill="#ccc" opacity="0.3"></rect>
+    <rect class="funsvg-bg-title-drop" x="46" y="0" width="644" height="20" fill="#ccc" opacity="0.3"></rect>
     <rect class="funsvg-bg-axis" x="0" y="0" width="46" height="52" fill="#40e700" opacity="0.7"></rect>
-    <rect class="funsvg-bg-title" x="46" width="644" height="20" fill="url(#funsvg-grad--6-0)" opacity="0.7"></rect>
+    <rect class="funsvg-bg-title" x="46" y="0" width="644" height="20" fill="url(#funsvg-grad--6-0)" opacity="0.7"></rect>
     <rect class="funsvg-bg-graph" x="46" width="644" y="20" height="32" fill="url(#funsvg-grad--6-0)" opacity="0.2"></rect>
   </g>
   <g class="funsvg-lines" transform="translate(46, 20)" stroke-width="0.5" fill="none" stroke-linecap="round">
@@ -113,9 +113,9 @@ exports[`SVG Generation should generate SVG for multiple independent scripts 1`]
           <stop offset="0.66" stop-color="#00eeff" stop-opacity="0"></stop>
       </linearGradient></defs>
     <rect class="funsvg-bg-axis-drop" x="0" y="0" width="46" height="52" fill="#ccc" opacity="0.3"></rect>
-    <rect class="funsvg-bg-title-drop" x="46" width="644" height="20" fill="#ccc" opacity="0.3"></rect>
+    <rect class="funsvg-bg-title-drop" x="46" y="0" width="644" height="20" fill="#ccc" opacity="0.3"></rect>
     <rect class="funsvg-bg-axis" x="0" y="0" width="46" height="52" fill="#004cc5" opacity="0.7"></rect>
-    <rect class="funsvg-bg-title" x="46" width="644" height="20" fill="url(#funsvg-grad--15-0)" opacity="0.7"></rect>
+    <rect class="funsvg-bg-title" x="46" y="0" width="644" height="20" fill="url(#funsvg-grad--15-0)" opacity="0.7"></rect>
     <rect class="funsvg-bg-graph" x="46" width="644" y="20" height="32" fill="url(#funsvg-grad--15-0)" opacity="0.2"></rect>
   </g>
   <g class="funsvg-lines" transform="translate(46, 20)" stroke-width="0.5" fill="none" stroke-linecap="round">
@@ -161,6 +161,379 @@ exports[`SVG Generation should generate SVG for multiple independent scripts 1`]
 </svg>"
 `;
 
+exports[`SVG Generation should render chapter bar when chapters are provided 1`] = `
+"<svg class="funsvg" width="690" height="62" xmlns="http://www.w3.org/2000/svg"
+    font-size="16px" font-family="Arial, sans-serif"
+>
+<g transform="translate(0, 0)">
+  <g class="funsvg-bgs">
+    <defs>
+      <linearGradient id="funsvg-grad--12-0">
+        <stop offset="0" stop-color="#00fe3a"></stop>
+          <stop offset="0.88" stop-color="#00fe3a"></stop>
+          <stop offset="0.9" stop-color="#00eeff" stop-opacity="0"></stop>
+      </linearGradient></defs>
+    <rect class="funsvg-bg-axis-drop" x="0" y="10" width="46" height="52" fill="#ccc" opacity="0.3"></rect>
+    <rect class="funsvg-bg-title-drop" x="46" y="10" width="644" height="20" fill="#ccc" opacity="0.3"></rect>
+    <rect class="funsvg-bg-axis" x="0" y="10" width="46" height="52" fill="#00ff67" opacity="0.7"></rect>
+    <rect class="funsvg-bg-title" x="46" y="10" width="644" height="20" fill="url(#funsvg-grad--12-0)" opacity="0.7"></rect>
+    <rect class="funsvg-bg-graph" x="46" width="644" y="30" height="32" fill="url(#funsvg-grad--12-0)" opacity="0.2"></rect>
+  </g>
+  <g class="funsvg-lines" transform="translate(46, 30)" stroke-width="0.5" fill="none" stroke-linecap="round">
+    <path d="M 0.5 8.25 L 51.94 23.75" stroke="#00fe3a"></path>
+    <path d="M 51.94 23.75 L 103.38 8.25" stroke="#00fe3a"></path>
+    <path d="M 103.38 8.25 L 154.82 23.75" stroke="#00fe3a"></path>
+    <path d="M 154.82 23.75 L 206.26 8.25" stroke="#00fe3a"></path>
+    <path d="M 206.26 8.25 L 257.7 23.75" stroke="#00fe3a"></path>
+    <path d="M 257.7 23.75 L 309.14 8.25" stroke="#00fe3a"></path>
+    <path d="M 309.14 8.25 L 360.58 23.75" stroke="#00fe3a"></path>
+    <path d="M 360.58 23.75 L 412.02 8.25" stroke="#00fe3a"></path>
+    <path d="M 412.02 8.25 L 463.46 23.75" stroke="#00fe3a"></path>
+    <path d="M 463.46 23.75 L 514.9 8.25" stroke="#00fe3a"></path>
+    <path d="M 514.9 8.25 L 566.34 23.75" stroke="#00fe3a"></path>
+  </g>
+  <g class="funsvg-titles">
+    <g class="funsvg-titles-halo" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent">
+      <text class="funsvg-title-halo" x="50" y="25">  </text>
+      <text class="funsvg-stat-label-halo" x="683" y="17" font-weight="bold" font-size="8px" text-anchor="end"> AvgSpeed </text>
+      <text class="funsvg-stat-value-halo" x="683" y="28.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 113 </text>
+      <text class="funsvg-stat-label-halo" x="637" y="17" font-weight="bold" font-size="8px" text-anchor="end"> MaxSpeed </text>
+      <text class="funsvg-stat-value-halo" x="637" y="28.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 125 </text>
+      <text class="funsvg-stat-label-halo" x="591" y="17" font-weight="bold" font-size="8px" text-anchor="end"> Actions </text>
+      <text class="funsvg-stat-value-halo" x="591" y="28.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 12 </text>
+      <text class="funsvg-stat-label-halo" x="545" y="17" font-weight="bold" font-size="8px" text-anchor="end"> Duration </text>
+      <text class="funsvg-stat-value-halo" x="545" y="28.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 0:05 </text>
+    </g>
+    <text class="funsvg-axis" x="23" y="40" font-size="34.5px" font-family="Consolas, monospace" text-anchor="middle" dominant-baseline="middle"> L0 </text>
+    <text class="funsvg-title" x="50" y="25">  </text>
+    <text class="funsvg-stat-label" x="683" y="17" font-weight="bold" font-size="8px" text-anchor="end"> AvgSpeed </text>
+    <text class="funsvg-stat-value" x="683" y="28.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 113 </text>
+    <text class="funsvg-stat-label" x="637" y="17" font-weight="bold" font-size="8px" text-anchor="end"> MaxSpeed </text>
+    <text class="funsvg-stat-value" x="637" y="28.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 125 </text>
+    <text class="funsvg-stat-label" x="591" y="17" font-weight="bold" font-size="8px" text-anchor="end"> Actions </text>
+    <text class="funsvg-stat-value" x="591" y="28.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 12 </text>
+    <text class="funsvg-stat-label" x="545" y="17" font-weight="bold" font-size="8px" text-anchor="end"> Duration </text>
+    <text class="funsvg-stat-value" x="545" y="28.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 0:05 </text>
+  </g>
+  <g class="funsvg-chapters" clip-path="url(#chapter-clip-46-644-10)">
+    <defs>
+      <clipPath id="chapter-clip-46-644-10">
+        <rect x="46" y="0" width="644" height="10" />
+      </clipPath>
+    </defs>
+    <rect x="46" y="0" width="257.6" height="14" rx="4" ry="4" fill="#ff4129" opacity="0.8">
+      <title>Intro</title>
+    </rect>
+    <text x="174.8" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Intro </text>
+    <rect x="303.6" y="0" width="206.08" height="14" rx="4" ry="4" fill="#ff9500" opacity="0.8">
+      <title>Middle</title>
+    </rect>
+    <text x="406.64" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Middle </text>
+    <rect x="509.68" y="0" width="180.32" height="14" rx="4" ry="4" fill="#8eda00" opacity="0.8">
+      <title>Finale</title>
+    </rect>
+    <text x="599.84" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Finale </text>
+  </g>
+</g>
+</svg>"
+`;
+
+exports[`SVG Generation should render chapter bar when a chapter is very short 1`] = `
+"<svg class="funsvg" width="690" height="62" xmlns="http://www.w3.org/2000/svg"
+    font-size="16px" font-family="Arial, sans-serif"
+>
+<g transform="translate(0, 0)">
+  <g class="funsvg-bgs">
+    <defs>
+      <linearGradient id="funsvg-grad--41-0">
+        <stop offset="0" stop-color="#00f6ff" stop-opacity="0.2"></stop>
+          <stop offset="1" stop-color="#00f6ff" stop-opacity="0.2"></stop>
+      </linearGradient></defs>
+    <rect class="funsvg-bg-axis-drop" x="0" y="10" width="46" height="52" fill="#ccc" opacity="0.3"></rect>
+    <rect class="funsvg-bg-title-drop" x="46" y="10" width="644" height="20" fill="#ccc" opacity="0.3"></rect>
+    <rect class="funsvg-bg-axis" x="0" y="10" width="46" height="52" fill="#00eeff" opacity="0.35"></rect>
+    <rect class="funsvg-bg-title" x="46" y="10" width="644" height="20" fill="url(#funsvg-grad--41-0)" opacity="0.7"></rect>
+    <rect class="funsvg-bg-graph" x="46" width="644" y="30" height="32" fill="url(#funsvg-grad--41-0)" opacity="0.2"></rect>
+  </g>
+  <g class="funsvg-lines" transform="translate(46, 30)" stroke-width="0.5" fill="none" stroke-linecap="round">
+    <path d="M 0.5 8.25 L 16.57 23.75" stroke="#00f6ff"></path>
+    <path d="M 16.57 23.75 L 32.65 8.25" stroke="#00f6ff"></path>
+    <path d="M 32.65 8.25 L 48.73 23.75" stroke="#00f6ff"></path>
+    <path d="M 48.73 23.75 L 64.8 8.25" stroke="#00f6ff"></path>
+    <path d="M 64.8 8.25 L 80.88 23.75" stroke="#00f6ff"></path>
+    <path d="M 80.88 23.75 L 96.95 8.25" stroke="#00f6ff"></path>
+    <path d="M 96.95 8.25 L 113.02 23.75" stroke="#00f6ff"></path>
+    <path d="M 113.02 23.75 L 129.1 8.25" stroke="#00f6ff"></path>
+    <path d="M 129.1 8.25 L 145.18 23.75" stroke="#00f6ff"></path>
+    <path d="M 145.18 23.75 L 161.25 8.25" stroke="#00f6ff"></path>
+    <path d="M 161.25 8.25 L 177.33 23.75" stroke="#00f6ff"></path>
+    <path d="M 177.33 23.75 L 193.4 8.25" stroke="#00f6ff"></path>
+    <path d="M 193.4 8.25 L 209.47 23.75" stroke="#00f6ff"></path>
+    <path d="M 209.47 23.75 L 225.55 8.25" stroke="#00f6ff"></path>
+    <path d="M 225.55 8.25 L 241.63 23.75" stroke="#00f6ff"></path>
+    <path d="M 241.63 23.75 L 257.7 8.25" stroke="#00f6ff"></path>
+    <path d="M 257.7 8.25 L 273.77 23.75" stroke="#00f6ff"></path>
+    <path d="M 273.77 23.75 L 289.85 8.25" stroke="#00f6ff"></path>
+    <path d="M 289.85 8.25 L 305.93 23.75" stroke="#00f6ff"></path>
+    <path d="M 305.93 23.75 L 322 8.25" stroke="#00f6ff"></path>
+    <path d="M 322 8.25 L 338.07 23.75" stroke="#00f6ff"></path>
+    <path d="M 338.07 23.75 L 354.15 8.25" stroke="#00f6ff"></path>
+    <path d="M 354.15 8.25 L 370.22 23.75" stroke="#00f6ff"></path>
+    <path d="M 370.22 23.75 L 386.3 8.25" stroke="#00f6ff"></path>
+    <path d="M 386.3 8.25 L 402.38 23.75" stroke="#00f6ff"></path>
+    <path d="M 402.38 23.75 L 418.45 8.25" stroke="#00f6ff"></path>
+    <path d="M 418.45 8.25 L 434.53 23.75" stroke="#00f6ff"></path>
+    <path d="M 434.53 23.75 L 450.6 8.25" stroke="#00f6ff"></path>
+    <path d="M 450.6 8.25 L 466.68 23.75" stroke="#00f6ff"></path>
+    <path d="M 466.68 23.75 L 482.75 8.25" stroke="#00f6ff"></path>
+    <path d="M 482.75 8.25 L 498.82 23.75" stroke="#00f6ff"></path>
+    <path d="M 498.82 23.75 L 514.9 8.25" stroke="#00f6ff"></path>
+    <path d="M 514.9 8.25 L 530.98 23.75" stroke="#00f6ff"></path>
+    <path d="M 530.98 23.75 L 547.05 8.25" stroke="#00f6ff"></path>
+    <path d="M 547.05 8.25 L 563.13 23.75" stroke="#00f6ff"></path>
+    <path d="M 563.13 23.75 L 579.2 8.25" stroke="#00f6ff"></path>
+    <path d="M 579.2 8.25 L 595.27 23.75" stroke="#00f6ff"></path>
+    <path d="M 595.27 23.75 L 611.35 8.25" stroke="#00f6ff"></path>
+    <path d="M 611.35 8.25 L 627.42 23.75" stroke="#00f6ff"></path>
+    <path d="M 627.42 23.75 L 643.5 8.25" stroke="#00f6ff"></path>
+  </g>
+  <g class="funsvg-titles">
+    <g class="funsvg-titles-halo" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent">
+      <text class="funsvg-title-halo" x="50" y="25">  </text>
+      <text class="funsvg-stat-label-halo" x="683" y="17" font-weight="bold" font-size="8px" text-anchor="end"> AvgSpeed </text>
+      <text class="funsvg-stat-value-halo" x="683" y="28.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 0 </text>
+      <text class="funsvg-stat-label-halo" x="637" y="17" font-weight="bold" font-size="8px" text-anchor="end"> MaxSpeed </text>
+      <text class="funsvg-stat-value-halo" x="637" y="28.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 20 </text>
+      <text class="funsvg-stat-label-halo" x="591" y="17" font-weight="bold" font-size="8px" text-anchor="end"> Actions </text>
+      <text class="funsvg-stat-value-halo" x="591" y="28.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 41 </text>
+      <text class="funsvg-stat-label-halo" x="545" y="17" font-weight="bold" font-size="8px" text-anchor="end"> Duration </text>
+      <text class="funsvg-stat-value-halo" x="545" y="28.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 1:40 </text>
+    </g>
+    <text class="funsvg-axis" x="23" y="40" font-size="34.5px" font-family="Consolas, monospace" text-anchor="middle" dominant-baseline="middle"> L0 </text>
+    <text class="funsvg-title" x="50" y="25">  </text>
+    <text class="funsvg-stat-label" x="683" y="17" font-weight="bold" font-size="8px" text-anchor="end"> AvgSpeed </text>
+    <text class="funsvg-stat-value" x="683" y="28.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 0 </text>
+    <text class="funsvg-stat-label" x="637" y="17" font-weight="bold" font-size="8px" text-anchor="end"> MaxSpeed </text>
+    <text class="funsvg-stat-value" x="637" y="28.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 20 </text>
+    <text class="funsvg-stat-label" x="591" y="17" font-weight="bold" font-size="8px" text-anchor="end"> Actions </text>
+    <text class="funsvg-stat-value" x="591" y="28.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 41 </text>
+    <text class="funsvg-stat-label" x="545" y="17" font-weight="bold" font-size="8px" text-anchor="end"> Duration </text>
+    <text class="funsvg-stat-value" x="545" y="28.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 1:40 </text>
+  </g>
+  <g class="funsvg-chapters" clip-path="url(#chapter-clip-46-644-10)">
+    <defs>
+      <clipPath id="chapter-clip-46-644-10">
+        <rect x="46" y="0" width="644" height="10" />
+      </clipPath>
+    </defs>
+    <rect x="46" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff4129" opacity="0.8">
+      <title>Ch1</title>
+    </rect>
+    <rect x="52.44" y="0" width="12.88" height="14" rx="4" ry="4" fill="#ff9500" opacity="0.8">
+      <title>Ch2</title>
+    </rect>
+    <rect x="65.32" y="0" width="19.32" height="14" rx="4" ry="4" fill="#8eda00" opacity="0.8">
+      <title>Ch3</title>
+    </rect>
+    <text x="74.98" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Ch3 </text>
+    <rect x="84.64" y="0" width="25.76" height="14" rx="4" ry="4" fill="#00f5af" opacity="0.8">
+      <title>Ch4</title>
+    </rect>
+    <text x="97.52" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Ch4 </text>
+    <rect x="110.4" y="0" width="32.2" height="14" rx="4" ry="4" fill="#00dcff" opacity="0.8">
+      <title>Ch5</title>
+    </rect>
+    <text x="126.5" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Ch5 </text>
+    <rect x="142.6" y="0" width="38.64" height="14" rx="4" ry="4" fill="#78a1ff" opacity="0.8">
+      <title>Ch6</title>
+    </rect>
+    <text x="161.92" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Ch6 </text>
+    <rect x="181.24" y="0" width="45.08" height="14" rx="4" ry="4" fill="#ff67ff" opacity="0.8">
+      <title>Ch7</title>
+    </rect>
+    <text x="203.78" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Ch7 </text>
+    <rect x="226.32" y="0" width="51.52" height="14" rx="4" ry="4" fill="#ff36a0" opacity="0.8">
+      <title>Ch8</title>
+    </rect>
+    <text x="252.08" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Ch8 </text>
+    <rect x="277.84" y="0" width="57.96" height="14" rx="4" ry="4" fill="#ff6900" opacity="0.8">
+      <title>Ch9</title>
+    </rect>
+    <text x="306.82" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Ch9 </text>
+    <rect x="335.8" y="0" width="6.44" height="14" rx="4" ry="4" fill="#e8bc00" opacity="0.8">
+      <title>Ch10</title>
+    </rect>
+    <rect x="342.24" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00ed38" opacity="0.8">
+      <title>Ch11</title>
+    </rect>
+    <rect x="348.68" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00efff" opacity="0.8">
+      <title>Ch12</title>
+    </rect>
+    <rect x="355.12" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00c1ff" opacity="0.8">
+      <title>Ch13</title>
+    </rect>
+    <rect x="361.56" y="0" width="6.44" height="14" rx="4" ry="4" fill="#cf83ff" opacity="0.8">
+      <title>Ch14</title>
+    </rect>
+    <rect x="368" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff4bf2" opacity="0.8">
+      <title>Ch15</title>
+    </rect>
+    <rect x="374.44" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff4129" opacity="0.8">
+      <title>Ch16</title>
+    </rect>
+    <rect x="380.88" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff9500" opacity="0.8">
+      <title>Ch17</title>
+    </rect>
+    <rect x="387.32" y="0" width="6.44" height="14" rx="4" ry="4" fill="#8eda00" opacity="0.8">
+      <title>Ch18</title>
+    </rect>
+    <rect x="393.76" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00f5af" opacity="0.8">
+      <title>Ch19</title>
+    </rect>
+    <rect x="400.2" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00dcff" opacity="0.8">
+      <title>Ch20</title>
+    </rect>
+    <rect x="406.64" y="0" width="6.44" height="14" rx="4" ry="4" fill="#78a1ff" opacity="0.8">
+      <title>Ch21</title>
+    </rect>
+    <rect x="413.08" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff67ff" opacity="0.8">
+      <title>Ch22</title>
+    </rect>
+    <rect x="419.52" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff36a0" opacity="0.8">
+      <title>Ch23</title>
+    </rect>
+    <rect x="425.96" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff6900" opacity="0.8">
+      <title>Ch24</title>
+    </rect>
+    <rect x="432.4" y="0" width="6.44" height="14" rx="4" ry="4" fill="#e8bc00" opacity="0.8">
+      <title>Ch25</title>
+    </rect>
+    <rect x="438.84" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00ed38" opacity="0.8">
+      <title>Ch26</title>
+    </rect>
+    <rect x="445.28" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00efff" opacity="0.8">
+      <title>Ch27</title>
+    </rect>
+    <rect x="451.72" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00c1ff" opacity="0.8">
+      <title>Ch28</title>
+    </rect>
+    <rect x="458.16" y="0" width="6.44" height="14" rx="4" ry="4" fill="#cf83ff" opacity="0.8">
+      <title>Ch29</title>
+    </rect>
+    <rect x="464.6" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff4bf2" opacity="0.8">
+      <title>Ch30</title>
+    </rect>
+    <rect x="471.04" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff4129" opacity="0.8">
+      <title>Ch31</title>
+    </rect>
+    <rect x="477.48" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff9500" opacity="0.8">
+      <title>Ch32</title>
+    </rect>
+    <rect x="483.92" y="0" width="6.44" height="14" rx="4" ry="4" fill="#8eda00" opacity="0.8">
+      <title>Ch33</title>
+    </rect>
+    <rect x="490.36" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00f5af" opacity="0.8">
+      <title>Ch34</title>
+    </rect>
+    <rect x="496.8" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00dcff" opacity="0.8">
+      <title>Ch35</title>
+    </rect>
+    <rect x="503.24" y="0" width="6.44" height="14" rx="4" ry="4" fill="#78a1ff" opacity="0.8">
+      <title>Ch36</title>
+    </rect>
+    <rect x="509.68" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff67ff" opacity="0.8">
+      <title>Ch37</title>
+    </rect>
+    <rect x="516.12" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff36a0" opacity="0.8">
+      <title>Ch38</title>
+    </rect>
+    <rect x="522.56" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff6900" opacity="0.8">
+      <title>Ch39</title>
+    </rect>
+    <rect x="535.44" y="0" width="148.12" height="14" rx="4" ry="4" fill="#e8bc00" opacity="0.8">
+      <title>Ch41</title>
+    </rect>
+    <text x="609.5" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Ch41 </text>
+  </g>
+</g>
+</svg>"
+`;
+
+exports[`SVG Generation should render chapter bar when chapters overlap 1`] = `
+"<svg class="funsvg" width="690" height="72" xmlns="http://www.w3.org/2000/svg"
+    font-size="16px" font-family="Arial, sans-serif"
+>
+<g transform="translate(0, 0)">
+  <g class="funsvg-bgs">
+    <defs>
+      <linearGradient id="funsvg-grad--10-0">
+        <stop offset="0" stop-color="#00f100"></stop>
+          <stop offset="0.45" stop-color="#00f100"></stop>
+          <stop offset="0.47" stop-color="#00eeff" stop-opacity="0"></stop>
+      </linearGradient></defs>
+    <rect class="funsvg-bg-axis-drop" x="0" y="20" width="46" height="52" fill="#ccc" opacity="0.3"></rect>
+    <rect class="funsvg-bg-title-drop" x="46" y="20" width="644" height="20" fill="#ccc" opacity="0.3"></rect>
+    <rect class="funsvg-bg-axis" x="0" y="20" width="46" height="52" fill="#00f900" opacity="0.7"></rect>
+    <rect class="funsvg-bg-title" x="46" y="20" width="644" height="20" fill="url(#funsvg-grad--10-0)" opacity="0.7"></rect>
+    <rect class="funsvg-bg-graph" x="46" width="644" y="40" height="32" fill="url(#funsvg-grad--10-0)" opacity="0.2"></rect>
+  </g>
+  <g class="funsvg-lines" transform="translate(46, 40)" stroke-width="0.5" fill="none" stroke-linecap="round">
+    <path d="M 0.5 8.25 L 32.65 23.75" stroke="#00f100"></path>
+    <path d="M 32.65 23.75 L 64.8 8.25" stroke="#00f100"></path>
+    <path d="M 64.8 8.25 L 96.95 23.75" stroke="#00f100"></path>
+    <path d="M 96.95 23.75 L 129.1 8.25" stroke="#00f100"></path>
+    <path d="M 129.1 8.25 L 161.25 23.75" stroke="#00f100"></path>
+    <path d="M 161.25 23.75 L 193.4 8.25" stroke="#00f100"></path>
+    <path d="M 193.4 8.25 L 225.55 23.75" stroke="#00f100"></path>
+    <path d="M 225.55 23.75 L 257.7 8.25" stroke="#00f100"></path>
+    <path d="M 257.7 8.25 L 289.85 23.75" stroke="#00f100"></path>
+  </g>
+  <g class="funsvg-titles">
+    <g class="funsvg-titles-halo" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent">
+      <text class="funsvg-title-halo" x="50" y="35">  </text>
+      <text class="funsvg-stat-label-halo" x="683" y="27" font-weight="bold" font-size="8px" text-anchor="end"> AvgSpeed </text>
+      <text class="funsvg-stat-value-halo" x="683" y="38.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 146 </text>
+      <text class="funsvg-stat-label-halo" x="637" y="27" font-weight="bold" font-size="8px" text-anchor="end"> MaxSpeed </text>
+      <text class="funsvg-stat-value-halo" x="637" y="38.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 167 </text>
+      <text class="funsvg-stat-label-halo" x="591" y="27" font-weight="bold" font-size="8px" text-anchor="end"> Actions </text>
+      <text class="funsvg-stat-value-halo" x="591" y="38.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 10 </text>
+      <text class="funsvg-stat-label-halo" x="545" y="27" font-weight="bold" font-size="8px" text-anchor="end"> Duration </text>
+      <text class="funsvg-stat-value-halo" x="545" y="38.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 0:06 </text>
+    </g>
+    <text class="funsvg-axis" x="23" y="50" font-size="34.5px" font-family="Consolas, monospace" text-anchor="middle" dominant-baseline="middle"> L0 </text>
+    <text class="funsvg-title" x="50" y="35">  </text>
+    <text class="funsvg-stat-label" x="683" y="27" font-weight="bold" font-size="8px" text-anchor="end"> AvgSpeed </text>
+    <text class="funsvg-stat-value" x="683" y="38.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 146 </text>
+    <text class="funsvg-stat-label" x="637" y="27" font-weight="bold" font-size="8px" text-anchor="end"> MaxSpeed </text>
+    <text class="funsvg-stat-value" x="637" y="38.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 167 </text>
+    <text class="funsvg-stat-label" x="591" y="27" font-weight="bold" font-size="8px" text-anchor="end"> Actions </text>
+    <text class="funsvg-stat-value" x="591" y="38.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 10 </text>
+    <text class="funsvg-stat-label" x="545" y="27" font-weight="bold" font-size="8px" text-anchor="end"> Duration </text>
+    <text class="funsvg-stat-value" x="545" y="38.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 0:06 </text>
+  </g>
+  <g class="funsvg-chapters" clip-path="url(#chapter-clip-46-644-20)">
+    <defs>
+      <clipPath id="chapter-clip-46-644-20">
+        <rect x="46" y="0" width="644" height="20" />
+      </clipPath>
+    </defs>
+    <rect x="260.67" y="0" width="322" height="24" rx="4" ry="4" fill="#ff9500" opacity="0.8">
+      <title>Overlap B</title>
+    </rect>
+    <text x="421.67" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Overlap B </text>
+    <rect x="46" y="10" width="322" height="14" rx="4" ry="4" fill="#ff4129" opacity="0.8">
+      <title>Overlap A</title>
+    </rect>
+    <text x="207" y="17.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Overlap A </text>
+    <rect x="475.33" y="10" width="214.67" height="14" rx="4" ry="4" fill="#8eda00" opacity="0.8">
+      <title>Overlap C</title>
+    </rect>
+    <text x="582.66" y="17.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Overlap C </text>
+  </g>
+</g>
+</svg>"
+`;
+
 exports[`SVG Generation should generate SVG with all options overridden 1`] = `
 "<svg class="funsvg" width="800" height="100" xmlns="http://www.w3.org/2000/svg"
     font-size="24px" font-family="Helvetica"
@@ -175,9 +548,9 @@ exports[`SVG Generation should generate SVG with all options overridden 1`] = `
           <stop offset="1" stop-color="#00f1ff" stop-opacity="0.07"></stop>
       </linearGradient></defs>
     <rect class="funsvg-bg-axis-drop" x="0" y="0" width="60" height="100" fill="#ccc" opacity="0.75"></rect>
-    <rect class="funsvg-bg-title-drop" x="60" width="740" height="30" fill="#ccc" opacity="0.75"></rect>
+    <rect class="funsvg-bg-title-drop" x="60" y="0" width="740" height="30" fill="#ccc" opacity="0.75"></rect>
     <rect class="funsvg-bg-axis" x="0" y="0" width="60" height="100" fill="#00eeff" opacity="0.45"></rect>
-    <rect class="funsvg-bg-title" x="60" width="740" height="30" fill="#00eeff" opacity="0.45"></rect>
+    <rect class="funsvg-bg-title" x="60" y="0" width="740" height="30" fill="#00eeff" opacity="0.45"></rect>
     <rect class="funsvg-bg-graph" x="60" width="740" y="30" height="70" fill="url(#funsvg-grad--8-0)" opacity="0.5"></rect>
   </g>
   <g class="funsvg-lines" transform="translate(60, 30)" stroke-width="2" fill="none" stroke-linecap="round">
