@@ -1,4 +1,4 @@
-<svg class="funsvg" width="690" height="72" xmlns="http://www.w3.org/2000/svg"
+<svg class="funsvg" width="690" height="82" xmlns="http://www.w3.org/2000/svg"
     font-size="16px" font-family="Arial, sans-serif"
 >
 <g transform="translate(0, 0)">
@@ -9,13 +9,13 @@
           <stop offset="0.45" stop-color="#00f100"></stop>
           <stop offset="0.47" stop-color="#00eeff" stop-opacity="0"></stop>
       </linearGradient></defs>
-    <rect class="funsvg-bg-axis-drop" x="0" y="20" width="46" height="52" fill="#ccc" opacity="0.3"></rect>
-    <rect class="funsvg-bg-title-drop" x="46" y="20" width="644" height="20" fill="#ccc" opacity="0.3"></rect>
-    <rect class="funsvg-bg-axis" x="0" y="20" width="46" height="52" fill="#00f900" opacity="0.7"></rect>
-    <rect class="funsvg-bg-title" x="46" y="20" width="644" height="20" fill="url(#funsvg-grad--10-0)" opacity="0.7"></rect>
-    <rect class="funsvg-bg-graph" x="46" width="644" y="40" height="32" fill="url(#funsvg-grad--10-0)" opacity="0.2"></rect>
+    <rect class="funsvg-bg-axis-drop" x="0" y="30" width="46" height="52" fill="#ccc" opacity="0.3"></rect>
+    <rect class="funsvg-bg-title-drop" x="46" y="30" width="644" height="20" fill="#ccc" opacity="0.3"></rect>
+    <rect class="funsvg-bg-axis" x="0" y="30" width="46" height="52" fill="#00f900" opacity="0.7"></rect>
+    <rect class="funsvg-bg-title" x="46" y="30" width="644" height="20" fill="url(#funsvg-grad--10-0)" opacity="0.7"></rect>
+    <rect class="funsvg-bg-graph" x="46" width="644" y="50" height="32" fill="url(#funsvg-grad--10-0)" opacity="0.2"></rect>
   </g>
-  <g class="funsvg-lines" transform="translate(46, 40)" stroke-width="0.5" fill="none" stroke-linecap="round">
+  <g class="funsvg-lines" transform="translate(46, 50)" stroke-width="0.5" fill="none" stroke-linecap="round">
     <path d="M 0.5 8.25 L 32.65 23.75" stroke="#00f100"></path>
     <path d="M 32.65 23.75 L 64.8 8.25" stroke="#00f100"></path>
     <path d="M 64.8 8.25 L 96.95 23.75" stroke="#00f100"></path>
@@ -28,45 +28,53 @@
   </g>
   <g class="funsvg-titles">
     <g class="funsvg-titles-halo" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent">
-      <text class="funsvg-title-halo" x="50" y="35">  </text>
-      <text class="funsvg-stat-label-halo" x="683" y="27" font-weight="bold" font-size="8px" text-anchor="end"> AvgSpeed </text>
-      <text class="funsvg-stat-value-halo" x="683" y="38.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 146 </text>
-      <text class="funsvg-stat-label-halo" x="637" y="27" font-weight="bold" font-size="8px" text-anchor="end"> MaxSpeed </text>
-      <text class="funsvg-stat-value-halo" x="637" y="38.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 167 </text>
-      <text class="funsvg-stat-label-halo" x="591" y="27" font-weight="bold" font-size="8px" text-anchor="end"> Actions </text>
-      <text class="funsvg-stat-value-halo" x="591" y="38.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 10 </text>
-      <text class="funsvg-stat-label-halo" x="545" y="27" font-weight="bold" font-size="8px" text-anchor="end"> Duration </text>
-      <text class="funsvg-stat-value-halo" x="545" y="38.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 0:06 </text>
+      <text class="funsvg-title-halo" x="50" y="45">  </text>
+      <text class="funsvg-stat-label-halo" x="683" y="37" font-weight="bold" font-size="8px" text-anchor="end"> AvgSpeed </text>
+      <text class="funsvg-stat-value-halo" x="683" y="48.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 146 </text>
+      <text class="funsvg-stat-label-halo" x="637" y="37" font-weight="bold" font-size="8px" text-anchor="end"> MaxSpeed </text>
+      <text class="funsvg-stat-value-halo" x="637" y="48.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 167 </text>
+      <text class="funsvg-stat-label-halo" x="591" y="37" font-weight="bold" font-size="8px" text-anchor="end"> Actions </text>
+      <text class="funsvg-stat-value-halo" x="591" y="48.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 10 </text>
+      <text class="funsvg-stat-label-halo" x="545" y="37" font-weight="bold" font-size="8px" text-anchor="end"> Duration </text>
+      <text class="funsvg-stat-value-halo" x="545" y="48.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 0:06 </text>
     </g>
-    <text class="funsvg-axis" x="23" y="50" font-size="34.5px" font-family="Consolas, monospace" text-anchor="middle" dominant-baseline="middle"> L0 </text>
-    <text class="funsvg-title" x="50" y="35">  </text>
-    <text class="funsvg-stat-label" x="683" y="27" font-weight="bold" font-size="8px" text-anchor="end"> AvgSpeed </text>
-    <text class="funsvg-stat-value" x="683" y="38.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 146 </text>
-    <text class="funsvg-stat-label" x="637" y="27" font-weight="bold" font-size="8px" text-anchor="end"> MaxSpeed </text>
-    <text class="funsvg-stat-value" x="637" y="38.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 167 </text>
-    <text class="funsvg-stat-label" x="591" y="27" font-weight="bold" font-size="8px" text-anchor="end"> Actions </text>
-    <text class="funsvg-stat-value" x="591" y="38.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 10 </text>
-    <text class="funsvg-stat-label" x="545" y="27" font-weight="bold" font-size="8px" text-anchor="end"> Duration </text>
-    <text class="funsvg-stat-value" x="545" y="38.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 0:06 </text>
+    <text class="funsvg-axis" x="23" y="60" font-size="34.5px" font-family="Consolas, monospace" text-anchor="middle" dominant-baseline="middle"> L0 </text>
+    <text class="funsvg-title" x="50" y="45">  </text>
+    <text class="funsvg-stat-label" x="683" y="37" font-weight="bold" font-size="8px" text-anchor="end"> AvgSpeed </text>
+    <text class="funsvg-stat-value" x="683" y="48.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 146 </text>
+    <text class="funsvg-stat-label" x="637" y="37" font-weight="bold" font-size="8px" text-anchor="end"> MaxSpeed </text>
+    <text class="funsvg-stat-value" x="637" y="48.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 167 </text>
+    <text class="funsvg-stat-label" x="591" y="37" font-weight="bold" font-size="8px" text-anchor="end"> Actions </text>
+    <text class="funsvg-stat-value" x="591" y="48.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 10 </text>
+    <text class="funsvg-stat-label" x="545" y="37" font-weight="bold" font-size="8px" text-anchor="end"> Duration </text>
+    <text class="funsvg-stat-value" x="545" y="48.4" font-weight="bold" font-size="14.4px" text-anchor="end"> 0:06 </text>
   </g>
-  <g class="funsvg-chapters" clip-path="url(#chapter-clip-46-644-20)">
+  <g class="funsvg-chapters" clip-path="url(#chapter-clip-46-644-30)">
     <defs>
-      <clipPath id="chapter-clip-46-644-20">
-        <rect x="46" y="0" width="644" height="20" />
+      <clipPath id="chapter-clip-46-644-30">
+        <rect x="46" y="0" width="644" height="30" />
       </clipPath>
     </defs>
-    <rect x="260.67" y="0" width="322" height="24" rx="4" ry="4" fill="#ff9500" opacity="0.8">
+    <rect x="303.6" y="0" width="225.4" height="34" rx="4" ry="4" fill="#b5f900" opacity="0.5">
+      <title>Overlap B1</title>
+    </rect>
+    <text x="416.3" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Overlap B1 </text>
+    <text x="416.3" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Overlap B1 </text>
+    <rect x="260.67" y="10" width="322" height="24" rx="4" ry="4" fill="#ffc100" opacity="0.5">
       <title>Overlap B</title>
     </rect>
-    <text x="421.67" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Overlap B </text>
-    <rect x="46" y="10" width="322" height="14" rx="4" ry="4" fill="#ff4129" opacity="0.8">
+    <text x="421.67" y="17.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Overlap B </text>
+    <text x="421.67" y="17.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Overlap B </text>
+    <rect x="46" y="20" width="322" height="14" rx="4" ry="4" fill="#ff8e72" opacity="0.5">
       <title>Overlap A</title>
     </rect>
-    <text x="207" y="17.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Overlap A </text>
-    <rect x="475.33" y="10" width="214.67" height="14" rx="4" ry="4" fill="#8eda00" opacity="0.8">
+    <text x="207" y="27.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Overlap A </text>
+    <text x="207" y="27.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Overlap A </text>
+    <rect x="475.33" y="20" width="214.67" height="14" rx="4" ry="4" fill="#00ffd1" opacity="0.5">
       <title>Overlap C</title>
     </rect>
-    <text x="582.66" y="17.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Overlap C </text>
+    <text x="582.66" y="27.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Overlap C </text>
+    <text x="582.66" y="27.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Overlap C </text>
   </g>
 </g>
 </svg>

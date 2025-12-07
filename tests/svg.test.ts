@@ -69,12 +69,14 @@ describe('SVG Generation', () => {
     }
     // Base increasing chapters (~1-9%)
     ;[1, 2, 3, 4, 5, 6, 7, 8, 9].forEach((len, i) => add(`Ch${i + 1}`, len))
-    // 30 small 1% chapters to showcase palette
-    for (let i = 0; i < 30; i++) {
-      add(`Ch${i + 10}`, 1)
-    }
-    add(`Gap`, 1)
-    add(`Ch${chapters.length + 1}`, 100 - t - 1)
+    // Three small 1% chapters to test palette and truncation labels
+    ;['Ch11', 'Ch12', 'Ch13'].forEach(name => add(name, 1))
+    const gapLength = 1
+    add(`Gap`, gapLength)
+    add(
+      `This is a very very very long chapter name that should definitely be truncated in the bar because it is enormous`,
+      100 - (t - gapLength),
+    )
     // Drop gap
     chapters.splice(-2, 1)
 
@@ -101,6 +103,7 @@ describe('SVG Generation', () => {
         chapters: [
           { name: 'Overlap A', startTime: '00:00:00.000', endTime: '00:00:03.000' },
           { name: 'Overlap B', startTime: '00:00:02.000', endTime: '00:00:05.000' },
+          { name: 'Overlap B1', startTime: '00:00:02.400', endTime: '00:00:04.500' },
           { name: 'Overlap C', startTime: '00:00:04.000', endTime: '00:00:06.000' },
         ],
         duration: 6,
