@@ -221,17 +221,20 @@ exports[`SVG Generation should render chapter bar when chapters are provided 1`]
         <rect x="46" y="0" width="644" height="10" />
       </clipPath>
     </defs>
-    <rect x="46" y="0" width="257.6" height="14" rx="4" ry="4" fill="#ff4129" opacity="0.8">
+    <rect x="46" y="0" width="257.6" height="14" rx="4" ry="4" fill="#ff8e72" opacity="0.5">
       <title>Intro</title>
     </rect>
+    <text x="174.8" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Intro </text>
     <text x="174.8" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Intro </text>
-    <rect x="303.6" y="0" width="206.08" height="14" rx="4" ry="4" fill="#ff9500" opacity="0.8">
+    <rect x="303.6" y="0" width="206.08" height="14" rx="4" ry="4" fill="#ffc100" opacity="0.5">
       <title>Middle</title>
     </rect>
+    <text x="406.64" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Middle </text>
     <text x="406.64" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Middle </text>
-    <rect x="509.68" y="0" width="180.32" height="14" rx="4" ry="4" fill="#8eda00" opacity="0.8">
+    <rect x="509.68" y="0" width="180.32" height="14" rx="4" ry="4" fill="#b5f900" opacity="0.5">
       <title>Finale</title>
     </rect>
+    <text x="599.84" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Finale </text>
     <text x="599.84" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Finale </text>
   </g>
 </g>
@@ -326,134 +329,61 @@ exports[`SVG Generation should render chapter bar when a chapter is very short 1
         <rect x="46" y="0" width="644" height="10" />
       </clipPath>
     </defs>
-    <rect x="46" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff4129" opacity="0.8">
+    <rect x="46" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff8e72" opacity="0.5">
       <title>Ch1</title>
     </rect>
-    <rect x="52.44" y="0" width="12.88" height="14" rx="4" ry="4" fill="#ff9500" opacity="0.8">
+    <rect x="52.44" y="0" width="12.88" height="14" rx="4" ry="4" fill="#ffc100" opacity="0.5">
       <title>Ch2</title>
     </rect>
-    <rect x="65.32" y="0" width="19.32" height="14" rx="4" ry="4" fill="#8eda00" opacity="0.8">
+    <rect x="65.32" y="0" width="19.32" height="14" rx="4" ry="4" fill="#b5f900" opacity="0.5">
       <title>Ch3</title>
     </rect>
-    <text x="74.98" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Ch3 </text>
-    <rect x="84.64" y="0" width="25.76" height="14" rx="4" ry="4" fill="#00f5af" opacity="0.8">
+    <text x="74.98" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Ch </text>
+    <text x="74.98" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Ch </text>
+    <rect x="84.64" y="0" width="25.76" height="14" rx="4" ry="4" fill="#00ffd1" opacity="0.5">
       <title>Ch4</title>
     </rect>
+    <text x="97.52" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Ch4 </text>
     <text x="97.52" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Ch4 </text>
-    <rect x="110.4" y="0" width="32.2" height="14" rx="4" ry="4" fill="#00dcff" opacity="0.8">
+    <rect x="110.4" y="0" width="32.2" height="14" rx="4" ry="4" fill="#00fdff" opacity="0.5">
       <title>Ch5</title>
     </rect>
+    <text x="126.5" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Ch5 </text>
     <text x="126.5" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Ch5 </text>
-    <rect x="142.6" y="0" width="38.64" height="14" rx="4" ry="4" fill="#78a1ff" opacity="0.8">
+    <rect x="142.6" y="0" width="38.64" height="14" rx="4" ry="4" fill="#a0cdff" opacity="0.5">
       <title>Ch6</title>
     </rect>
+    <text x="161.92" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Ch6 </text>
     <text x="161.92" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Ch6 </text>
-    <rect x="181.24" y="0" width="45.08" height="14" rx="4" ry="4" fill="#ff67ff" opacity="0.8">
+    <rect x="181.24" y="0" width="45.08" height="14" rx="4" ry="4" fill="#ff9fff" opacity="0.5">
       <title>Ch7</title>
     </rect>
+    <text x="203.78" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Ch7 </text>
     <text x="203.78" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Ch7 </text>
-    <rect x="226.32" y="0" width="51.52" height="14" rx="4" ry="4" fill="#ff36a0" opacity="0.8">
+    <rect x="226.32" y="0" width="51.52" height="14" rx="4" ry="4" fill="#ff87c5" opacity="0.5">
       <title>Ch8</title>
     </rect>
+    <text x="252.08" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Ch8 </text>
     <text x="252.08" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Ch8 </text>
-    <rect x="277.84" y="0" width="57.96" height="14" rx="4" ry="4" fill="#ff6900" opacity="0.8">
+    <rect x="277.84" y="0" width="57.96" height="14" rx="4" ry="4" fill="#ffa300" opacity="0.5">
       <title>Ch9</title>
     </rect>
+    <text x="306.82" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Ch9 </text>
     <text x="306.82" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Ch9 </text>
-    <rect x="335.8" y="0" width="6.44" height="14" rx="4" ry="4" fill="#e8bc00" opacity="0.8">
-      <title>Ch10</title>
-    </rect>
-    <rect x="342.24" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00ed38" opacity="0.8">
+    <rect x="335.8" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ffe000" opacity="0.5">
       <title>Ch11</title>
     </rect>
-    <rect x="348.68" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00efff" opacity="0.8">
+    <rect x="342.24" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00ff7c" opacity="0.5">
       <title>Ch12</title>
     </rect>
-    <rect x="355.12" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00c1ff" opacity="0.8">
+    <rect x="348.68" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00ffff" opacity="0.5">
       <title>Ch13</title>
     </rect>
-    <rect x="361.56" y="0" width="6.44" height="14" rx="4" ry="4" fill="#cf83ff" opacity="0.8">
-      <title>Ch14</title>
+    <rect x="361.56" y="0" width="334.88" height="14" rx="4" ry="4" fill="#00e7ff" opacity="0.5">
+      <title>This is a very very very long chapter name that should definitely be truncated in the bar because it is enormous</title>
     </rect>
-    <rect x="368" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff4bf2" opacity="0.8">
-      <title>Ch15</title>
-    </rect>
-    <rect x="374.44" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff4129" opacity="0.8">
-      <title>Ch16</title>
-    </rect>
-    <rect x="380.88" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff9500" opacity="0.8">
-      <title>Ch17</title>
-    </rect>
-    <rect x="387.32" y="0" width="6.44" height="14" rx="4" ry="4" fill="#8eda00" opacity="0.8">
-      <title>Ch18</title>
-    </rect>
-    <rect x="393.76" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00f5af" opacity="0.8">
-      <title>Ch19</title>
-    </rect>
-    <rect x="400.2" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00dcff" opacity="0.8">
-      <title>Ch20</title>
-    </rect>
-    <rect x="406.64" y="0" width="6.44" height="14" rx="4" ry="4" fill="#78a1ff" opacity="0.8">
-      <title>Ch21</title>
-    </rect>
-    <rect x="413.08" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff67ff" opacity="0.8">
-      <title>Ch22</title>
-    </rect>
-    <rect x="419.52" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff36a0" opacity="0.8">
-      <title>Ch23</title>
-    </rect>
-    <rect x="425.96" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff6900" opacity="0.8">
-      <title>Ch24</title>
-    </rect>
-    <rect x="432.4" y="0" width="6.44" height="14" rx="4" ry="4" fill="#e8bc00" opacity="0.8">
-      <title>Ch25</title>
-    </rect>
-    <rect x="438.84" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00ed38" opacity="0.8">
-      <title>Ch26</title>
-    </rect>
-    <rect x="445.28" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00efff" opacity="0.8">
-      <title>Ch27</title>
-    </rect>
-    <rect x="451.72" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00c1ff" opacity="0.8">
-      <title>Ch28</title>
-    </rect>
-    <rect x="458.16" y="0" width="6.44" height="14" rx="4" ry="4" fill="#cf83ff" opacity="0.8">
-      <title>Ch29</title>
-    </rect>
-    <rect x="464.6" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff4bf2" opacity="0.8">
-      <title>Ch30</title>
-    </rect>
-    <rect x="471.04" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff4129" opacity="0.8">
-      <title>Ch31</title>
-    </rect>
-    <rect x="477.48" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff9500" opacity="0.8">
-      <title>Ch32</title>
-    </rect>
-    <rect x="483.92" y="0" width="6.44" height="14" rx="4" ry="4" fill="#8eda00" opacity="0.8">
-      <title>Ch33</title>
-    </rect>
-    <rect x="490.36" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00f5af" opacity="0.8">
-      <title>Ch34</title>
-    </rect>
-    <rect x="496.8" y="0" width="6.44" height="14" rx="4" ry="4" fill="#00dcff" opacity="0.8">
-      <title>Ch35</title>
-    </rect>
-    <rect x="503.24" y="0" width="6.44" height="14" rx="4" ry="4" fill="#78a1ff" opacity="0.8">
-      <title>Ch36</title>
-    </rect>
-    <rect x="509.68" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff67ff" opacity="0.8">
-      <title>Ch37</title>
-    </rect>
-    <rect x="516.12" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff36a0" opacity="0.8">
-      <title>Ch38</title>
-    </rect>
-    <rect x="522.56" y="0" width="6.44" height="14" rx="4" ry="4" fill="#ff6900" opacity="0.8">
-      <title>Ch39</title>
-    </rect>
-    <rect x="535.44" y="0" width="148.12" height="14" rx="4" ry="4" fill="#e8bc00" opacity="0.8">
-      <title>Ch41</title>
-    </rect>
-    <text x="609.5" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Ch41 </text>
+    <text x="529" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> This is a very very very long chapter name that should definitely be trunc </text>
+    <text x="529" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> This is a very very very long chapter name that should definitely be trunc </text>
   </g>
 </g>
 </svg>"
@@ -517,17 +447,20 @@ exports[`SVG Generation should render chapter bar when chapters overlap 1`] = `
         <rect x="46" y="0" width="644" height="20" />
       </clipPath>
     </defs>
-    <rect x="260.67" y="0" width="322" height="24" rx="4" ry="4" fill="#ff9500" opacity="0.8">
+    <rect x="260.67" y="0" width="322" height="24" rx="4" ry="4" fill="#ffc100" opacity="0.5">
       <title>Overlap B</title>
     </rect>
+    <text x="421.67" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Overlap B </text>
     <text x="421.67" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Overlap B </text>
-    <rect x="46" y="10" width="322" height="14" rx="4" ry="4" fill="#ff4129" opacity="0.8">
+    <rect x="46" y="10" width="322" height="14" rx="4" ry="4" fill="#ff8e72" opacity="0.5">
       <title>Overlap A</title>
     </rect>
+    <text x="207" y="17.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Overlap A </text>
     <text x="207" y="17.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Overlap A </text>
-    <rect x="475.33" y="10" width="214.67" height="14" rx="4" ry="4" fill="#8eda00" opacity="0.8">
+    <rect x="475.33" y="10" width="214.67" height="14" rx="4" ry="4" fill="#b5f900" opacity="0.5">
       <title>Overlap C</title>
     </rect>
+    <text x="582.66" y="17.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Overlap C </text>
     <text x="582.66" y="17.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Overlap C </text>
   </g>
 </g>

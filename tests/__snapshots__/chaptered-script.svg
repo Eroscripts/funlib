@@ -57,17 +57,20 @@
         <rect x="46" y="0" width="644" height="10" />
       </clipPath>
     </defs>
-    <rect x="46" y="0" width="257.6" height="14" rx="4" ry="4" fill="#ff4129" opacity="0.8">
+    <rect x="46" y="0" width="257.6" height="14" rx="4" ry="4" fill="#ff8e72" opacity="0.5">
       <title>Intro</title>
     </rect>
+    <text x="174.8" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Intro </text>
     <text x="174.8" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Intro </text>
-    <rect x="303.6" y="0" width="206.08" height="14" rx="4" ry="4" fill="#ff9500" opacity="0.8">
+    <rect x="303.6" y="0" width="206.08" height="14" rx="4" ry="4" fill="#ffc100" opacity="0.5">
       <title>Middle</title>
     </rect>
+    <text x="406.64" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Middle </text>
     <text x="406.64" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Middle </text>
-    <rect x="509.68" y="0" width="180.32" height="14" rx="4" ry="4" fill="#8eda00" opacity="0.8">
+    <rect x="509.68" y="0" width="180.32" height="14" rx="4" ry="4" fill="#b5f900" opacity="0.5">
       <title>Finale</title>
     </rect>
+    <text x="599.84" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Finale </text>
     <text x="599.84" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Finale </text>
   </g>
 </g>

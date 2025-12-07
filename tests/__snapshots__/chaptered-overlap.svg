@@ -55,17 +55,20 @@
         <rect x="46" y="0" width="644" height="20" />
       </clipPath>
     </defs>
-    <rect x="260.67" y="0" width="322" height="24" rx="4" ry="4" fill="#ff9500" opacity="0.8">
+    <rect x="260.67" y="0" width="322" height="24" rx="4" ry="4" fill="#ffc100" opacity="0.5">
       <title>Overlap B</title>
     </rect>
+    <text x="421.67" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Overlap B </text>
     <text x="421.67" y="7.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Overlap B </text>
-    <rect x="46" y="10" width="322" height="14" rx="4" ry="4" fill="#ff4129" opacity="0.8">
+    <rect x="46" y="10" width="322" height="14" rx="4" ry="4" fill="#ff8e72" opacity="0.5">
       <title>Overlap A</title>
     </rect>
+    <text x="207" y="17.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Overlap A </text>
     <text x="207" y="17.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Overlap A </text>
-    <rect x="475.33" y="10" width="214.67" height="14" rx="4" ry="4" fill="#8eda00" opacity="0.8">
+    <rect x="475.33" y="10" width="214.67" height="14" rx="4" ry="4" fill="#b5f900" opacity="0.5">
       <title>Overlap C</title>
     </rect>
+    <text x="582.66" y="17.8" font-size="8px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> Overlap C </text>
     <text x="582.66" y="17.8" font-size="8px" font-weight="bold" text-anchor="middle" fill="black"> Overlap C </text>
   </g>
 </g>

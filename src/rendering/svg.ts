@@ -12,7 +12,7 @@ import { lerp } from '../utils/misc'
  */
 const CHAPTER_COLORS = Array.from({ length: 15 }).fill(0)
   .map((_, i, a) => i * 720 / a.length + 30)
-  .map(h => oklch2hex({ l: 0.8, c: 0.3, h: h % 360 }))
+  .map(h => oklch2hex({ l: 0.9, c: 0.25, h: h % 360 }))
 
 /**
  * Generate a color for a chapter based on its index.
@@ -539,12 +539,12 @@ export function layerChapters(chapters: FunChapter[]): { layer: number, chapter:
 
 export function renderChapters(
   script: Funscript,
-  ops: SvgSubOptions<'chapterHeight' | 'chapterLayers' | 'durationMs' | 'width' | 'iconWidth' | 'iconSpacing' | 'titleHeight' | 'showChapters'>,
+  ops: SvgSubOptions<'chapterHeight' | 'chapterLayers' | 'durationMs' | 'width' | 'iconWidth' | 'iconSpacing' | 'titleHeight' | 'showChapters' | 'halo' | 'font'>,
   ctx: {
     chapterBarHeight: number
   },
 ): string[] {
-  const { chapterHeight, chapterLayers, durationMs, width, iconWidth, titleHeight, showChapters } = ops
+  const { chapterHeight, chapterLayers, durationMs, width, iconWidth, titleHeight, showChapters, halo, font } = ops
   const iconSpacing = iconWidth === 0 ? 0 : ops.iconSpacing
   const chapters = script.metadata.chapters
 
@@ -597,7 +597,7 @@ export function renderChapters(
       // Height extends from y to chapterBarHeight + cornerRadius so bottom gets clipped cleanly
       const rectHeight = round(ctx.chapterBarHeight - y + cornerRadius)
       result.push(
-        `    <rect x="${x}" y="${y}" width="${chapterWidth}" height="${rectHeight}" rx="${cornerRadius}" ry="${cornerRadius}" fill="${color}" opacity="0.8">`,
+        `    <rect x="${x}" y="${y}" width="${chapterWidth}" height="${rectHeight}" rx="${cornerRadius}" ry="${cornerRadius}" fill="${color}" opacity="0.5">`,
         `      <title>${textToSvgText(chapter.name)}</title>`,
         `    </rect>`,
       )
@@ -607,8 +607,26 @@ export function renderChapters(
       if (chapterWidth >= minWidthForText) {
         const textX = round(x + chapterWidth / 2)
         const textY = round(y + chapterHeight / 2 + chapterFontSize * 0.35)
+        const fontSpec = `${chapterFontSize}px ${font}`
+        const measure = (text: string) => {
+          const measured = textToSvgLength(text, fontSpec)
+          return measured || text.length * chapterFontSize * 0.55
+        }
+        const maxLabelWidth = chapterWidth - 8
+        let label = chapter.name ?? ''
+        if (measure(label) > maxLabelWidth) {
+          while (label.length && measure(label) > maxLabelWidth) {
+            label = label.slice(0, -1)
+          }
+        }
+        const safeLabel = textToSvgText(label)
+        if (halo) {
+          result.push(
+            `    <text x="${textX}" y="${textY}" font-size="${chapterFontSize}px" font-weight="bold" text-anchor="middle" stroke="white" opacity="0.5" paint-order="stroke fill markers" stroke-width="3" stroke-dasharray="none" stroke-linejoin="round" fill="transparent"> ${safeLabel} </text>`,
+          )
+        }
         result.push(
-          `    <text x="${textX}" y="${textY}" font-size="${chapterFontSize}px" font-weight="bold" text-anchor="middle" fill="black"> ${textToSvgText(chapter.name)} </text>`,
+          `    <text x="${textX}" y="${textY}" font-size="${chapterFontSize}px" font-weight="bold" text-anchor="middle" fill="black"> ${safeLabel} </text>`,
         )
       }
     }
