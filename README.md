@@ -177,6 +177,16 @@ const blobUrl = toSvgBlobUrl(script, {})
 | `titleOpacity` | number | 0.7 | Title bar opacity |
 | `normalize` | boolean | true | Normalize before rendering |
 
+## Snapshot Gallery
+
+Examples from the SVG rendering tests.
+<img src="tests/__snapshots__/single-script.svg" />
+<img src="tests/__snapshots__/multiple-scripts.svg" />
+<img src="tests/__snapshots__/custom-options.svg" />
+<img src="tests/__snapshots__/chaptered-script.svg" />
+<img src="tests/__snapshots__/chaptered-overlap.svg" />
+<img src="tests/__snapshots__/chaptered-short.svg" />
+
 ## Serial Communication (TCode)
 
 Control TCode-compatible devices via Web Serial:
