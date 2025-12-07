@@ -179,15 +179,19 @@ const blobUrl = toSvgBlobUrl(script, {})
 
 ## Snapshot Gallery
 
-Examples from the SVG rendering tests, generated with different inputs and options.
+Examples from the SVG rendering tests.
 
-| Single script | Multiple scripts | Custom options |
-| --- | --- | --- |
-| <img src="tests/__snapshots__/single-script.svg" width="320" alt="Single script heatmap" /> | <img src="tests/__snapshots__/multiple-scripts.svg" width="320" alt="Multiple scripts heatmap" /> | <img src="tests/__snapshots__/custom-options.svg" width="320" alt="Custom options heatmap" /> |
+<img src="tests/__snapshots__/single-script.svg" width="320" alt="Single script heatmap" />
 
-| Chaptered script | Chaptered overlap | Chaptered short |
-| --- | --- | --- |
-| <img src="tests/__snapshots__/chaptered-script.svg" width="320" alt="Chaptered script heatmap" /> | <img src="tests/__snapshots__/chaptered-overlap.svg" width="320" alt="Chaptered overlap heatmap" /> | <img src="tests/__snapshots__/chaptered-short.svg" width="320" alt="Chaptered short heatmap" /> |
+<img src="tests/__snapshots__/multiple-scripts.svg" width="320" alt="Multiple scripts heatmap" />
+
+<img src="tests/__snapshots__/custom-options.svg" width="320" alt="Custom options heatmap" />
+
+<img src="tests/__snapshots__/chaptered-script.svg" width="320" alt="Chaptered script heatmap" />
+
+<img src="tests/__snapshots__/chaptered-overlap.svg" width="320" alt="Chaptered overlap heatmap" />
+
+<img src="tests/__snapshots__/chaptered-short.svg" width="320" alt="Chaptered short heatmap" />
 
 ## Serial Communication (TCode)
 
