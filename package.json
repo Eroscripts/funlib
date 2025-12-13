@@ -20,6 +20,12 @@
     }
   },
   "module": "src/index.ts",
+  "files": [
+    "README.md",
+    "dist",
+    "funscript.schema.json",
+    "src"
+  ],
   "scripts": {
     "lint": "oxlint --type-aware --fix && eslint --fix",
     "build:iife": "bun build src/iife.ts --target browser --outdir dist --format iife",

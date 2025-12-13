@@ -5,8 +5,9 @@
   "type": "object",
   "properties": {
     "version": {
-      "description": "Funscript version string.",
-      "type": "string"
+      "description": "Funscript version string. Supports 1.0 (single-axis), 1.1 (multi-axis with axes array), and 2.0 (multi-axis with channels object).",
+      "type": "string",
+      "enum": ["1.0", "1.1", "2.0"]
     },
     "inverted": {
       "description": "Indicates if the axes movement is inverted. Deprecated: Not widely supported.",
@@ -21,12 +22,12 @@
       "deprecated": true
     },
     "actions": {
-      "description": "Default actions for the primary axis (usually L0/stroke).",
+      "description": "Default actions for the primary axis. The primary axis is L0 (stroke), or inferred from file extension prefix (e.g. 'video.roll.funscript' → R1). In version 2.0, if both `actions` and `channels.stroke` are present, player should prefer `actions` for single-axis devices (e.g. Handy), and `channels.stroke` for multi-axis devices (e.g. SR6).",
       "type": "array",
       "items": { "$ref": "#/$defs/action" }
     },
     "axes": {
-      "description": "Actions defined per axis.",
+      "description": "Actions defined per axis. Used in version 1.1 for multi-axis scripts.",
       "type": "array",
       "items": {
         "type": "object",
@@ -41,11 +42,33 @@
         "required": ["id", "actions"]
       }
     },
+    "channels": {
+      "description": "Actions defined per channel. Used in version 2.0 for multi-axis scripts with named channels (e.g. stroke, roll, pitch, surge, sway, twist, suck).",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "actions": {
+            "description": "Actions for this specific channel.",
+            "type": "array",
+            "items": { "$ref": "#/$defs/action" }
+          }
+        },
+        "required": ["actions"]
+      }
+    },
+    "channel": {
+      "description": "Human-readable channel name hint for the `actions` array.",
+      "type": "string"
+    },
     "metadata": {
       "$ref": "#/$defs/metadata"
     }
   },
-  "required": ["actions"],
+  "anyOf": [
+    { "required": ["actions"] },
+    { "required": ["channels"] }
+  ],
 
   "$defs": {
     "axisId": {
@@ -119,9 +142,13 @@
           "description": "Title of the script or video."
         },
         "duration": {
-          "type": "integer",
-          "description": "Duration of the video in seconds. Should be an integer, as some players don't support floats.",
+          "type": "number",
+          "description": "Duration of the video in seconds, with milliseconds precision.",
           "minimum": 0
+        },
+        "durationTime": {
+          "$ref": "#/$defs/timeSpan",
+          "description": "Human-readable duration hint (e.g. '00:03:00.017')."
         },
         "chapters": {
           "type": "array",
@@ -154,11 +181,6 @@
           "description": "Names of performers.",
           "items": { "type": "string" }
         },
-        "script_url": {
-          "type": "string",
-          "format": "uri",
-          "description": "URL to the script source."
-        },
         "tags": {
           "type": "array",
           "description": "Tags associated with the script. We recommend adding 'handy' tag for scripts supporting one.",
@@ -167,6 +189,16 @@
         "type": {
           "type": "string",
           "description": "Type of the script."
+        },
+        "topic_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to the topic or discussion thread."
+        },
+        "script_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to the script source."
         },
         "video_url": {
           "type": "string",

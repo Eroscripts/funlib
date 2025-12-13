@@ -259,10 +259,10 @@ export class Funscript implements JsonFunscript {
     const channelsOrAxes = extras?.channels ?? funscript?.channels ?? funscript?.axes
     const channels = Array.isArray(channelsOrAxes)
       ? Object.fromEntries<JsonFunscript>(
-          channelsOrAxes.map<[channel, JsonFunscript]>(e => ['channel' in e ? e.channel! : axisToChannelName(e.id), e] as const),
+          channelsOrAxes.map<[channel, JsonFunscript]>(e => ['channel' in e ? e.channel! : 'id' in e ? axisToChannelName(e.id) : 'stroke', e] as const),
         )
       : channelsOrAxes
-    this.channels = mapObject(channels ?? ({} as never), (e, channel) => {
+    this.channels = mapObject(channels ?? {}, (e, channel) => {
       return new base.Channel(e, { parent: this, channel })
     })
 
