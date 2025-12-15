@@ -171,10 +171,13 @@ export class Funscript implements JsonFunscript {
 
   /** merge multi-axis scripts into one */
   static mergeMultiAxis(scripts: Funscript[], options?: {
+    /** @deprecated use missingStroke instead */
     allowMissingActions?: boolean
+    /** What to do when secondary axes have no main stroke script: 'error' (default), 'empty-base', or 'leave' */
+    missingStroke?: 'error' | 'empty-base' | 'leave'
     combineSingleSecondaryChannel?: boolean
   }): Funscript[] {
-    const allowMissingActions = options?.allowMissingActions ?? false
+    const missingStroke = options?.missingStroke ?? (options?.allowMissingActions ? 'empty-base' : 'error')
     const combineSingleSecondaryChannel = options?.combineSingleSecondaryChannel ?? false
 
     const multiScriptChannels = scripts.filter(e => e.listChannels.length)
@@ -208,10 +211,27 @@ export class Funscript implements JsonFunscript {
       }
       const mainScript = allScripts.find(e => !e.channel)
       const secondaryScripts = allScripts.filter(e => e.channel)
-      if (!mainScript && !allowMissingActions) {
-        throw new Error('Funscript.mergeMultiAxis: cannot merge scripts with no base script')
+      if (mainScript) {
+        return [new Funscript(mainScript, { channels: secondaryScripts, isMerging: true })]
       }
-      return [new Funscript(mainScript, { channels: secondaryScripts, isMerging: true })]
+      if (missingStroke === 'leave') {
+        // Leave as individual single-axis scripts (unmerged but still processed)
+        return allScripts
+      }
+      if (missingStroke === 'empty-base') {
+        // Create empty main script using first secondary's metadata
+        const firstSecondary = secondaryScripts[0]
+        const baseFilePath = firstSecondary.file
+          ? `${firstSecondary.file.dir}${firstSecondary.file.title}.funscript`
+          : undefined
+        return [new Funscript({
+          ...firstSecondary.toJSON(),
+          actions: [],
+          channel: undefined,
+        }, { channels: secondaryScripts, isMerging: true, file: baseFilePath })]
+      }
+      const filePaths = JSON.stringify(allScripts.map(e => e.file?.filePath?.replaceAll('\\', '/') ?? '[unnamed]'))
+      throw new Error(`Funscript.mergeMultiAxis: cannot merge scripts with no base script (file paths: ${filePaths})`)
     })
     return [...multiScriptChannels, ...mergedSingleScriptChannels]
   }

@@ -9,11 +9,26 @@ A TypeScript library for parsing, creating, manipulating, and visualizing **Funs
 
 - 📦 **Parse & Create** — Read, write, and construct Funscript files with full type safety
 - 🎛️ **Multi-Axis Support** — Handle complex multi-axis scripts (stroke, surge, sway, twist, roll, pitch, suck)
+- 🖥️ **CLI Tool** — Merge multi-axis scripts from the command line with `bunx @eroscripts/funlib merge`
 - 🔌 **Serial Communication** — TCode protocol support via Web Serial API for direct hardware control
 - 📊 **SVG Visualization** — Generate beautiful heatmap-style SVG graphs of scripts
 - 🎬 **Video Sync** — Synchronize script playback with HTML5 video elements
 - ✂️ **Manipulations** — Smooth, simplify, limit speed, slice chapters, and more
 - 🔄 **Format Conversion** — Convert between v1.0, v1.1, and v2.0 formats
+
+## CLI
+
+Merge multi-axis funscript files directly from the command line:
+
+```bash
+bunx @eroscripts/funlib merge ./scripts
+```
+
+This will:
+- Recursively scan for `.funscript` files
+- Merge multi-axis scripts by filename (e.g., `video.funscript` + `video.roll.funscript` → merged `video.funscript`)
+- Create a timestamped backup zip (`.processed-<timestamp>.zip`)
+- Auto-select output format (v1.0 for single-axis, v2.0 for multi-axis)
 
 ## Quick Start
 

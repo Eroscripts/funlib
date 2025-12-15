@@ -6,7 +6,9 @@ import { Funscript } from './index'
 const { values, positionals } = parseArgs({
   args: Bun.argv.slice(2),
   options: {
-    help: { type: 'boolean', short: 'h' },
+    'help': { type: 'boolean', short: 'h' },
+    'missing-stroke': { type: 'string', default: 'error' },
+    'dry-run': { type: 'boolean', short: 'n', default: false },
   },
   allowPositionals: true,
 })
@@ -26,7 +28,13 @@ if (command === 'merge') {
     console.error('Example: bunx @eroscripts/funlib merge .')
     process.exit(1)
   }
-  await mergeCommand(folder)
+  const missingStroke = values['missing-stroke'] as 'error' | 'empty-base' | 'leave'
+  if (!['error', 'empty-base', 'leave'].includes(missingStroke)) {
+    console.error(`Error: Invalid --missing-stroke value: ${missingStroke}`)
+    console.error('Valid values: error, empty-base, leave')
+    process.exit(1)
+  }
+  await mergeCommand(folder, { dryRun: values['dry-run'] ?? false, missingStroke })
 }
 else {
   console.error(`Unknown command: ${command}`)
@@ -47,13 +55,23 @@ Commands:
 Examples:
   bunx @eroscripts/funlib merge .
   bunx @eroscripts/funlib merge ./scripts
+  bunx @eroscripts/funlib merge ./scripts --missing-stroke=leave
 
 Options:
-  -h, --help        Show this help message
+  -h, --help                  Show this help message
+  -n, --dry-run               Show what would be done without making changes
+  --missing-stroke=<mode>     What to do when secondary axes have no main stroke script
+                              error (default) - throw an error
+                              empty-base - merge with empty stroke channel
+                              leave - leave unmerged (still processed)
 `)
 }
 
-async function mergeCommand(folder: string) {
+async function mergeCommand(folder: string, options: { dryRun: boolean, missingStroke: 'error' | 'empty-base' | 'leave' }) {
+  const { dryRun, missingStroke } = options
+  if (dryRun) {
+    console.log('[DRY RUN] Previewing changes (no files will be modified)\n')
+  }
   const glob = new Bun.Glob('**/*.funscript')
   const files = await Array.fromAsync(glob.scan({ cwd: folder, absolute: true }))
 
@@ -74,7 +92,22 @@ async function mergeCommand(folder: string) {
   }
 
   // Merge multi-axis scripts
-  const merged = Funscript.mergeMultiAxis(scripts)
+  let merged: Funscript[]
+  try {
+    merged = Funscript.mergeMultiAxis(scripts, {
+      missingStroke,
+    })
+  }
+  catch (e) {
+    if (e instanceof Error && e.message.includes('no base script')) {
+      console.error(`Error: ${e.message}`)
+      console.error('\nUse --missing-stroke to handle secondary axes without a main stroke:')
+      console.error('  --missing-stroke=empty-base  Merge with empty stroke channel')
+      console.error('  --missing-stroke=leave       Leave unmerged')
+      process.exit(1)
+    }
+    throw e
+  }
 
   if (merged.length === scripts.length) {
     console.log('No scripts to merge (all scripts are already standalone)')
@@ -99,12 +132,16 @@ async function mergeCommand(folder: string) {
 
   // Generate and write zip
   const zipContent = await zip.generateAsync({ type: 'nodebuffer' })
-  await Bun.write(zipPath, zipContent)
-  console.log(`Backup created: ${zipPath}`)
+  if (!dryRun) {
+    await Bun.write(zipPath, zipContent)
+  }
+  console.log(`${dryRun ? '[DRY RUN] Would create backup' : 'Backup created'}: ${zipPath}`)
 
   // Delete original files
-  for (const filePath of files) {
-    await Bun.file(filePath).delete!()
+  if (!dryRun) {
+    for (const filePath of files) {
+      await Bun.file(filePath).delete!()
+    }
   }
 
   // Write merged scripts
@@ -115,8 +152,10 @@ async function mergeCommand(folder: string) {
     }
     const outputPath = script.file.filePath
     const content = script.toJsonText()
-    await Bun.write(outputPath, content)
-    console.log(`Written: ${outputPath}`)
+    if (!dryRun) {
+      await Bun.write(outputPath, content)
+    }
+    console.log(`${dryRun ? '[DRY RUN] Would write' : 'Written'}: ${outputPath}`)
 
     // Log which files were merged
     if (script.file.mergedFiles && script.file.mergedFiles.length > 1) {
@@ -125,5 +164,5 @@ async function mergeCommand(folder: string) {
     }
   }
 
-  console.log('Done!')
+  console.log(dryRun ? '\n[DRY RUN] No changes were made' : 'Done!')
 }
