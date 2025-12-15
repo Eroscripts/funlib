@@ -1,7 +1,7 @@
 import antfu from '@antfu/eslint-config'
 
 export default antfu({
-
+  ignores: ['**/*.local.ts'],
 })
   .overrideRules({
     'no-console': 'off',
